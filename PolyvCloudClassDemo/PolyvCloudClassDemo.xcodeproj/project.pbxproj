@@ -20,10 +20,10 @@
 		229B22FD21379ECD001246B7 /* PLVVodMediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 229B22FC21379ECD001246B7 /* PLVVodMediaViewController.m */; };
 		22AD6182218316A50053F496 /* plv_clear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22AD6181218316A50053F496 /* plv_clear@2x.png */; };
 		22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF123D21816B54006127FD /* plv_logo@2x.png */; };
-		22BF124521816B5E006127FD /* skin_player_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124121816B5E006127FD /* skin_player_background@2x.png */; };
-		22BF124621816B5E006127FD /* skin_close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124221816B5E006127FD /* skin_close@2x.png */; };
+		22BF124521816B5E006127FD /* plv_skin_player_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */; };
+		22BF124621816B5E006127FD /* plv_skin_close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124221816B5E006127FD /* plv_skin_close@2x.png */; };
 		22BF124721816B5E006127FD /* skin_ppt_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124321816B5E006127FD /* skin_ppt_background@2x.png */; };
-		22BF124821816B5E006127FD /* skin_switchCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124421816B5E006127FD /* skin_switchCamera@2x.png */; };
+		22BF124821816B5E006127FD /* plv_skin_switchCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */; };
 		22DE140021460C94004B1A3E /* PLVTextInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DE13E521460C94004B1A3E /* PLVTextInputView.m */; };
 		22DE140121460C94004B1A3E /* PLVEmojiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DE13E721460C94004B1A3E /* PLVEmojiModel.m */; };
 		22DE140221460C94004B1A3E /* FacialView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DE13E821460C94004B1A3E /* FacialView.m */; };
@@ -61,6 +61,10 @@
 		6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D66A2136A42D0076AF7D /* MarqueeLabel.m */; };
 		6740D6782136B2C90076AF7D /* plv_img_flower@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6762136B2C80076AF7D /* plv_img_flower@2x.png */; };
 		6740D6792136B2C90076AF7D /* plv_img_flower@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6772136B2C90076AF7D /* plv_img_flower@3x.png */; };
+		67428E262195294300D2B634 /* skin_ppt_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E232195294300D2B634 /* skin_ppt_background@3x.png */; };
+		67428E272195294300D2B634 /* plv_skin_close@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E242195294300D2B634 /* plv_skin_close@3x.png */; };
+		67428E282195294300D2B634 /* plv_skin_player_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E252195294300D2B634 /* plv_skin_player_background@3x.png */; };
+		67428E2A21955AF000D2B634 /* plv_skin_switchCamera@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */; };
 		6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */; };
 		6761E9F52180189F0026E8A6 /* PLVAuthorizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9F42180189F0026E8A6 /* PLVAuthorizationManager.m */; };
 		677B2B3A2192ED6100A85934 /* PolyvCloudClassSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 677B2B3B2192ED6100A85934 /* PolyvCloudClassSDK.framework */; };
@@ -94,10 +98,10 @@
 		22A68B062150DE76002C850C /* PLVMediaViewControllerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVMediaViewControllerProtocol.h; sourceTree = "<group>"; };
 		22AD6181218316A50053F496 /* plv_clear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_clear@2x.png"; sourceTree = "<group>"; };
 		22BF123D21816B54006127FD /* plv_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_logo@2x.png"; sourceTree = "<group>"; };
-		22BF124121816B5E006127FD /* skin_player_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_player_background@2x.png"; sourceTree = "<group>"; };
-		22BF124221816B5E006127FD /* skin_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_close@2x.png"; sourceTree = "<group>"; };
+		22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_player_background@2x.png"; sourceTree = "<group>"; };
+		22BF124221816B5E006127FD /* plv_skin_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_close@2x.png"; sourceTree = "<group>"; };
 		22BF124321816B5E006127FD /* skin_ppt_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_ppt_background@2x.png"; sourceTree = "<group>"; };
-		22BF124421816B5E006127FD /* skin_switchCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_switchCamera@2x.png"; sourceTree = "<group>"; };
+		22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_switchCamera@2x.png"; sourceTree = "<group>"; };
 		22DE13E521460C94004B1A3E /* PLVTextInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVTextInputView.m; sourceTree = "<group>"; };
 		22DE13E721460C94004B1A3E /* PLVEmojiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVEmojiModel.m; sourceTree = "<group>"; };
 		22DE13E821460C94004B1A3E /* FacialView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacialView.m; sourceTree = "<group>"; };
@@ -155,6 +159,10 @@
 		6740D66B2136A42D0076AF7D /* MarqueeLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarqueeLabel.h; sourceTree = "<group>"; };
 		6740D6762136B2C80076AF7D /* plv_img_flower@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_flower@2x.png"; sourceTree = "<group>"; };
 		6740D6772136B2C90076AF7D /* plv_img_flower@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_flower@3x.png"; sourceTree = "<group>"; };
+		67428E232195294300D2B634 /* skin_ppt_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_ppt_background@3x.png"; sourceTree = "<group>"; };
+		67428E242195294300D2B634 /* plv_skin_close@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_close@3x.png"; sourceTree = "<group>"; };
+		67428E252195294300D2B634 /* plv_skin_player_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_player_background@3x.png"; sourceTree = "<group>"; };
+		67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_switchCamera@3x.png"; sourceTree = "<group>"; };
 		6761E9EE218016F00026E8A6 /* PLVPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPhotoBrowser.h; sourceTree = "<group>"; };
 		6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPhotoBrowser.m; sourceTree = "<group>"; };
 		6761E9F32180189F0026E8A6 /* PLVAuthorizationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVAuthorizationManager.h; sourceTree = "<group>"; };
@@ -240,10 +248,14 @@
 		22BF124021816B5E006127FD /* resource */ = {
 			isa = PBXGroup;
 			children = (
-				22BF124121816B5E006127FD /* skin_player_background@2x.png */,
-				22BF124221816B5E006127FD /* skin_close@2x.png */,
+				22BF124221816B5E006127FD /* plv_skin_close@2x.png */,
+				67428E242195294300D2B634 /* plv_skin_close@3x.png */,
 				22BF124321816B5E006127FD /* skin_ppt_background@2x.png */,
-				22BF124421816B5E006127FD /* skin_switchCamera@2x.png */,
+				67428E232195294300D2B634 /* skin_ppt_background@3x.png */,
+				22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */,
+				67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */,
+				22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */,
+				67428E252195294300D2B634 /* plv_skin_player_background@3x.png */,
 			);
 			path = resource;
 			sourceTree = "<group>";
@@ -590,9 +602,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67428E2A21955AF000D2B634 /* plv_skin_switchCamera@3x.png in Resources */,
 				22DE14182146490C004B1A3E /* plv_input_user_normal@2x.png in Resources */,
 				22DE141C2146490C004B1A3E /* plv_input_user_select@2x.png in Resources */,
-				22BF124621816B5E006127FD /* skin_close@2x.png in Resources */,
+				67428E272195294300D2B634 /* plv_skin_close@3x.png in Resources */,
+				22BF124621816B5E006127FD /* plv_skin_close@2x.png in Resources */,
+				67428E262195294300D2B634 /* skin_ppt_background@3x.png in Resources */,
 				22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */,
 				22DE140621460C94004B1A3E /* faceDelete@2x.png in Resources */,
 				22DE141A2146490C004B1A3E /* plv_emoji@2x.png in Resources */,
@@ -605,16 +620,17 @@
 				221AD3D0211A86C3000A423A /* Main.storyboard in Resources */,
 				22DE14192146490C004B1A3E /* plv_flower@2x.png in Resources */,
 				22DE140721460C94004B1A3E /* faceDelete.png in Resources */,
+				67428E282195294300D2B634 /* plv_skin_player_background@3x.png in Resources */,
 				22BF124721816B5E006127FD /* skin_ppt_background@2x.png in Resources */,
 				6740D6782136B2C90076AF7D /* plv_img_flower@2x.png in Resources */,
 				22DE141B2146490C004B1A3E /* plv_keyboard@2x.png in Resources */,
 				67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */,
 				22DE141121460C94004B1A3E /* Emotions.plist in Resources */,
 				672D7CF1212D7B1500974886 /* FTTitleViewCell.xib in Resources */,
-				22BF124821816B5E006127FD /* skin_switchCamera@2x.png in Resources */,
+				22BF124821816B5E006127FD /* plv_skin_switchCamera@2x.png in Resources */,
 				6740D6792136B2C90076AF7D /* plv_img_flower@3x.png in Resources */,
 				22AD6182218316A50053F496 /* plv_clear@2x.png in Resources */,
-				22BF124521816B5E006127FD /* skin_player_background@2x.png in Resources */,
+				22BF124521816B5E006127FD /* plv_skin_player_background@2x.png in Resources */,
 				22DE140521460C94004B1A3E /* Emotion.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

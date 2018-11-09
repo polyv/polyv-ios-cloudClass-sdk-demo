@@ -68,7 +68,7 @@
     [self addSubview:self.title];
     
     self.backImgView = [[UIImageView alloc] initWithFrame:CGRectMake((BrightnessViewWidth - 79.0) * 0.5, self.title.frame.origin.y + self.title.frame.size.height + 5.0, 79.0, 76.0)];
-    self.backImgView.image = [UIImage imageNamed:[@"PLVPlayerSkin.bundle" stringByAppendingPathComponent:@"skin_brightness"]];
+    self.backImgView.image = [UIImage imageNamed:[@"PLVPlayerSkin.bundle" stringByAppendingPathComponent:@"plv_skin_brightness"]];
     [self addSubview:self.backImgView];
     
     self.brightnessLevelView = [[UIView alloc] initWithFrame:CGRectMake(13.0, 132.0, BrightnessViewWidth - 26.0, 7.0)];

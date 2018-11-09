@@ -8,8 +8,7 @@ target 'PolyvCloudClassDemo' do
   # Pods for PolyvCloudClassDemo
   pod 'PolyvCloudClassSDK', '~> 0.1.0' # polyv 云课堂 SDK
   
-  pod 'AgoraRtcEngine_iOS', '~>2.3.1'  # Agora rtc engine
-  pod 'Masonry', '~> 1.1'
   pod 'SDWebImage', '~> 4.4.0'
   pod 'MBProgressHUD', '~> 1.1.0'
+  pod 'AgoraRtcEngine_iOS', '~>2.3.1'
 end

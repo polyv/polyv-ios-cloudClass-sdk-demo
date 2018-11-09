@@ -368,14 +368,14 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     [self addSubview:self.controllView];
     
     //直播，点播都共有的按钮
-    self.backBtn = [self addButton:@"skin_back.png" selectedImgName:nil title:nil fontSize:17.0 action:@selector(back:) inView:self];
-    self.switchScreenBtn = [self addButton:@"skin_switchscreen.png" title:nil action:@selector(switchScreen:)];
-    self.zoomScreenBtn = [self addButton:@"skin_fullscreen.png" title:nil action:@selector(zoomScreen:)];
+    self.backBtn = [self addButton:@"plv_skin_back" selectedImgName:nil title:nil fontSize:17.0 action:@selector(back:) inView:self];
+    self.switchScreenBtn = [self addButton:@"plv_skin_switchscreen" title:nil action:@selector(switchScreen:)];
+    self.zoomScreenBtn = [self addButton:@"plv_skin_fullscreen" title:nil action:@selector(zoomScreen:)];
     self.codeRateBtn = [self addButton:nil title:@"流畅" action:@selector(codeRate:)];
     
     if (self.type == PLVPlayerSkinViewTypeLive) {
-        self.mainBtn = [self addButton:@"skin_refresh.png" title:nil action:@selector(mainTap:)];
-        self.linkMicBtn = [self addButton:@"skin_hangup.png" selectedImgName:nil title:nil fontSize:17.0 action:@selector(linkMic:) inView:self.controllView];
+        self.mainBtn = [self addButton:@"plv_skin_refresh" title:nil action:@selector(mainTap:)];
+        self.linkMicBtn = [self addButton:@"plv_skin_hangup" selectedImgName:nil title:nil fontSize:17.0 action:@selector(linkMic:) inView:self.controllView];
         self.linkMicBtn.hidden = YES;
         
         self.danmuLabel = [self addLabel:@"弹幕" textAlignment:NSTextAlignmentCenter];
@@ -387,7 +387,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
         [self.danmuSwitch addTarget:self action:@selector(switchDanmu:) forControlEvents:UIControlEventValueChanged];
         [self.controllView addSubview:self.danmuSwitch];
     } else {
-        self.mainBtn = [self addButton:@"skin_play.png" selectedImgName:@"skin_pause.png" title:nil fontSize:17.0 action:@selector(mainTap:) inView:self.controllView];
+        self.mainBtn = [self addButton:@"plv_skin_play" selectedImgName:@"plv_skin_pause" title:nil fontSize:17.0 action:@selector(mainTap:) inView:self.controllView];
         self.speedBtn = [self addButton:nil title:@"1.0X" action:@selector(speed:)];
         self.currentPlayTimeLabel = [self addLabel:@"00:00" textAlignment:NSTextAlignmentRight];
         self.blankLabel = [self addLabel:@"/" textAlignment:NSTextAlignmentCenter];
@@ -404,7 +404,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
         self.slider = [[UISlider alloc] init];
         self.slider.minimumTrackTintColor = [UIColor colorWithRed:43.0 / 255.0 green:159.0 / 255.0 blue:252.0 / 255.0 alpha:1.0];
         self.slider.maximumTrackTintColor = [UIColor clearColor];
-        [self.slider setThumbImage:[self playerSkinImage:@"skin_playSlider.png"] forState:UIControlStateNormal];
+        [self.slider setThumbImage:[self playerSkinImage:@"plv_skin_playSlider"] forState:UIControlStateNormal];
         [self.slider addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDownRepeat | UIControlEventTouchDragInside | UIControlEventTouchDragOutside | UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
         [self.slider addTarget:self action:@selector(sliderTouchEnd:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
         [self.slider addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
@@ -436,11 +436,11 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             [self.switchScreenBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             [self.switchScreenBtn setTitle:@"PPT" forState:UIControlStateNormal];
         } else {
-            [self.switchScreenBtn setImage:[self playerSkinImage:@"skin_camera.png"] forState:UIControlStateNormal];
+            [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_camera"] forState:UIControlStateNormal];
             [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
         }
     } else {
-        [self.switchScreenBtn setImage:[self playerSkinImage:@"skin_switchscreen.png"] forState:UIControlStateNormal];
+        [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_switchscreen"] forState:UIControlStateNormal];
         [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
     }
 }
@@ -536,9 +536,9 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 - (void)linkMicStatus:(BOOL)select {
     if (select) {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"skin_linkmic.png"] forState:UIControlStateNormal];
+        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_linkmic"] forState:UIControlStateNormal];
     } else {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"skin_hangup.png"] forState:UIControlStateNormal];
+        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_hangup"] forState:UIControlStateNormal];
     }
 }
 

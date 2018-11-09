@@ -26,7 +26,6 @@ PODS:
 
 DEPENDENCIES:
   - AgoraRtcEngine_iOS (~> 2.3.1)
-  - Masonry (~> 1.1)
   - MBProgressHUD (~> 1.1.0)
   - PolyvCloudClassSDK (~> 0.1.0)
   - SDWebImage (~> 4.4.0)
@@ -60,6 +59,6 @@ SPEC CHECKSUMS:
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
 
-PODFILE CHECKSUM: 2798d8df389eacc235196cc4b40929fabd082801
+PODFILE CHECKSUM: 96a3455251814ed7c1011f5c168594fd3fed638d
 
 COCOAPODS: 1.5.3

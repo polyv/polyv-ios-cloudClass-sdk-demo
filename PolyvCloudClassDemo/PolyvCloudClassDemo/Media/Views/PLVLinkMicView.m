@@ -33,7 +33,7 @@
     self.mainView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.mainView];
     
-    UIImage *img = audio ? [UIImage imageNamed:@"skin_player_background.png"] : [UIImage imageNamed:@"skin_player_background.png"];
+    UIImage *img = audio ? [UIImage imageNamed:@"plv_skin_player_background"] : [UIImage imageNamed:@"plv_skin_player_background"];
     self.imgView = [[UIImageView alloc] initWithImage:img];
     [self.mainView addSubview:self.imgView];
     __weak typeof(self) weakSelf = self;
@@ -49,7 +49,7 @@
     if (!audio && me) {
         self.switchCameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         self.switchCameraBtn.frame = CGRectMake(self.bounds.size.width - 44.0, 0.0, 44.0, 44.0);
-        [self.switchCameraBtn setImage:[UIImage imageNamed:@"skin_switchCamera.png"] forState:UIControlStateNormal];
+        [self.switchCameraBtn setImage:[UIImage imageNamed:@"plv_skin_switchCamera"] forState:UIControlStateNormal];
         [self addSubview:self.switchCameraBtn];
         
         UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showSwitchCameraBtn)];

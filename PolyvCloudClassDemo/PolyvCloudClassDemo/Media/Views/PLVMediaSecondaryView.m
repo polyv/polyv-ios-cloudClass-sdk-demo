@@ -22,7 +22,7 @@
     self.clipsToBounds = YES;
     self.closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.closeBtn.frame = CGRectMake(0.0, 0.0, 30.0, 30.0);
-    [self.closeBtn setImage:[UIImage imageNamed:@"skin_close.png"] forState:UIControlStateNormal];
+    [self.closeBtn setImage:[UIImage imageNamed:@"plv_skin_close"] forState:UIControlStateNormal];
     [self.closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.closeBtn];
     [self showCloseBtn];
