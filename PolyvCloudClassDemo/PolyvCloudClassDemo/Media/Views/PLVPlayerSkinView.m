@@ -159,7 +159,10 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 }
 
 - (void)layout {
-    UIEdgeInsets backMargin = UIEdgeInsetsMake(0.0, 10.0, -1.0, -1.0);
+    UIEdgeInsets backMargin = UIEdgeInsetsMake(20.0, 10.0, -1.0, -1.0);
+    if (@available(iOS 11.0, *)) {
+        backMargin = UIEdgeInsetsMake(0.0, 10.0, -1.0, -1.0);
+    }
     UIEdgeInsets mainMargin = UIEdgeInsetsMake(-1.0, 10.0, 0.0, -1.0);
     UIEdgeInsets switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 64.0, 10.0);
     UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);

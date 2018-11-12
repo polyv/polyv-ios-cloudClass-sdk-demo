@@ -3,7 +3,7 @@ PODS:
   - Masonry (1.1.0)
   - MBProgressHUD (1.1.0)
   - PolyvAliHttpDNS (1.6.7)
-  - PolyvBusinessSDK (0.0.1):
+  - PolyvBusinessSDK (0.1.0):
     - Masonry (~> 1.1)
     - PolyvAliHttpDNS (~> 1.6.7)
     - PolyvFoundationSDK (~> 0.0.1)
@@ -11,8 +11,8 @@ PODS:
     - Socket.IO-Client-Swift (~> 13.2.0)
     - Starscream (= 3.0.5)
     - YYModel (~> 1.0.4)
-  - PolyvCloudClassSDK (0.1.0):
-    - PolyvBusinessSDK (~> 0.0.1)
+  - PolyvCloudClassSDK (0.2.0):
+    - PolyvBusinessSDK (~> 0.1.0)
     - PolyvFoundationSDK (~> 0.0.1)
   - PolyvFoundationSDK (0.0.1)
   - PolyvIJKPlayer (0.3.0)
@@ -27,7 +27,7 @@ PODS:
 DEPENDENCIES:
   - AgoraRtcEngine_iOS (~> 2.3.1)
   - MBProgressHUD (~> 1.1.0)
-  - PolyvCloudClassSDK (~> 0.1.0)
+  - PolyvCloudClassSDK (~> 0.2.0)
   - SDWebImage (~> 4.4.0)
 
 SPEC REPOS:
@@ -50,8 +50,8 @@ SPEC CHECKSUMS:
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   PolyvAliHttpDNS: 0fbbbcd3aab07a48305d36884681ca33849cc0b7
-  PolyvBusinessSDK: 8285a1bc76e1189ddb8bb3e1f92ee7cb6e515318
-  PolyvCloudClassSDK: 91fec6a8f343e44e39129e19557de5ca32bbd872
+  PolyvBusinessSDK: ee6f251dfd9c5b7486411b2c5cced92c6eeeebd6
+  PolyvCloudClassSDK: 9433c37456a2cee6345c9137412ee5f768841198
   PolyvFoundationSDK: b0e00704e058994e0c8b5d7ccb6319263122c241
   PolyvIJKPlayer: 1577e6890fdbec60c44bea6c7425f7215a58b6a0
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
@@ -59,6 +59,6 @@ SPEC CHECKSUMS:
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
 
-PODFILE CHECKSUM: 96a3455251814ed7c1011f5c168594fd3fed638d
+PODFILE CHECKSUM: c495ac953e7a67fdca6d02441dc482e0d206437d
 
 COCOAPODS: 1.5.3

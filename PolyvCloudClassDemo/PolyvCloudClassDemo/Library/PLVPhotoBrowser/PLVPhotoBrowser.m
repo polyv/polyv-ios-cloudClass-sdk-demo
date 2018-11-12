@@ -26,6 +26,9 @@
 
 - (void)scaleImageViewToFullScreen:(UIImageView *)imageView {
     self.image = imageView.image;
+    if (!self.image) {
+        return;
+    }
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     
     self.backgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];

@@ -22,7 +22,7 @@
 		22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF123D21816B54006127FD /* plv_logo@2x.png */; };
 		22BF124521816B5E006127FD /* plv_skin_player_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */; };
 		22BF124621816B5E006127FD /* plv_skin_close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124221816B5E006127FD /* plv_skin_close@2x.png */; };
-		22BF124721816B5E006127FD /* skin_ppt_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124321816B5E006127FD /* skin_ppt_background@2x.png */; };
+		22BF124721816B5E006127FD /* plv_skin_ppt_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124321816B5E006127FD /* plv_skin_ppt_background@2x.png */; };
 		22BF124821816B5E006127FD /* plv_skin_switchCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */; };
 		22DE140021460C94004B1A3E /* PLVTextInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DE13E521460C94004B1A3E /* PLVTextInputView.m */; };
 		22DE140121460C94004B1A3E /* PLVEmojiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DE13E721460C94004B1A3E /* PLVEmojiModel.m */; };
@@ -61,10 +61,12 @@
 		6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D66A2136A42D0076AF7D /* MarqueeLabel.m */; };
 		6740D6782136B2C90076AF7D /* plv_img_flower@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6762136B2C80076AF7D /* plv_img_flower@2x.png */; };
 		6740D6792136B2C90076AF7D /* plv_img_flower@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6772136B2C90076AF7D /* plv_img_flower@3x.png */; };
-		67428E262195294300D2B634 /* skin_ppt_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E232195294300D2B634 /* skin_ppt_background@3x.png */; };
+		67428E262195294300D2B634 /* plv_skin_ppt_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E232195294300D2B634 /* plv_skin_ppt_background@3x.png */; };
 		67428E272195294300D2B634 /* plv_skin_close@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E242195294300D2B634 /* plv_skin_close@3x.png */; };
 		67428E282195294300D2B634 /* plv_skin_player_background@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E252195294300D2B634 /* plv_skin_player_background@3x.png */; };
 		67428E2A21955AF000D2B634 /* plv_skin_switchCamera@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */; };
+		67444CB621955F37001BE12C /* PolyvBusinessSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67444CB821955F37001BE12C /* PolyvBusinessSDK.framework */; };
+		67444CB721955F37001BE12C /* PolyvFoundationSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67444CB921955F37001BE12C /* PolyvFoundationSDK.framework */; };
 		6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */; };
 		6761E9F52180189F0026E8A6 /* PLVAuthorizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9F42180189F0026E8A6 /* PLVAuthorizationManager.m */; };
 		677B2B3A2192ED6100A85934 /* PolyvCloudClassSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 677B2B3B2192ED6100A85934 /* PolyvCloudClassSDK.framework */; };
@@ -100,7 +102,7 @@
 		22BF123D21816B54006127FD /* plv_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_logo@2x.png"; sourceTree = "<group>"; };
 		22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_player_background@2x.png"; sourceTree = "<group>"; };
 		22BF124221816B5E006127FD /* plv_skin_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_close@2x.png"; sourceTree = "<group>"; };
-		22BF124321816B5E006127FD /* skin_ppt_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_ppt_background@2x.png"; sourceTree = "<group>"; };
+		22BF124321816B5E006127FD /* plv_skin_ppt_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_ppt_background@2x.png"; sourceTree = "<group>"; };
 		22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_switchCamera@2x.png"; sourceTree = "<group>"; };
 		22DE13E521460C94004B1A3E /* PLVTextInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVTextInputView.m; sourceTree = "<group>"; };
 		22DE13E721460C94004B1A3E /* PLVEmojiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVEmojiModel.m; sourceTree = "<group>"; };
@@ -135,7 +137,6 @@
 		22FB80EA212AB55100B5CB53 /* ZJZDanMuLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMuLabel.h; sourceTree = "<group>"; };
 		22FB80EB212AB55100B5CB53 /* ZJZDanMuLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZJZDanMuLabel.m; sourceTree = "<group>"; };
 		22FB80EC212AB55100B5CB53 /* ZJZDanMu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMu.h; sourceTree = "<group>"; };
-		4DAE5FC863F773FDF5A7B59E /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		67219F48217F3B4300756A54 /* plv_btn_download@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@2x.png"; sourceTree = "<group>"; };
 		67219F49217F3B4300756A54 /* plv_btn_download@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@3x.png"; sourceTree = "<group>"; };
 		672D7CE9212D7B1500974886 /* FTPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTPageController.h; sourceTree = "<group>"; };
@@ -159,10 +160,12 @@
 		6740D66B2136A42D0076AF7D /* MarqueeLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarqueeLabel.h; sourceTree = "<group>"; };
 		6740D6762136B2C80076AF7D /* plv_img_flower@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_flower@2x.png"; sourceTree = "<group>"; };
 		6740D6772136B2C90076AF7D /* plv_img_flower@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_flower@3x.png"; sourceTree = "<group>"; };
-		67428E232195294300D2B634 /* skin_ppt_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "skin_ppt_background@3x.png"; sourceTree = "<group>"; };
+		67428E232195294300D2B634 /* plv_skin_ppt_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_ppt_background@3x.png"; sourceTree = "<group>"; };
 		67428E242195294300D2B634 /* plv_skin_close@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_close@3x.png"; sourceTree = "<group>"; };
 		67428E252195294300D2B634 /* plv_skin_player_background@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_player_background@3x.png"; sourceTree = "<group>"; };
 		67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_skin_switchCamera@3x.png"; sourceTree = "<group>"; };
+		67444CB821955F37001BE12C /* PolyvBusinessSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvBusinessSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		67444CB921955F37001BE12C /* PolyvFoundationSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvFoundationSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6761E9EE218016F00026E8A6 /* PLVPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPhotoBrowser.h; sourceTree = "<group>"; };
 		6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPhotoBrowser.m; sourceTree = "<group>"; };
 		6761E9F32180189F0026E8A6 /* PLVAuthorizationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVAuthorizationManager.h; sourceTree = "<group>"; };
@@ -171,7 +174,8 @@
 		67C9EC0C214652F000B326C3 /* plv_img_default_avatar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_default_avatar@2x.png"; sourceTree = "<group>"; };
 		67C9EC0E214689EC00B326C3 /* PLVLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVLabel.h; sourceTree = "<group>"; };
 		67C9EC0F214689EC00B326C3 /* PLVLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVLabel.m; sourceTree = "<group>"; };
-		7D9CE80C579C3128988427D1 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		93104F57E1DCA83EB146433B /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		C8E1A5F1F4B33B38DFDF9919 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 		F8127FE369CF4921ABCA4A08 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -180,6 +184,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67444CB621955F37001BE12C /* PolyvBusinessSDK.framework in Frameworks */,
+				67444CB721955F37001BE12C /* PolyvFoundationSDK.framework in Frameworks */,
 				677B2B3A2192ED6100A85934 /* PolyvCloudClassSDK.framework in Frameworks */,
 				53E95BF4B345CA3791994EA3 /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
 			);
@@ -250,8 +256,8 @@
 			children = (
 				22BF124221816B5E006127FD /* plv_skin_close@2x.png */,
 				67428E242195294300D2B634 /* plv_skin_close@3x.png */,
-				22BF124321816B5E006127FD /* skin_ppt_background@2x.png */,
-				67428E232195294300D2B634 /* skin_ppt_background@3x.png */,
+				22BF124321816B5E006127FD /* plv_skin_ppt_background@2x.png */,
+				67428E232195294300D2B634 /* plv_skin_ppt_background@3x.png */,
 				22BF124421816B5E006127FD /* plv_skin_switchCamera@2x.png */,
 				67428E2921955AF000D2B634 /* plv_skin_switchCamera@3x.png */,
 				22BF124121816B5E006127FD /* plv_skin_player_background@2x.png */,
@@ -527,6 +533,8 @@
 		8F0F50E05503F0F99A6A8D07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				67444CB821955F37001BE12C /* PolyvBusinessSDK.framework */,
+				67444CB921955F37001BE12C /* PolyvFoundationSDK.framework */,
 				677B2B3B2192ED6100A85934 /* PolyvCloudClassSDK.framework */,
 				F8127FE369CF4921ABCA4A08 /* Pods_PolyvCloudClassDemo.framework */,
 			);
@@ -536,8 +544,8 @@
 		AB0E412E19A1496BAD99BFDC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				4DAE5FC863F773FDF5A7B59E /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
-				7D9CE80C579C3128988427D1 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
+				93104F57E1DCA83EB146433B /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
+				C8E1A5F1F4B33B38DFDF9919 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -607,7 +615,7 @@
 				22DE141C2146490C004B1A3E /* plv_input_user_select@2x.png in Resources */,
 				67428E272195294300D2B634 /* plv_skin_close@3x.png in Resources */,
 				22BF124621816B5E006127FD /* plv_skin_close@2x.png in Resources */,
-				67428E262195294300D2B634 /* skin_ppt_background@3x.png in Resources */,
+				67428E262195294300D2B634 /* plv_skin_ppt_background@3x.png in Resources */,
 				22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */,
 				22DE140621460C94004B1A3E /* faceDelete@2x.png in Resources */,
 				22DE141A2146490C004B1A3E /* plv_emoji@2x.png in Resources */,
@@ -621,7 +629,7 @@
 				22DE14192146490C004B1A3E /* plv_flower@2x.png in Resources */,
 				22DE140721460C94004B1A3E /* faceDelete.png in Resources */,
 				67428E282195294300D2B634 /* plv_skin_player_background@3x.png in Resources */,
-				22BF124721816B5E006127FD /* skin_ppt_background@2x.png in Resources */,
+				22BF124721816B5E006127FD /* plv_skin_ppt_background@2x.png in Resources */,
 				6740D6782136B2C90076AF7D /* plv_img_flower@2x.png in Resources */,
 				22DE141B2146490C004B1A3E /* plv_keyboard@2x.png in Resources */,
 				67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */,
@@ -851,7 +859,7 @@
 		};
 		22142F662113094200062C6E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4DAE5FC863F773FDF5A7B59E /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
+			baseConfigurationReference = 93104F57E1DCA83EB146433B /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -879,7 +887,7 @@
 		};
 		22142F672113094200062C6E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7D9CE80C579C3128988427D1 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
+			baseConfigurationReference = C8E1A5F1F4B33B38DFDF9919 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

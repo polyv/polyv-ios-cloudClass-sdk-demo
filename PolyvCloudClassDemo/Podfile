@@ -6,7 +6,7 @@ target 'PolyvCloudClassDemo' do
   use_frameworks!
 
   # Pods for PolyvCloudClassDemo
-  pod 'PolyvCloudClassSDK', '~> 0.1.0' # polyv 云课堂 SDK
+  pod 'PolyvCloudClassSDK', '~> 0.2.0' # polyv 云课堂 SDK
   
   pod 'SDWebImage', '~> 4.4.0'
   pod 'MBProgressHUD', '~> 1.1.0'

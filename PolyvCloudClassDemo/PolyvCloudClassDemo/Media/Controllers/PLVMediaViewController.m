@@ -152,7 +152,8 @@
 }
 
 - (void)switchAction:(BOOL)manualControl {
-    if (self.pptOnSecondaryView) {
+    self.pptOnSecondaryView = !self.pptOnSecondaryView;
+    if (!self.pptOnSecondaryView) {
         [self.secondaryView insertSubview:self.player.playerView atIndex:0];
         [self.player setFrame:self.secondaryView.bounds];
         [self.mainView insertSubview:self.pptVC.view atIndex:0];
@@ -166,12 +167,6 @@
         [self.secondaryView insertSubview:self.pptVC.view atIndex:0];
         self.pptVC.view.frame = self.secondaryView.bounds;
     }
-}
-
-- (void)switchScreen:(BOOL)manualControl {//切换主副屏
-    [self switchAction:manualControl];
-    self.pptOnSecondaryView = !self.pptOnSecondaryView;
-
     [self changePPTScreenBackgroundColor:self.pptVC];
     [self changePlayerScreenBackgroundColor:self.player];
 }
@@ -180,7 +175,7 @@
     if (self.secondaryView.hidden) {
         [self openSecondaryView];
     } else {
-        [self switchScreen:YES];
+        [self switchAction:YES];
     }
 }
 
@@ -255,7 +250,7 @@
 - (void)adPreparedToPlay:(PLVPlayerController *)playerController {
     self.skinView.controllView.hidden = YES;
     if (!self.pptOnSecondaryView) {//主屏切换为暖场，副屏为PPT
-        [self switchScreen:NO];
+        [self switchAction:NO];
     }
     if (self.pptOnSecondaryView) {//关闭副屏的PPT
         [self closeSecondaryView:self.secondaryView];
@@ -278,7 +273,7 @@
     
     if (self.pptOnSecondaryView && !self.player.playingAD && !self.pptFlag) {//自动切换主屏为PPT，副屏为视频
         self.pptFlag = YES;
-        [self switchScreen:NO];
+        [self switchAction:NO];
     }
 
     if (![self cameraClosed] && !self.player.playingAD && !self.pptOnSecondaryView && self.secondaryView.hidden) {
@@ -297,6 +292,10 @@
     } else {
         self.secondaryView.backgroundColor = (self.player.playable && (![self cameraClosed] || self.player.playingAD)) ? [UIColor blackColor] : [UIColor whiteColor];
     }
+}
+
+- (BOOL)onSafeArea:(PLVPlayerController *)playerController {
+    return self.pptOnSecondaryView && !self.skinView.fullscreen;
 }
 
 //============PLVPPTViewControllerDelegate============

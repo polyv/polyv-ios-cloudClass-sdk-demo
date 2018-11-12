@@ -54,7 +54,7 @@
         }
         self.danmuLayer = [[ZJZDanMu alloc] initWithFrame:danmuRect];
         self.danmuLayer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self.mainView addSubview:self.danmuLayer];
+        [self.view insertSubview:self.danmuLayer belowSubview:self.skinView];
     }
 }
 
@@ -79,7 +79,7 @@
     if ([json containsString:@"\"isCamClosed\":1"]) {//推流端关闭了摄像头
         if (self.pptOnSecondaryView && !self.player.playingAD && !((PLVLivePlayerController *)self.player).linkMic) {//自动切换主屏为PPT，副屏为视频
             self.pptFlag = YES;
-            [self switchScreen:NO];
+            [self switchAction:NO];
         }
         
         ((PLVLivePlayerController *)self.player).cameraClosed = YES;
@@ -190,7 +190,8 @@
 - (void)switchAction:(BOOL)manualControl {
     if (self.linkMicVC.linkMicViewArray.count > 0) {
         PLVLinkMicView *linkMicView = [self.linkMicVC.linkMicViewArray objectAtIndex:0];
-        if (self.pptOnSecondaryView) {
+        self.pptOnSecondaryView = !self.pptOnSecondaryView;
+        if (!self.pptOnSecondaryView) {
             UIView *videoView = self.mainView.subviews[0];
             [linkMicView insertSubview:videoView belowSubview:linkMicView.nickNameLabel];
             [videoView setFrame:linkMicView.bounds];

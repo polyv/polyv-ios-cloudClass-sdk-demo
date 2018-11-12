@@ -20,9 +20,6 @@
 //打开副屏
 - (void)openSecondaryView;
 
-//切换主副屏
-- (void)switchScreen:(BOOL)manualControl;
-
 //skin皮肤的透明度动画（显示或隐藏）
 - (void)skinAlphaAnimaion:(CGFloat)alpha;
 

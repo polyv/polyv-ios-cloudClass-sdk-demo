@@ -26,11 +26,11 @@ typedef NS_ENUM(NSUInteger, PLVLinkMicStatus) {
 @property (nonatomic, assign) BOOL linkMicOnAudio;//记住当前频道讲师开启的连麦类型（YES：声音；NO：视频）
 @property (nonatomic, assign) PLVLinkMicStatus linkMicStatus;//当前用户连麦状态
 @property (nonatomic, strong) AgoraRtcEngineKit *agoraKit;//声网的连麦工具
-@property (nonatomic, strong) NSTimer *timer;//定时器，没20秒轮询一次服务器当前频道的连麦信息（状态，连麦列表）,防止sockect重连导致连麦信息丢失而引起当前频道连麦状态不一致的问题
+@property (nonatomic, strong) NSTimer *timer;//定时器，每20秒轮询一次服务器当前频道的连麦信息（状态，连麦列表）,防止sockect重连导致连麦信息丢失而引起当前频道连麦状态不一致的问题
 @property (nonatomic, strong) UIScrollView *scrollView;//连麦列表的展示窗口
 @property (nonatomic, strong) NSMutableDictionary *linkMicViewDic;//连麦人的关联窗口集合（以声网的userId为key，方便以key来创建新的连麦人窗口）
 @property (nonatomic, strong) NSMutableArray *linkMicViewArray;//连麦人的关联窗口集合(避免 linkMicViewDic 导致的先后顺序问题，方便顺序查找连麦人的窗口)
-@property (nonatomic, assign) NSUInteger otherIndex;//其他连麦用户的窗口位置排在讲师和自己之后
+@property (atomic, assign) NSUInteger otherIndex;//其他连麦用户的窗口位置排在讲师和自己之后
 
 @end
 
@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, PLVLinkMicStatus) {
 
 - (void)clearResource {
     [self leaveAgoraRtc];
+    [AgoraRtcEngineKit destroy];
     [self.timer invalidate];
     self.timer = nil;
 }
@@ -413,7 +414,8 @@ typedef NS_ENUM(NSUInteger, PLVLinkMicStatus) {
 }
 
 - (void)rtcEngine:(AgoraRtcEngineKit *)engine didOfflineOfUid:(NSUInteger)uid reason:(AgoraUserOfflineReason)reason {
-    if (uid != self.login.userId.integerValue) {
+    if (uid != self.login.userId.integerValue && uid != self.login.roomId) {
+        self.otherIndex--;
         NSString *key = @(uid).stringValue;
         PLVLinkMicView *offlineView = [self.linkMicViewDic objectForKey:key];
         [offlineView removeFromSuperview];
