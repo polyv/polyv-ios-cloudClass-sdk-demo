@@ -7,6 +7,7 @@
 //
 
 #import "PLVVodViewController.h"
+#import <PolyvBusinessSDK/PLVVodConfig.h>
 #import "PLVVodMediaViewController.h"
 
 #define PlayerViewScale (3.0 / 4.0)
@@ -23,9 +24,10 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
+    PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
     self.mediaVC = [[PLVVodMediaViewController alloc] init];
     self.mediaVC.delegate = self;
-    self.mediaVC.vodVideo = self.vodVideo;
+    self.mediaVC.vodId = vodConfig.vodId;//必须，不能为空
     CGFloat h = self.view.bounds.size.width * PlayerViewScale + 44.0;
     self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
     [self.view addSubview:self.mediaVC.view];

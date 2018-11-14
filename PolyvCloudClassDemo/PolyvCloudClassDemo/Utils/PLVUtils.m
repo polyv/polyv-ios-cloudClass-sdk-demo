@@ -130,17 +130,10 @@ static PLVUtils *chatroomHud = nil;
     return newImage;
 }
 
-+ (NSString *)secondsToString:(NSTimeInterval)seconds {
-    NSInteger time = seconds;
-    NSInteger hour = time / 3600;
-    NSInteger min = (time / 60) % 60;
-    NSInteger sec = time % 60;
-    NSString *str = hour > 0 ? [NSString stringWithFormat:@"%02zd:", hour] : @"";
-    str = [str stringByAppendingString:[NSString stringWithFormat:@"%02zd:%02zd", min, sec]];
-    return str;
++ (void)presentAlertViewController:(NSString *)title message:(NSString *)message inViewController:(UIViewController *)vc {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
+    [vc presentViewController:alertController animated:YES completion:nil];
 }
-
-#pragma mark - Privates
-
 
 @end

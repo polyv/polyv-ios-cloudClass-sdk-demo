@@ -7,9 +7,9 @@
 //
 
 #import "PLVMediaViewController.h"
+#import <PolyvCloudClassSDK/PLVLivePlayerController.h>
 #import "PLVMediaViewControllerPrivateProtocol.h"
 #import "PLVMediaViewControllerProtocol.h"
-#import <PolyvCloudClassSDK/PLVLivePlayerController.h>
 
 #define BlueBackgroundColor [UIColor colorWithRed:215.0 / 255.0 green:242.0 / 255.0 blue:254.0 / 255.0 alpha:1.0]
 
@@ -95,15 +95,13 @@
     }
 }
 
-- (void)loadSkinView:(PLVPlayerSkinViewType)skinType codeRateItems:(NSMutableArray *)codeRateItems codeRate:(NSString *)codeRate {
+- (void)loadSkinView:(PLVPlayerSkinViewType)skinType {
     self.skinView = [[PLVPlayerSkinView alloc]  initWithFrame:self.view.bounds];
     self.skinView.delegate = self;
-    self.skinView.codeRateItems = codeRateItems;
     self.skinView.type = skinType;
     self.skinView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.skinView];
     [self.skinView loadSubviews];
-    [self.skinView switchCodeRate:codeRate];
     self.skinView.controllView.hidden = YES;
 }
 
@@ -179,6 +177,7 @@
     }
 }
 
+//横竖屏选装动画
 - (void)deviceOrientationDidChange {
     UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
     if (!self.zoomAnimationing && self.curOrientation != orientation) {
@@ -247,6 +246,16 @@
 }
 
 //============PLVPlayerControllerDelegate============
+- (void)playerController:(PLVPlayerController *)playerController codeRateItems:(NSMutableArray *)codeRateItems codeRate:(NSString *)codeRate {
+    self.skinView.codeRateItems = codeRateItems;
+    [self.skinView layout];
+    [self.skinView switchCodeRate:codeRate];
+}
+
+- (void)playerController:(PLVPlayerController *)playerController loadMainPlayerFailure:(NSString *)message {
+    [self openSecondaryView];
+}
+
 - (void)adPreparedToPlay:(PLVPlayerController *)playerController {
     self.skinView.controllView.hidden = YES;
     if (!self.pptOnSecondaryView) {//主屏切换为暖场，副屏为PPT

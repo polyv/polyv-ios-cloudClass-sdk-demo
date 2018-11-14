@@ -7,10 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <PolyvBusinessSDK/PLVVodVideo.h>
 
 @interface PLVVodViewController : UIViewController
-
-@property (nonatomic, strong) PLVVodVideo *vodVideo;
 
 @end

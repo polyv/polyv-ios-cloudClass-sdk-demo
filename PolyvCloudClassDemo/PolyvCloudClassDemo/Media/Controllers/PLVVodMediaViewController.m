@@ -28,20 +28,14 @@
 
 - (void)loadPlayer {
     [self openSecondaryView];
-    self.player = [[PLVVodPlayerController alloc] initWithVideo:self.vodVideo displayView:self.secondaryView delegate:self];
+    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.secondaryView delegate:self];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.pptVC videoStart:self.vodVideo.vid];
+    [self.pptVC videoStart:self.vodId];
     
-    NSMutableArray *codeRateItems = [[NSMutableArray alloc] init];
-    if (self.vodVideo.qualityCount > 1) {
-        for (NSInteger quality = 1; quality <= self.vodVideo.qualityCount; quality++) {
-            [codeRateItems addObject:NSStringFromPLVVodQuality(quality)];
-        }
-    }
-    [self loadSkinView:PLVPlayerSkinViewTypeVod codeRateItems:codeRateItems codeRate:NSStringFromPLVVodQuality(self.vodVideo.preferredQuality)];
+    [self loadSkinView:PLVPlayerSkinViewTypeVod];
     self.skinView.controllView.hidden = YES;
 }
 
@@ -66,10 +60,7 @@
 }
 
 - (void)playerSkinView:(PLVPlayerSkinView *)skinView codeRate:(NSString *)codeRate {
-    [self.vodVideo updatePreferredQuality:codeRate];
-    
-    [self.player clearAllPlayer];
-    [self.player loadMainPlayer];
+    [(PLVVodPlayerController *)self.player switchCodeRate:codeRate];
 }
 
 //============PLVVodPlayerControllerDelegate============
@@ -84,7 +75,7 @@
 
 //============PLVPPTViewControllerDelegate============
 - (void)pptPrepare:(PLVPPTViewController *)pptVC {
-    [(PLVVodPlayerController *)self.player prepareToPlay];
+    
 }
 
 - (NSTimeInterval)getCurrentTime:(PLVPPTViewController *)pptVC {

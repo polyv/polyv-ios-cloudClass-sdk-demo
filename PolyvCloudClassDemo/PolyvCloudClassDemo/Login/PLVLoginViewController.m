@@ -6,13 +6,14 @@
 //  Copyright © 2018年 polyv. All rights reserved.
 //
 #import "PLVLoginViewController.h"
-#import <MBProgressHUD/MBProgressHUD.h>
 #import <Masonry/Masonry.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 #import <PolyvCloudClassSDK/PLVLiveAPI.h>
 #import <PolyvCloudClassSDK/PLVLiveConfig.h>
-#import <PolyvBusinessSDK/PLVVodVideo.h>
+#import <PolyvBusinessSDK/PLVVodConfig.h>
 #import "PLVLiveViewController.h"
 #import "PLVVodViewController.h"
+#import "PLVUtils.h"
 
 @interface PLVLoginViewController ()
 
@@ -148,6 +149,7 @@
             self.appSecretTF.text = liveLoginInfo[3];
         } else {
             PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
+            self.channelIdTF.text = liveConfig.channelId;
             self.appIDTF.text = liveConfig.appId;
             self.userIDTF.text = liveConfig.userId;
             self.appSecretTF.text = liveConfig.appSecret;
@@ -165,18 +167,13 @@
             self.vIdTF.text = vodLoginInfo[0];
             self.appIDTF.text = vodLoginInfo[1];
         } else {
+            PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
             PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
-            self.vIdTF.text = liveConfig.vodId;
+            self.vIdTF.text = vodConfig.vodId;
             self.appIDTF.text = liveConfig.appId;
         }
         [self checkTextFields];
     }
-}
-
-- (void)presentAlertViewController:(NSString *)message {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (IBAction)loginButtonClick:(UIButton *)sender {
@@ -188,39 +185,35 @@
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.appIDTF.text, self.userIDTF.text, self.appSecretTF.text] forKey:@"liveLoginInfo"];
         
         [PLVLiveAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:nil appId:self.appIDTF.text userId:self.userIDTF.text appSecret:self.appSecretTF.text completion:^{
+            [hud hideAnimated:YES];
+            
+            //必需先设置 PLVLiveConfig 单例里需要的信息，因为在后面的加载中需要使用
             PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
+            liveConfig.channelId = self.channelIdTF.text;
             liveConfig.appId = self.appIDTF.text;
             liveConfig.userId = self.userIDTF.text;
             liveConfig.appSecret = self.appSecretTF.text;
-            [PLVLiveAPI loadChannelInfoRepeatedlyWithUserId:liveConfig.userId channelId:self.channelIdTF.text.integerValue completion:^(PLVLiveChannel *channel) {
-                [hud hideAnimated:YES];
-                PLVLiveViewController *liveVC = [PLVLiveViewController new];
-                liveVC.channel = channel;
-                [weakSelf presentViewController:liveVC animated:YES completion:nil];
-            } failure:^(NSError *error) {
-                [hud hideAnimated:YES];
-                [weakSelf presentAlertViewController:error.localizedDescription];
-            }];
+            
+            [weakSelf presentViewController:[PLVLiveViewController new] animated:YES completion:nil];
         } failure:^(NSError *error) {
             [hud hideAnimated:YES];
-            [weakSelf presentAlertViewController:error.localizedDescription];
+            [PLVUtils presentAlertViewController:nil message:error.localizedDescription inViewController:weakSelf];
         }];
     } else {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.vIdTF.text, self.appIDTF.text] forKey:@"vodLoginInfo"];
         
         [PLVLiveAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
-            [PLVVodVideo requestVideoWithVid:self.vIdTF.text completion:^(PLVVodVideo *video) {
-                [hud hideAnimated:YES];
-                PLVVodViewController *vodVC = [PLVVodViewController new];
-                vodVC.vodVideo = video;
-                [weakSelf presentViewController:vodVC animated:YES completion:nil];
-            } fail:^(NSError *error) {
-                [hud hideAnimated:YES];
-                [weakSelf presentAlertViewController:error.localizedDescription];
-            }];
+            [hud hideAnimated:YES];
+            
+            //必需先设置 PLVVodConfig 单例里需要的信息，因为在后面的加载中需要使用
+            PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
+            vodConfig.vodId = self.vIdTF.text;
+            vodConfig.appId = self.appIDTF.text;
+            
+            [weakSelf presentViewController:[PLVVodViewController new] animated:YES completion:nil];
         } failure:^(NSError *error) {
             [hud hideAnimated:YES];
-            [weakSelf presentAlertViewController:error.localizedDescription];
+            [PLVUtils presentAlertViewController:nil message:error.localizedDescription inViewController:weakSelf];
         }];
     }
 }

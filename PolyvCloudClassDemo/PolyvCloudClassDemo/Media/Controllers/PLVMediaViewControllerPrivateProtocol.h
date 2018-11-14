@@ -26,8 +26,8 @@
 //skin皮肤的隐藏动画
 - (void)skinHiddenAnimaion;
 
-//播放器皮肤开启码率选择功能
-- (void)loadSkinView:(PLVPlayerSkinViewType)skinType codeRateItems:(NSMutableArray *)codeRateItems codeRate:(NSString *)codeRate;
+//加载皮肤
+- (void)loadSkinView:(PLVPlayerSkinViewType)skinType;
 
 //横竖屏动画时，子类某些窗口需要做动画的逻辑在这里实现
 - (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)transform;

@@ -11,6 +11,6 @@
 
 @interface PLVVodMediaViewController : PLVMediaViewController
 
-@property (nonatomic, strong) PLVVodVideo *vodVideo;
+@property (nonatomic, strong) NSString *vodId;//必须，不能为空
 
 @end

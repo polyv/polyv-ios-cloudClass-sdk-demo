@@ -13,6 +13,7 @@
 #import "PLVMediaViewControllerPrivateProtocol.h"
 #import "PLVMediaViewControllerProtocol.h"
 #import "ZJZDanMu.h"
+#import "PLVUtils.h"
 
 @interface PLVLiveMediaViewController () <PLVMediaViewControllerPrivateProtocol, PLVMediaViewControllerProtocol, PLVLivePlayerControllerDelegate, PLVPlayerSkinViewDelegate, PLVLinkMicControllerDelegate>
 
@@ -118,7 +119,7 @@
 
 - (void)loadPlayer {
     [self closeSecondaryView:self.secondaryView];
-    self.player = [[PLVLivePlayerController alloc] initWithChannel:self.channel displayView:self.secondaryView delegate:self];
+    self.player = [[PLVLivePlayerController alloc] initWithChannelId:self.channelId userId:self.userId displayView:self.secondaryView delegate:self];
 }
 
 - (void)reOpenPlayer:(NSString *)codeRate showHud:(BOOL)showHud {
@@ -133,25 +134,16 @@
     }
     
     __weak typeof(self) weakSelf = self;
-    [PLVLiveAPI loadChannelInfoRepeatedlyWithUserId:self.channel.userId channelId:self.channel.channelId.integerValue completion:^(PLVLiveChannel *channel) {
+    [(PLVLivePlayerController *)self.player loadChannel:codeRate completion:^{
         weakSelf.reOpening = NO;
         if (hud != nil) {
             hud.label.text = @"JSON加载成功";
             [hud hideAnimated:YES];
         }
-        
-        weakSelf.channel = channel;
-        if (codeRate != nil && codeRate.length > 0) {
-            [weakSelf.channel updateDefaultDefinitionWithDefinition:codeRate];
-        }
-        
-        [weakSelf.player clearAllPlayer];
-        ((PLVLivePlayerController*)weakSelf.player).channel = weakSelf.channel;
-        [weakSelf.player loadMainPlayer];
-    } failure:^(NSError *error) {
+    } failure:^(NSString *message) {
         weakSelf.reOpening = NO;
         if (hud != nil) {
-            hud.label.text = @"JSON加载失败";
+            hud.label.text = [NSString stringWithFormat:@"JSON加载失败:%@", message];
             [hud hideAnimated:YES];
         }
     }];
@@ -160,15 +152,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSMutableArray *codeRateItems = [[NSMutableArray alloc] init];
-    for (NSDictionary *definition in self.channel.definitions) {
-        [codeRateItems addObject:definition[@"definition"]];
-    }
-    [self loadSkinView:PLVPlayerSkinViewTypeLive codeRateItems:codeRateItems codeRate:self.channel.defaultDefinition];
+    [self loadSkinView:PLVPlayerSkinViewTypeLive];
     
     self.linkMicVC = [[PLVLinkMicController alloc] init];
     self.linkMicVC.delegate = self;
-    self.linkMicVC.skinView = self.skinView;
+    self.linkMicVC.linkMicBtn = self.skinView.linkMicBtn;
 }
 
 - (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)transform {
@@ -253,6 +241,14 @@
 }
 
 //============PLVLinkMicControllerDelegate============
+- (void)linkMicController:(PLVLinkMicController *)lickMic toastTitle:(NSString *)title detail:(NSString *)detail {
+    [PLVUtils showHUDWithTitle:title detail:detail view:[UIApplication sharedApplication].delegate.window];
+}
+
+- (void)linkMicController:(PLVLinkMicController *)lickMic linkMicStatus:(BOOL)select {
+    [self.skinView linkMicStatus:select];
+}
+
 - (void)linkMicController:(PLVLinkMicController *)lickMic emitLinkMicObject:(PLVSocketLinkMicEventType)eventType {
     if (self.liveDelegate && [self.liveDelegate respondsToSelector:@selector(liveMediaViewController:emitLinkMicObject:)]) {
         [self.liveDelegate liveMediaViewController:self emitLinkMicObject:eventType];

@@ -9,8 +9,8 @@
 #import "PLVPlayerSkinView.h"
 #import <MediaPlayer/MPVolumeView.h>
 #import <Masonry/Masonry.h>
+#import <PolyvFoundationSDK/PLVDateUtil.h>
 #import "PLVBrightnessView.h"
-#import "PLVUtils.h"
 
 #define BlueColor [UIColor colorWithRed:33.0 / 255.0 green:150.0 / 255.0 blue:243.0 / 255.0 alpha:1.0]
 
@@ -312,9 +312,9 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
                 [self sliderTouchDown:self.slider];
             }
         } else {
-            if (self.lastPoint.x <= self.bounds.size.width * 0.5) {//在屏幕左边，上下滑动调整声音
+            if (self.lastPoint.x > self.bounds.size.width * 0.5) {//在屏幕右边，上下滑动调整声音
                 self.panType = PLVPlayerSkinViewTypeAdjusVolume;
-            } else {//在屏幕右边，上下滑动调整亮度
+            } else {//在屏幕左边，上下滑动调整亮度
                 self.panType = PLVPlayerSkinViewTypeAdjusBrightness;
                 [PLVBrightnessView sharedBrightnessView];
             }
@@ -325,7 +325,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
                 CGFloat dx = p.x - self.lastPoint.x;
                 self.slider.value = [self valueOfDistance:dx baseValue:self.slider.value];
                 self.seekSlider.value = self.slider.value;
-                NSString *text = [PLVUtils secondsToString:self.slider.value * self.duration];
+                NSString *text = [PLVDateUtil secondsToString:self.slider.value * self.duration];
                 self.currentPlayTimeLabel.text = text;
                 self.seekTimeLable.text = text;
                 if (gestureRecognizer.state == UIGestureRecognizerStateEnded || gestureRecognizer.state == UIGestureRecognizerStateCancelled) {

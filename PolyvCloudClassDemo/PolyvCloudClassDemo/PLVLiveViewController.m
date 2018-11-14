@@ -22,15 +22,17 @@
 
 @interface PLVLiveViewController () <PLVMediaViewControllerDelegate, PLVLiveMediaViewControllerDelegate, PLVSocketIODelegate, PLVChatroomDelegate>
 
+@property (nonatomic, assign) NSUInteger channelId;//当前直播的频道号
 @property (nonatomic, strong) PLVSocketIO *socketIO;
-@property (nonatomic, strong) PLVSocketObject *login; // 登录对象
+@property (nonatomic, strong) PLVSocketObject *login;//登录对象
 
 @property (nonatomic, strong) PLVLiveMediaViewController *mediaVC;
 @property (nonatomic, strong) FTPageController *pageController;
 @property (nonatomic, strong) PLVChatroomController *publicChatroomController;
 @property (nonatomic, strong) PLVChatroomController *privateChatroomController;
 
-@property (nonatomic, assign) NSUInteger channelId; // 当前频道号
+@property (nonatomic, strong) NSString *nickName;//聊天室用户昵称
+@property (nonatomic, strong) NSString *avatarUrl;//聊天室用户头像地址，HTTPS 协议地址
 
 @end
 
@@ -45,14 +47,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.channelId = [self.channel.channelId unsignedIntegerValue];
+    PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
+    self.channelId = liveConfig.channelId.integerValue;
     
     __weak typeof(self) weakSelf = self;
     if ([PLVChatroomController havePermissionToWatchLive:self.channelId]) {
-        [self setupUI];
+        [weakSelf setupUI];
         
         PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
-        [PLVLiveAPI requestAuthorizationForLinkingSocketWithChannelId:self.channelId Appld:liveConfig.appId appSecret:liveConfig.appSecret success:^(NSDictionary *responseDict) {
+        [PLVLiveAPI requestAuthorizationForLinkingSocketWithChannelId:weakSelf.channelId Appld:liveConfig.appId appSecret:liveConfig.appSecret success:^(NSDictionary *responseDict) {
             [weakSelf initSocketIOWithTokenInfo:responseDict];
         } failure:^(NSError *error) {
             [PLVUtils showHUDWithTitle:@"聊天室Token获取失败！" detail:error.localizedDescription view:weakSelf.view];
@@ -122,42 +125,26 @@
 }
 
 - (void)addMediaViewController:(CGFloat)h {
+    PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
     self.mediaVC = [[PLVLiveMediaViewController alloc] init];
     self.mediaVC.delegate = self;
     self.mediaVC.liveDelegate = self;
-    self.mediaVC.channel = self.channel;
+    self.mediaVC.channelId = liveConfig.channelId;//必须，不能为空
+    self.mediaVC.userId = liveConfig.userId;//必须，不能为空
     self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
     [self.view addSubview:self.mediaVC.view];
     CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
     [self.mediaVC loadSecondaryView:CGRectMake(self.mediaVC.view.frame.size.width - w, self.mediaVC.view.frame.origin.y + self.mediaVC.view.frame.size.height + 44.0, w, (int)(w * PlayerViewScale))];
-    
-    __weak typeof(self)weakSelf = self;
-    [self.channel updateChannelRestrictInfo:^(PLVLiveChannel *channel) {
-        switch (channel.restrictState) {
-            case PLVLiveRestrictNone : {
-                break;
-            }
-            case PLVLiveRestrictPlay: {
-                [weakSelf showNoPermissionAlert:@"该频道设置了限制条件"];
-                break;
-            }
-            default: {
-                [weakSelf showNoPermissionAlert:@"该频道的限制条件获取失败，请重新登录"];
-                break;
-            }
-        }
-    }];
 }
 
 #pragma mark - Private
 - (void)exitCurrentController {
-    // if-else 退出当前页面，模态进来就 dismissViewController
     [self.mediaVC clearResource];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)showNoPermissionAlert:(NSString *)message {
-    __weak typeof(self)weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [weakSelf exitCurrentController];
@@ -167,14 +154,12 @@
 
 #pragma mark - SocketIO
 - (void)initSocketIOWithTokenInfo:(NSDictionary *)responseDict {
-    // 初始化 socketIO 连接对象
-    self.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:responseDict[@"chat_token"] enableLog:NO];
+    self.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:responseDict[@"chat_token"] enableLog:NO];//初始化 socketIO 连接对象
     self.socketIO.delegate = self;
     //self.socketIO.debugMode = YES;
     [self.socketIO connect];
     
-    // 初始化登录对象，nickName、avatarUrl 为空时会使用默认昵称、头像地址
-    self.login = [PLVSocketObject socketObjectForLoginEventWithRoomId:self.channelId nickName:self.nickName avatar:self.avatarUrl userType:PLVSocketObjectUserTypeSlice];
+    self.login = [PLVSocketObject socketObjectForLoginEventWithRoomId:self.channelId nickName:self.nickName avatar:self.avatarUrl userType:PLVSocketObjectUserTypeSlice];//初始化登录对象，nickName、avatarUrl 为空时会使用默认昵称、头像地址
     self.mediaVC.linkMicVC.login = self.login;
     self.mediaVC.linkMicVC.linkMicParams = responseDict;
 }
@@ -191,7 +176,7 @@
 // 此方法可能多次调用，如锁屏后返回会重连聊天室
 - (void)socketIO:(PLVSocketIO *)socketIO didConnectWithInfo:(NSString *)info {
     NSLog(@"%@--%@", NSStringFromSelector(_cmd), info);
-    [socketIO emitMessageWithSocketObject:self.login];   // 登录聊天室
+    [socketIO emitMessageWithSocketObject:self.login];//登录聊天室
 }
 
 - (void)socketIO:(PLVSocketIO *)socketIO didUserStateChange:(PLVSocketUserState)userState {
@@ -258,7 +243,7 @@
 
 #pragma mark <PLVChatroomDelegate>
 - (void)chatroom:(PLVChatroomController *)chatroom didOpenError:(PLVChatroomErrorCode)code {
-    if (code==PLVChatroomErrorCodeBeKicked) {
+    if (code == PLVChatroomErrorCodeBeKicked) {
         [self showNoPermissionAlert:@"您未被授权观看本直播"];
     }
 }
@@ -266,7 +251,7 @@
 - (void)chatroom:(PLVChatroomController *)chatroom emitSocketObject:(PLVSocketChatRoomObject *)object {
     if (self.socketIO.socketIOState == PLVSocketIOStateConnected) {
         [self.socketIO emitMessageWithSocketObject:object];
-    }else {
+    } else {
         [PLVUtils showChatroomMessage:@"聊天室未连接！" addedToView:self.pageController.view];
     }
 }
@@ -313,12 +298,12 @@
 }
 
 - (void)liveMediaViewController:(PLVLiveMediaViewController *)liveVC emitLinkMicObject:(PLVSocketLinkMicEventType)eventType {
-    PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channel.channelId.integerValue userNick:self.login.nickName userPic:self.login.avatar userId:(NSUInteger)self.login.userId.longLongValue userType:PLVSocketObjectUserTypeSlice];
+    PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channelId userNick:self.login.nickName userPic:self.login.avatar userId:(NSUInteger)self.login.userId.longLongValue userType:PLVSocketObjectUserTypeSlice];
     [self.socketIO emitMessageWithSocketObject:linkMicObject];
 }
 
 - (void)liveMediaViewController:(PLVLiveMediaViewController *)liveVC emitAck:(PLVSocketLinkMicEventType)eventType after:(double)after callback:(void (^)(NSArray * _Nonnull))callback {
-    PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channel.channelId.integerValue userNick:self.login.nickName userPic:self.login.avatar userId:(NSUInteger)self.login.userId.longLongValue userType:PLVSocketObjectUserTypeSlice];
+    PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channelId userNick:self.login.nickName userPic:self.login.avatar userId:(NSUInteger)self.login.userId.longLongValue userType:PLVSocketObjectUserTypeSlice];
     [self.socketIO emitACKWithSocketObject:linkMicObject after:after callback:callback];
 }
 

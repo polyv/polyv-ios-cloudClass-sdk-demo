@@ -7,7 +7,7 @@
 //
 
 #import "PLVPhotoBrowser.h"
-#import "PLVAuthorizationManager.h"
+#import <PolyvCloudClassSDK/PLVAuthorizationManager.h>
 #import <MBProgressHUD/MBProgressHUD.h>
 #import <Masonry/Masonry.h>
 

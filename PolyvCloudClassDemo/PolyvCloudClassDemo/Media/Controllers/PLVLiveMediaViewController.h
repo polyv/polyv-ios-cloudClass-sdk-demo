@@ -7,15 +7,15 @@
 //
 
 #import "PLVMediaViewController.h"
-#import <PolyvCloudClassSDK/PLVLiveChannel.h>
-#import "PLVLinkMicController.h"
+#import <PolyvCloudClassSDK/PLVLinkMicController.h>
 
 @protocol PLVLiveMediaViewControllerDelegate;
 
 @interface PLVLiveMediaViewController : PLVMediaViewController
 
+@property (nonatomic, strong) NSString *channelId;//必须，不能为空
+@property (nonatomic, strong) NSString *userId;//必须，不能为空
 @property (nonatomic, weak) id<PLVLiveMediaViewControllerDelegate> liveDelegate;
-@property (nonatomic, strong) PLVLiveChannel *channel;//频道信息，直播播放器需要使用
 @property (nonatomic, strong, readonly) PLVLinkMicController *linkMicVC;//连麦的控件
 
 //显示一条弹幕，该message由外层的键盘输入回调传递进来

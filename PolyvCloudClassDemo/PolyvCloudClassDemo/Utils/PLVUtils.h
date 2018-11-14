@@ -37,6 +37,6 @@
 
 + (nullable UIImage *)imageRotatedByDegrees:(nullable UIImage *)oldImage deg:(CGFloat)degrees;
 
-+ (NSString *)secondsToString:(NSTimeInterval)seconds;
++ (void)presentAlertViewController:(NSString *)title message:(NSString *)message inViewController:(UIViewController *)vc;
 
 @end

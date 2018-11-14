@@ -13,15 +13,22 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //以下的直播字符串参数在官网（https://live.polyv.net/#/develop/appId）上已配置好
     PLVLiveConfig *liveConfig = [PLVLiveConfig sharedInstance];
-    liveConfig.appId =
-    liveConfig.userId =
-    liveConfig.appSecret =
-    liveConfig.vodId =
-    
+    liveConfig.channelId = ;
+    liveConfig.appId = ;
+    liveConfig.userId = ;
+    liveConfig.appSecret = ;
+
+    //直播后，在（https://live.polyv.net/#/channel/你的频道号/playback）中可把某段视频转存到回放列表，然后在官网（https://my.polyv.net/secure/video/）上找到回放的 vodId 字符串值
+    PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
+    vodConfig.vodId = ;
+    //以下字符串 configString，key，iv 的值在官网（https://my.polyv.net/secure/setting/api）上已配置好
     NSError *error = nil;
-    NSString *vodKey = @"yQRmgnzPyCUYDx6weXRATIN8gkp7BYGAl3ATjE/jHZunrULx8CoKa1WGMjfHftVChhIQlCA9bFeDDX+ThiuBHLjsNRjotqxhiz97ZjYaCQH/MhUrbEURv58317PwPuGEf3rbLVPOa4c9jliBcO+22A==";
-    [PLVVodConfig settingsWithConfigString:vodKey error:&error];
+    NSString *configString = ;
+    NSString *key = ;
+    NSString *iv = ;
+    [PLVVodConfig settingsWithConfigString:configString key:key iv:iv error:&error];
     
     return YES;
 }
