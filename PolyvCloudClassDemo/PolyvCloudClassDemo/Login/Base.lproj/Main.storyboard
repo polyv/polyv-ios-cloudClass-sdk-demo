@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -54,7 +54,7 @@
                                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
                                                 <connections>
-                                                    <action selector="switchLive:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Ic9-4F-CT2"/>
+                                                    <action selector="switchLiveAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="htn-gl-gvf"/>
                                                 </connections>
                                             </button>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUb-K4-uR5">
@@ -75,7 +75,7 @@
                                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
                                                 <connections>
-                                                    <action selector="switchVod:" destination="BYZ-38-t0r" eventType="touchUpInside" id="4iD-ne-mPT"/>
+                                                    <action selector="switchVodAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ueg-Or-Rb4"/>
                                                 </connections>
                                             </button>
                                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fMz-7b-fO6">
@@ -96,7 +96,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                                                 <connections>
-                                                    <action selector="textEditChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="7hd-9y-Kwe"/>
+                                                    <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="iYi-Qv-dd8"/>
                                                 </connections>
                                             </textField>
                                             <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="VID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="DP2-8E-X2O">
@@ -109,7 +109,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits"/>
                                                 <connections>
-                                                    <action selector="textEditChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="Ng4-JT-JE1"/>
+                                                    <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="pbA-kA-SyG"/>
                                                 </connections>
                                             </textField>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ON8-jM-RUn" userLabel="LineView">
@@ -130,7 +130,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits"/>
                                                 <connections>
-                                                    <action selector="textEditChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="PvL-n5-1of"/>
+                                                    <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="PNd-sC-51J"/>
                                                 </connections>
                                             </textField>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LNC-XR-S40" userLabel="LineView">
@@ -152,7 +152,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits"/>
                                                 <connections>
-                                                    <action selector="textEditChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="7jD-z4-bd9"/>
+                                                    <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="WRl-iw-x3L"/>
                                                 </connections>
                                             </textField>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1TJ-Ay-ARX" userLabel="LineView">
@@ -174,7 +174,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits"/>
                                                 <connections>
-                                                    <action selector="textEditChanged:" destination="BYZ-38-t0r" eventType="editingChanged" id="nZS-CC-hKO"/>
+                                                    <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="Yyx-Rf-xS8"/>
                                                 </connections>
                                             </textField>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ngg-NN-HcT" userLabel="LineView">
@@ -200,7 +200,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="loginButtonClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GWm-6r-7We"/>
+                                                    <action selector="loginButtonClickAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="jo0-YP-Hrb"/>
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="© 2013-2018 广州易方信息科技股份有限公司 版权所有" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ezz-dZ-a25">

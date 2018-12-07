@@ -1,25 +1,42 @@
 PODS:
+  - AFNetworking (3.2.1):
+    - AFNetworking/NSURLSession (= 3.2.1)
+    - AFNetworking/Reachability (= 3.2.1)
+    - AFNetworking/Security (= 3.2.1)
+    - AFNetworking/Serialization (= 3.2.1)
+    - AFNetworking/UIKit (= 3.2.1)
+  - AFNetworking/NSURLSession (3.2.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.2.1)
+  - AFNetworking/Security (3.2.1)
+  - AFNetworking/Serialization (3.2.1)
+  - AFNetworking/UIKit (3.2.1):
+    - AFNetworking/NSURLSession
   - AgoraRtcEngine_iOS (2.3.1)
   - Masonry (1.1.0)
   - MBProgressHUD (1.1.0)
   - PolyvAliHttpDNS (1.6.7)
-  - PolyvBusinessSDK (0.2.0):
+  - PolyvBusinessSDK (0.4.0):
     - Masonry (~> 1.1)
     - PolyvAliHttpDNS (~> 1.6.7)
-    - PolyvFoundationSDK (~> 0.0.1)
+    - PolyvFoundationSDK (~> 0.4.0)
     - PolyvIJKPlayer (~> 0.3.0)
     - Socket.IO-Client-Swift (~> 13.2.0)
     - Starscream (= 3.0.5)
     - YYModel (~> 1.0.4)
-  - PolyvCloudClassSDK (0.3.0):
+  - PolyvCloudClassSDK (0.4.0):
+    - AFNetworking (~> 3.2.1)
     - AgoraRtcEngine_iOS (~> 2.3.1)
-    - PolyvBusinessSDK (~> 0.2.0)
-    - PolyvFoundationSDK (~> 0.0.2)
-  - PolyvFoundationSDK (0.0.2)
-  - PolyvIJKPlayer (0.3.0)
-  - SDWebImage (4.4.2):
-    - SDWebImage/Core (= 4.4.2)
-  - SDWebImage/Core (4.4.2)
+    - PolyvBusinessSDK (~> 0.4.0)
+    - PolyvFoundationSDK (~> 0.4.0)
+    - SDWebImage (~> 4.4.0)
+  - PolyvFoundationSDK (0.4.0)
+  - PolyvIJKPlayer (0.3.1)
+  - SDWebImage (4.4.3):
+    - SDWebImage/Core (= 4.4.3)
+  - SDWebImage/Core (4.4.3)
   - Socket.IO-Client-Swift (13.2.1):
     - Starscream (~> 3.0.2)
   - Starscream (3.0.5)
@@ -27,11 +44,11 @@ PODS:
 
 DEPENDENCIES:
   - MBProgressHUD (~> 1.1.0)
-  - PolyvCloudClassSDK (~> 0.3.0)
-  - SDWebImage (~> 4.4.0)
+  - PolyvCloudClassSDK (~> 0.4.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - AFNetworking
     - AgoraRtcEngine_iOS
     - Masonry
     - MBProgressHUD
@@ -46,19 +63,20 @@ SPEC REPOS:
     - YYModel
 
 SPEC CHECKSUMS:
+  AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
   AgoraRtcEngine_iOS: b0304fee470e0b88bd3abedf9ce1c4309f4fd722
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   PolyvAliHttpDNS: 0fbbbcd3aab07a48305d36884681ca33849cc0b7
-  PolyvBusinessSDK: dcbae1fed46410c4e2d36bc5dfa4ff74b3c4d608
-  PolyvCloudClassSDK: a032ea623d069d708189712ffe7a03cbd44b6dac
-  PolyvFoundationSDK: d479b23c160f8c14d595245b804b717e84ed7e0f
-  PolyvIJKPlayer: 1577e6890fdbec60c44bea6c7425f7215a58b6a0
-  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  PolyvBusinessSDK: be8cccc4141f0b745204487022f8b34d3d66a215
+  PolyvCloudClassSDK: c87eb63cb6c434a81d885a651e41ac00c406597d
+  PolyvFoundationSDK: 955dcdaf673469c5b4ab0d21b6f5d9f1434f042b
+  PolyvIJKPlayer: 85d8f6a19d5f3040c88a6e6cb7ab88cb145c67b0
+  SDWebImage: c5594f1a19c48d526d321e548902b56b479cd508
   Socket.IO-Client-Swift: b94943e2fb916fe2f95244b9ed21828634002280
   Starscream: faf918b2f2eff7d5dd21180646bf015a669673bd
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
 
-PODFILE CHECKSUM: 11b8439011f2ca5afa99f90f28af0041e9232990
+PODFILE CHECKSUM: fb80f775c07485b7d8e3a4962dccdf42357705f0
 
 COCOAPODS: 1.5.3
