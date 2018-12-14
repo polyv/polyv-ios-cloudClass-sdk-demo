@@ -177,15 +177,10 @@
 
 + (CGSize)imageSizeOnScaleWidth:(UIImage*)image {
     CGSize imageSize = [UIImage getImageSize:image];
-    CGFloat w = [UIScreen mainScreen].bounds.size.width * [UIScreen mainScreen].scale;
+    CGFloat w = 500.0 * image.scale;
     if (imageSize.width > w) {
         CGFloat scale_w = w / imageSize.width;
-        CGSize imageSize_w = CGSizeMake(w, (int)(imageSize.height * scale_w));
-        if (imageSize_w.width * imageSize_w.height * 3 >= imageSize.width * imageSize.height) {
-            imageSize = imageSize_w;
-        } else {
-           imageSize = CGSizeMake((int)(imageSize.width / 2.5), (int)(imageSize.height / 2.5));
-        }
+        imageSize = CGSizeMake(w, (int)(imageSize.height * scale_w));
     }
     return imageSize;
 }

@@ -21,10 +21,7 @@
 @synthesize player;
 @synthesize vodId;
 
-- (void)dealloc {
-    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
-}
-
+#pragma mark - life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     

@@ -123,7 +123,7 @@
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
         if (!error) {
             NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:sampleBuffer];
-            weakSelf.selectedImage = [UIImage decodedOriginImage:[UIImage imageWithData:jpegData]];
+            weakSelf.selectedImage = [UIImage decodedScaleImage:[UIImage imageWithData:jpegData]];
             weakSelf.imageView.image = weakSelf.selectedImage;
             [weakSelf switchView:YES];
         } else {

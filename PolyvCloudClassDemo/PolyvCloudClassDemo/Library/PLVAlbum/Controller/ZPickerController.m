@@ -404,7 +404,7 @@
     self.view.backgroundColor = ViewBackgroupColor;
     [MyTool leftBarButtonItemAction:@selector(exitAcion) target:self];
     self.navigationController.delegate = self;
-    self.originY = self.navigationController.navigationBar.frame.origin.y + self.navigationController.navigationBar.frame.size.height;
+    self.originY = [UIApplication sharedApplication].statusBarFrame.size.height + self.navigationController.navigationBar.frame.size.height;
     
     if (self.albumsBtn == nil) {
         self.albumsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -730,7 +730,7 @@
         @autoreleasepool {
             imgInfo.requestID = [UIImage requestOriginImageData:imgInfo.asset synchronous:count > 1 ? YES : NO imageHandler:^(UIImage *img, NSString *_Nullable dataUTI, UIImageOrientation orientation, NSDictionary *_Nullable info) {
                 if (img != nil) {
-                    imgInfo.originImg = [UIImage decodedOriginImage:img];
+                    imgInfo.originImg = [UIImage decodedScaleImage:img];
                     if (flag) {
                         [weak_self uploadImage:imgInfo.originImg];
                     }

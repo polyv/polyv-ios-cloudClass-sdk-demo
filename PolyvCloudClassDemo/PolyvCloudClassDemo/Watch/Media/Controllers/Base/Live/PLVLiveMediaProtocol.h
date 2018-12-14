@@ -30,7 +30,11 @@
 //取消连麦，由外层连麦控件调用
 - (void)cancelLinkMic;
 
-//当前LiveVideoChannel对象
-- (PLVLiveVideoChannel *)currentChannel;
+/**
+ 获取当前直播的seesionId
+ 
+ @return 返回值有可能为 nil，调用层需要做判断
+ */
+- (NSString *)currentChannelSessionId;
 
 @end

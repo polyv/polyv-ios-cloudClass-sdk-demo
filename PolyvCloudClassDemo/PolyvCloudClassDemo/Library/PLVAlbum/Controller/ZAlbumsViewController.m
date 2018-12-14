@@ -164,4 +164,17 @@
     });
 }
 
+#pragma mark - view controls
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return NO;
+}
+
 @end

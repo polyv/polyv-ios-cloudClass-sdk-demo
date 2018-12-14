@@ -77,7 +77,7 @@
     delBtn.layer.cornerRadius = 5.0;
     delBtn.backgroundColor = [UIColor colorWithRed:234.0 / 255.0 green:234.0/ 255.0 blue:234.0/ 255.0 alpha:1.0];
     delBtn.frame = CGRectMake(self.scrollView.frame.origin.x + self.scrollView.frame.size.width, 5.0, itemWidth - 5.0, itemHeight - 5.0);
-    [delBtn setImage:[UIImage imageNamed:@"plv_faceDelete.png"] forState:UIControlStateNormal];
+    [delBtn setImage:[UIImage imageNamed:@"plv_backspace"] forState:UIControlStateNormal];
     [delBtn addTarget:self action:@selector(delBtnTouchBegin:)forControlEvents:UIControlEventTouchDown];
     [delBtn addTarget:self action:@selector(delBtnTouchEnd:)forControlEvents:UIControlEventTouchUpInside];
     [delBtn addTarget:self action:@selector(delBtnTouchEnd:)forControlEvents:UIControlEventTouchUpOutside];

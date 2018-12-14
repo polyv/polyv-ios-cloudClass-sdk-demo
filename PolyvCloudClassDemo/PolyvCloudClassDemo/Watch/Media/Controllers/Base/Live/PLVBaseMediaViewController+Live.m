@@ -61,8 +61,8 @@
     }
 }
 
-- (PLVLiveVideoChannel *)currentChannel {
-    return ((PLVLivePlayerController *)self.player).channel;
+- (NSString *)currentChannelSessionId; {
+    return [((PLVLivePlayerController *)self.player) currentChannelSessionId];
 }
 
 #pragma mark - PLVPlayerSkinViewDelegate

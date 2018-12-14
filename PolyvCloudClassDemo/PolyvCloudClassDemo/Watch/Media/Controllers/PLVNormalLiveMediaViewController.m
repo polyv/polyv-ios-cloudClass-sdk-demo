@@ -26,11 +26,6 @@
 @synthesize player;
 
 #pragma mark - life cycle
-
-- (void)dealloc {
-    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self loadSkinView:PLVPlayerSkinViewTypeNormalLive];

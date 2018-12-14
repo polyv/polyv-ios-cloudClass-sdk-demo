@@ -17,14 +17,12 @@
 		220CB19221B8C95B0034C384 /* plv_input_user_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */; };
 		220CB19321B8C95B0034C384 /* plv_flower@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17B21B8C95B0034C384 /* plv_flower@2x.png */; };
 		220CB19421B8C95B0034C384 /* plv_like@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17C21B8C95B0034C384 /* plv_like@2x.png */; };
-		220CB19521B8C95B0034C384 /* plv_emoji@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17D21B8C95B0034C384 /* plv_emoji@2x.png */; };
 		220CB19621B8C95B0034C384 /* plv_like@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17E21B8C95B0034C384 /* plv_like@3x.png */; };
 		220CB19721B8C95B0034C384 /* plv_keyboard@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17F21B8C95B0034C384 /* plv_keyboard@2x.png */; };
 		220CB19821B8C95B0034C384 /* plv_input_user_select@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18021B8C95B0034C384 /* plv_input_user_select@2x.png */; };
 		220CB19921B8C95B0034C384 /* plv_shoot@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18121B8C95B0034C384 /* plv_shoot@3x.png */; };
 		220CB19A21B8C95B0034C384 /* plv_more@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18221B8C95B0034C384 /* plv_more@2x.png */; };
 		220CB19B21B8C95B0034C384 /* plv_btn_like@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18321B8C95B0034C384 /* plv_btn_like@2x.png */; };
-		220CB19C21B8C95B0034C384 /* plv_faceDelete@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18421B8C95B0034C384 /* plv_faceDelete@2x.png */; };
 		220CB19D21B8C95B0034C384 /* plv_btn_like@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18521B8C95B0034C384 /* plv_btn_like@3x.png */; };
 		220CB19E21B8C95B0034C384 /* plv_more@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18621B8C95B0034C384 /* plv_more@3x.png */; };
 		220CB19F21B8C95B0034C384 /* plv_shoot@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB18721B8C95B0034C384 /* plv_shoot@2x.png */; };
@@ -111,6 +109,15 @@
 		672D7CEF212D7B1500974886 /* FTPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D7CEA212D7B1500974886 /* FTPageController.m */; };
 		672D7CF0212D7B1500974886 /* FTTitleViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D7CEC212D7B1500974886 /* FTTitleViewCell.m */; };
 		672D7CF1212D7B1500974886 /* FTTitleViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 672D7CEE212D7B1500974886 /* FTTitleViewCell.xib */; };
+		673631EA21BF5D41006868DE /* plv_flower@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E421BF5D41006868DE /* plv_flower@3x.png */; };
+		673631EB21BF5D41006868DE /* plv_input_user_normal@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E521BF5D41006868DE /* plv_input_user_normal@3x.png */; };
+		673631EC21BF5D41006868DE /* plv_backspace@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E621BF5D41006868DE /* plv_backspace@3x.png */; };
+		673631ED21BF5D41006868DE /* plv_backspace@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E721BF5D41006868DE /* plv_backspace@2x.png */; };
+		673631EE21BF5D41006868DE /* plv_input_user_select@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E821BF5D41006868DE /* plv_input_user_select@3x.png */; };
+		673631F321BF5FF3006868DE /* plv_emoji_off@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631EF21BF5FF2006868DE /* plv_emoji_off@2x.png */; };
+		673631F421BF5FF3006868DE /* plv_emoji_off@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631F021BF5FF2006868DE /* plv_emoji_off@3x.png */; };
+		673631F521BF5FF3006868DE /* plv_emoji_on@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631F121BF5FF3006868DE /* plv_emoji_on@3x.png */; };
+		673631F621BF5FF3006868DE /* plv_emoji_on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631F221BF5FF3006868DE /* plv_emoji_on@2x.png */; };
 		6740D66C2136A42D0076AF7D /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6662136A42D0076AF7D /* LICENSE */; };
 		6740D66D2136A42D0076AF7D /* README.mdown in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6672136A42D0076AF7D /* README.mdown */; };
 		6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D66A2136A42D0076AF7D /* MarqueeLabel.m */; };
@@ -135,14 +142,12 @@
 		220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_normal@2x.png"; sourceTree = "<group>"; };
 		220CB17B21B8C95B0034C384 /* plv_flower@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_flower@2x.png"; sourceTree = "<group>"; };
 		220CB17C21B8C95B0034C384 /* plv_like@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_like@2x.png"; sourceTree = "<group>"; };
-		220CB17D21B8C95B0034C384 /* plv_emoji@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_emoji@2x.png"; sourceTree = "<group>"; };
 		220CB17E21B8C95B0034C384 /* plv_like@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_like@3x.png"; sourceTree = "<group>"; };
 		220CB17F21B8C95B0034C384 /* plv_keyboard@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_keyboard@2x.png"; sourceTree = "<group>"; };
 		220CB18021B8C95B0034C384 /* plv_input_user_select@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_select@2x.png"; sourceTree = "<group>"; };
 		220CB18121B8C95B0034C384 /* plv_shoot@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_shoot@3x.png"; sourceTree = "<group>"; };
 		220CB18221B8C95B0034C384 /* plv_more@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_more@2x.png"; sourceTree = "<group>"; };
 		220CB18321B8C95B0034C384 /* plv_btn_like@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_like@2x.png"; sourceTree = "<group>"; };
-		220CB18421B8C95B0034C384 /* plv_faceDelete@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_faceDelete@2x.png"; sourceTree = "<group>"; };
 		220CB18521B8C95B0034C384 /* plv_btn_like@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_like@3x.png"; sourceTree = "<group>"; };
 		220CB18621B8C95B0034C384 /* plv_more@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_more@3x.png"; sourceTree = "<group>"; };
 		220CB18721B8C95B0034C384 /* plv_shoot@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_shoot@2x.png"; sourceTree = "<group>"; };
@@ -271,6 +276,15 @@
 		672D7CEC212D7B1500974886 /* FTTitleViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTTitleViewCell.m; sourceTree = "<group>"; };
 		672D7CED212D7B1500974886 /* FTTitleViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTTitleViewCell.h; sourceTree = "<group>"; };
 		672D7CEE212D7B1500974886 /* FTTitleViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FTTitleViewCell.xib; sourceTree = "<group>"; };
+		673631E421BF5D41006868DE /* plv_flower@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_flower@3x.png"; sourceTree = "<group>"; };
+		673631E521BF5D41006868DE /* plv_input_user_normal@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_normal@3x.png"; sourceTree = "<group>"; };
+		673631E621BF5D41006868DE /* plv_backspace@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_backspace@3x.png"; sourceTree = "<group>"; };
+		673631E721BF5D41006868DE /* plv_backspace@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_backspace@2x.png"; sourceTree = "<group>"; };
+		673631E821BF5D41006868DE /* plv_input_user_select@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_select@3x.png"; sourceTree = "<group>"; };
+		673631EF21BF5FF2006868DE /* plv_emoji_off@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_emoji_off@2x.png"; sourceTree = "<group>"; };
+		673631F021BF5FF2006868DE /* plv_emoji_off@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_emoji_off@3x.png"; sourceTree = "<group>"; };
+		673631F121BF5FF3006868DE /* plv_emoji_on@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_emoji_on@3x.png"; sourceTree = "<group>"; };
+		673631F221BF5FF3006868DE /* plv_emoji_on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_emoji_on@2x.png"; sourceTree = "<group>"; };
 		6740D64521364C010076AF7D /* PCCUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PCCUtils.m; sourceTree = "<group>"; };
 		6740D64621364C010076AF7D /* PCCUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCCUtils.h; sourceTree = "<group>"; };
 		6740D6662136A42D0076AF7D /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -279,8 +293,8 @@
 		6740D66B2136A42D0076AF7D /* MarqueeLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarqueeLabel.h; sourceTree = "<group>"; };
 		6761E9EE218016F00026E8A6 /* PLVPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPhotoBrowser.h; sourceTree = "<group>"; };
 		6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPhotoBrowser.m; sourceTree = "<group>"; };
-		6CED54E876F61B22EE11843A /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		F4E34B541FC6E1E11DFB2C34 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		6B42C2D08653AB8AC063BCF8 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		6C82C2D0D7032A2506A59541 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		F8127FE369CF4921ABCA4A08 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -340,22 +354,29 @@
 		220CB17921B8C95B0034C384 /* skin */ = {
 			isa = PBXGroup;
 			children = (
-				220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */,
+				673631EF21BF5FF2006868DE /* plv_emoji_off@2x.png */,
+				673631F021BF5FF2006868DE /* plv_emoji_off@3x.png */,
+				673631F221BF5FF3006868DE /* plv_emoji_on@2x.png */,
+				673631F121BF5FF3006868DE /* plv_emoji_on@3x.png */,
+				673631E721BF5D41006868DE /* plv_backspace@2x.png */,
+				673631E621BF5D41006868DE /* plv_backspace@3x.png */,
 				220CB17B21B8C95B0034C384 /* plv_flower@2x.png */,
-				220CB17C21B8C95B0034C384 /* plv_like@2x.png */,
-				220CB17D21B8C95B0034C384 /* plv_emoji@2x.png */,
-				220CB17E21B8C95B0034C384 /* plv_like@3x.png */,
-				220CB17F21B8C95B0034C384 /* plv_keyboard@2x.png */,
+				673631E421BF5D41006868DE /* plv_flower@3x.png */,
+				673631E521BF5D41006868DE /* plv_input_user_normal@3x.png */,
+				673631E821BF5D41006868DE /* plv_input_user_select@3x.png */,
+				220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */,
 				220CB18021B8C95B0034C384 /* plv_input_user_select@2x.png */,
-				220CB18121B8C95B0034C384 /* plv_shoot@3x.png */,
-				220CB18221B8C95B0034C384 /* plv_more@2x.png */,
+				220CB17F21B8C95B0034C384 /* plv_keyboard@2x.png */,
 				220CB18321B8C95B0034C384 /* plv_btn_like@2x.png */,
-				220CB18421B8C95B0034C384 /* plv_faceDelete@2x.png */,
 				220CB18521B8C95B0034C384 /* plv_btn_like@3x.png */,
+				220CB17C21B8C95B0034C384 /* plv_like@2x.png */,
+				220CB17E21B8C95B0034C384 /* plv_like@3x.png */,
+				220CB18221B8C95B0034C384 /* plv_more@2x.png */,
 				220CB18621B8C95B0034C384 /* plv_more@3x.png */,
-				220CB18721B8C95B0034C384 /* plv_shoot@2x.png */,
-				220CB18821B8C95B0034C384 /* plv_album@3x.png */,
 				220CB18921B8C95B0034C384 /* plv_album@2x.png */,
+				220CB18821B8C95B0034C384 /* plv_album@3x.png */,
+				220CB18721B8C95B0034C384 /* plv_shoot@2x.png */,
+				220CB18121B8C95B0034C384 /* plv_shoot@3x.png */,
 			);
 			path = skin;
 			sourceTree = "<group>";
@@ -783,8 +804,8 @@
 		AB0E412E19A1496BAD99BFDC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6CED54E876F61B22EE11843A /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
-				F4E34B541FC6E1E11DFB2C34 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
+				6C82C2D0D7032A2506A59541 /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
+				6B42C2D08653AB8AC063BCF8 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -851,14 +872,15 @@
 			files = (
 				220CB19221B8C95B0034C384 /* plv_input_user_normal@2x.png in Resources */,
 				22D9ABD121B676FB003DFD42 /* plv_shoot_close@3x.png in Resources */,
-				220CB19521B8C95B0034C384 /* plv_emoji@2x.png in Resources */,
 				220CB1A021B8C95B0034C384 /* plv_album@3x.png in Resources */,
 				229F768621ABA1600085F5DE /* plv_skin_switchCamera@3x.png in Resources */,
 				22D9ABCF21B676FB003DFD42 /* plv_shoot_close@2x.png in Resources */,
 				229F768421ABA1600085F5DE /* plv_skin_close@2x.png in Resources */,
+				673631ED21BF5D41006868DE /* plv_backspace@2x.png in Resources */,
 				22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */,
 				22D9ABD021B676FB003DFD42 /* plv_shoot_switchCamera@2x.png in Resources */,
 				22D9AB8721B66D13003DFD42 /* plv_resend@2x.png in Resources */,
+				673631F621BF5FF3006868DE /* plv_emoji_on@2x.png in Resources */,
 				22D9ABC521B66E34003DFD42 /* plv_btn_shoot@3x.png in Resources */,
 				220CB19421B8C95B0034C384 /* plv_like@2x.png in Resources */,
 				6740D66C2136A42D0076AF7D /* LICENSE in Resources */,
@@ -876,13 +898,14 @@
 				67219F4B217F3B4300756A54 /* plv_btn_download@3x.png in Resources */,
 				220CB1A221B8C95B0034C384 /* Emotion.bundle in Resources */,
 				229F768021ABA1600085F5DE /* plv_skin_player_background@3x.png in Resources */,
-				220CB19C21B8C95B0034C384 /* plv_faceDelete@2x.png in Resources */,
 				22D9ABC221B66E34003DFD42 /* cancel@2x.png in Resources */,
 				220CB19B21B8C95B0034C384 /* plv_btn_like@2x.png in Resources */,
 				22B27D72219BC5F8003550EA /* plv_logo@3x.png in Resources */,
 				220CB1A121B8C95B0034C384 /* plv_album@2x.png in Resources */,
 				229F768E21ABA1600085F5DE /* PLVPlayerSkin.bundle in Resources */,
+				673631EA21BF5D41006868DE /* plv_flower@3x.png in Resources */,
 				22D9AB8621B66D13003DFD42 /* plv_resend@3x.png in Resources */,
+				673631F521BF5FF3006868DE /* plv_emoji_on@3x.png in Resources */,
 				229F768721ABA1600085F5DE /* plv_skin_switchCamera@2x.png in Resources */,
 				221AD3D0211A86C3000A423A /* Main.storyboard in Resources */,
 				220CB19721B8C95B0034C384 /* plv_keyboard@2x.png in Resources */,
@@ -893,18 +916,23 @@
 				229F766E21ABA1600085F5DE /* plv_img_default_avatar@2x.png in Resources */,
 				22D9ABC321B66E34003DFD42 /* plv_shoot_send@2x.png in Resources */,
 				220CB19921B8C95B0034C384 /* plv_shoot@3x.png in Resources */,
+				673631F321BF5FF3006868DE /* plv_emoji_off@2x.png in Resources */,
 				220CB19A21B8C95B0034C384 /* plv_more@2x.png in Resources */,
 				220CB19E21B8C95B0034C384 /* plv_more@3x.png in Resources */,
 				22D9ABC421B66E34003DFD42 /* plv_shoot_cancel@3x.png in Resources */,
 				220CB19F21B8C95B0034C384 /* plv_shoot@2x.png in Resources */,
+				673631EB21BF5D41006868DE /* plv_input_user_normal@3x.png in Resources */,
 				220CB19821B8C95B0034C384 /* plv_input_user_select@2x.png in Resources */,
+				673631EE21BF5D41006868DE /* plv_input_user_select@3x.png in Resources */,
 				22B27D71219BC5F8003550EA /* plv_clear@3x.png in Resources */,
 				67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */,
 				229F766D21ABA1600085F5DE /* plv_skin_flower@3x.png in Resources */,
 				672D7CF1212D7B1500974886 /* FTTitleViewCell.xib in Resources */,
 				22D9ABC621B66E34003DFD42 /* plv_btn_shoot@2x.png in Resources */,
+				673631EC21BF5D41006868DE /* plv_backspace@3x.png in Resources */,
 				220CB19321B8C95B0034C384 /* plv_flower@2x.png in Resources */,
 				22AD6182218316A50053F496 /* plv_clear@2x.png in Resources */,
+				673631F421BF5FF3006868DE /* plv_emoji_off@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,7 +1171,7 @@
 		};
 		22142F662113094200062C6E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6CED54E876F61B22EE11843A /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
+			baseConfigurationReference = 6C82C2D0D7032A2506A59541 /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1174,7 +1202,7 @@
 		};
 		22142F672113094200062C6E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F4E34B541FC6E1E11DFB2C34 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
+			baseConfigurationReference = 6B42C2D08653AB8AC063BCF8 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

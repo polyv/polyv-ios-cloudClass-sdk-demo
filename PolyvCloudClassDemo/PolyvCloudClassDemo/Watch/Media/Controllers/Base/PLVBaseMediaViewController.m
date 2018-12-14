@@ -45,6 +45,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
+- (void)dealloc {
+    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
+}
+
 #pragma mark - public clear
 - (void)clearResource {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -140,7 +144,7 @@
         self.zoomAnimationing = YES;
         
         __weak typeof(self) weakSelf = self;
-        [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)orientation animated:YES];
+        [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)(orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown ? UIDeviceOrientationPortrait : orientation) animated:YES];
         [UIView animateWithDuration:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             weakSelf.skinView.fullscreen = fullscreen;
             if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(statusBarAppearanceNeedsUpdate:)]) {

@@ -54,20 +54,22 @@
     PLVSocketChatRoomObject *chatRoomObject = [self.welcomeArray lastObject];
     [self.welcomeArray removeLastObject];
     NSString *nickNames = chatRoomObject.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserNickKey];
+    NSUInteger length = nickNames.length;
     if (all) {
         for (NSInteger i = 0; i < 2; i++) {
             chatRoomObject = self.welcomeArray[i];
             nickNames = [nickNames stringByAppendingString:[NSString stringWithFormat:@"、%@", chatRoomObject.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserNickKey]]];
         }
-        nickNames = [nickNames stringByAppendingString:[NSString stringWithFormat:@"等[%d]人", (int)self.welcomeArray.count + 1]];
+        length = nickNames.length;
+        nickNames = [nickNames stringByAppendingString:[NSString stringWithFormat:@"等%d人", (int)self.welcomeArray.count + 1]];
         [self.welcomeArray removeAllObjects];
     }
-    [self pop:nickNames];
+    [self pop:nickNames length:length];
 }
 
-- (void)pop:(NSString *)nickNames {
-    NSMutableAttributedString *welcomeMessage = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"欢迎 %@ 加入", nickNames]];
-    [welcomeMessage setAttributes:@{NSForegroundColorAttributeName : [UIColor colorWithRed:130.0 / 255.0 green:179.0 / 255.0 blue:201.0 / 255.0 alpha:1.0]} range:NSMakeRange(3, nickNames.length)];
+- (void)pop:(NSString *)nickNames length:(NSUInteger)length {
+    NSMutableAttributedString *welcomeMessage = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"欢迎%@加入", nickNames]];
+    [welcomeMessage setAttributes:@{NSForegroundColorAttributeName : [UIColor colorWithRed:130.0 / 255.0 green:179.0 / 255.0 blue:201.0 / 255.0 alpha:1.0]} range:NSMakeRange(2, length)];
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(pop:welcomeMessage:)]) {
         [self.delegate pop:self welcomeMessage:welcomeMessage];
@@ -78,23 +80,17 @@
     @synchronized (self) {
         if (self.chatRoomObjectOfMe != nil) {
             NSString *nickNames = self.chatRoomObjectOfMe.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserNickKey];
-            [self pop:nickNames];
+            [self pop:nickNames length:nickNames.length];
             self.chatRoomObjectOfMe = nil;
         } else {
             NSUInteger count = self.welcomeArray.count;
             if (count > 0) {
-                if (count >= 10) {
-                    if ((++self.timing) % 3 == 0) {
+                if ((self.timing++) % 3 == 0) {
+                    if (count >= 10) {
                         [self popWelcomeMessage:YES];
-                    }
-                    
-                } else if (count > 3) {
-                    if ((++self.timing) % 3 == 0) {
+                    } else {
                         [self popWelcomeMessage:NO];
                     }
-                } else {
-                    self.timing = 0;
-                    [self popWelcomeMessage:NO];
                 }
             }
         }

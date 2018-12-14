@@ -61,6 +61,9 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 + (instancetype)chatroomWithType:(PLVTextInputViewType)type roomId:(NSUInteger)roomId frame:(CGRect)frame;
 - (instancetype)initChatroomWithType:(PLVTextInputViewType)type roomId:(NSUInteger)roomId frame:(CGRect)frame;
 
+//准备退出时，必须清空定时器资源
+- (void)clearResource;
+
 /// 加载子视图
 - (void)loadSubViews;
 

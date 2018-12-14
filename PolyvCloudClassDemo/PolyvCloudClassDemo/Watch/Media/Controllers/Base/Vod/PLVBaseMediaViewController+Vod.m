@@ -12,7 +12,7 @@
 
 @end
 
-@implementation PLVBaseMediaViewController (Live)
+@implementation PLVBaseMediaViewController (Vod)
 
 #pragma mark - PLVPlayerSkinViewDelegate
 - (void)playerSkinView:(PLVPlayerSkinView *)skinView speed:(CGFloat)speed {

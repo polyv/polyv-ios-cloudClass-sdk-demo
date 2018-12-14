@@ -190,6 +190,8 @@
 - (void)exitCurrentController {//退出前释放播放器，连麦，socket资源
     [self.mediaVC clearResource];
     [self.linkMicVC clearResource];
+    [self.publicChatroomController clearResource];
+    [self.privateChatroomController clearResource];
     [self clearSocketIO];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -332,13 +334,13 @@
     }
 }
 
+- (NSString *)currentChannelSessionId:(PLVChatroomController *)chatroom {
+    return [self.mediaVC currentChannelSessionId];
+}
+
 - (void)chatroom:(PLVChatroomController *)chatroom didSendSpeakContent:(NSString *)content {
     NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:content font:[UIFont systemFontOfSize:14]];
     [self.mediaVC danmu:attributedStr];
-}
-
-- (NSString *)currentChannelSessionId:(PLVChatroomController *)chatroom {
-    return [self.mediaVC currentChannel].sessionId;
 }
 
 #pragma mark - PLVBaseMediaViewControllerDelegate
@@ -351,22 +353,6 @@
     
     BOOL fullscreen = self.mediaVC.skinView.fullscreen;
     self.triviaCardVC.view.alpha = fullscreen ? 0.0 : 1.0;//横屏时隐藏答题卡
-    
-    if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
-        if (fullscreen) {
-            [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
-            CGRect rect = CGRectMake(0.0, 0.0, [UIScreen mainScreen].bounds.size.width, self.linkMicVC.view.frame.size.height);
-            if (@available(iOS 11.0, *)) {
-                CGRect safeFrame = [UIApplication sharedApplication].delegate.window.safeAreaLayoutGuide.layoutFrame;
-                rect.origin.x = safeFrame.origin.x;
-                rect.size.width -= rect.origin.x * 2.0;
-            }
-            self.linkMicVC.view.frame = rect;
-        } else {
-            self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-            [self.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.view];
-        }
-    }
     
     if (fullscreen) {
         [self.publicChatroomController.inputView tapAction];

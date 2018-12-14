@@ -7,8 +7,8 @@
 //
 
 #import "PLVTextInputView.h"
-#import <Masonry/Masonry.h>
 #import "objc/runtime.h"
+#import <Masonry/Masonry.h>
 #import "PLVFaceView.h"
 #import "PLVEmojiModel.h"
 #import "PLVKeyboardMoreView.h"
@@ -162,17 +162,18 @@ static BOOL nickNameSetted = NO;
         self.backgroundColor = [UIColor colorWithRed:245.0 / 255.0 green:245.0 / 255.0 blue:247.0 / 255.0 alpha:1.0];
         self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
         
-        CGRect rect = CGRectMake(48.0, 7.0, self.bounds.size.width - 96.0, 37.0);
+        CGRect rect = CGRectMake(48.0, 6.5, self.bounds.size.width - 96.0, 37.0);
         if (type == PLVTextInputViewTypePrivate) {
-            rect = CGRectMake(10.0, 7.0, self.bounds.size.width - 20.0, 37.0);
+            rect = CGRectMake(10.0, 6.5, self.bounds.size.width - 20.0, 37.0);
         }
         self.textView = [[PLVTextView alloc] initWithFrame:rect];
         self.textView.delegate = self;
         self.textView.backgroundColor = [UIColor whiteColor];
         self.textView.returnKeyType = UIReturnKeySend;
         self.textView.scrollEnabled = NO;
+        self.textView.showsHorizontalScrollIndicator = NO;
         UIEdgeInsets oldTextContainerInset = self.textView.textContainerInset;
-        oldTextContainerInset.right = 20.0;
+        oldTextContainerInset.right = 24.0;
         self.textView.textContainerInset = oldTextContainerInset;
         self.textView.layer.borderColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
         self.textView.layer.borderWidth = 0.65f;
@@ -196,7 +197,7 @@ static BOOL nickNameSetted = NO;
         self.bottomHeight = self.bounds.size.height - (self.textView.frame.origin.y * 2.0 + self.textView.frame.size.height);
         self.lastTextViewHeight = ceilf([self.textView sizeThatFits:self.textView.frame.size].height);
         
-        UIEdgeInsets emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 15.0, 15.0);
+        UIEdgeInsets emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 15.0);
         if (type < PLVTextInputViewTypePrivate) {
             self.userBtn = [self addButton:@"plv_input_user_normal.png" selectedImgName:@"plv_input_user_select.png" action:@selector(onlyTeacherAction:) inView:self];
             [self remakeConstraints:self.userBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
@@ -207,12 +208,12 @@ static BOOL nickNameSetted = NO;
             self.moreBtn = [self addButton:@"plv_more.png" selectedImgName:nil action:@selector(moreAction:) inView:self];
             self.moreBtn.hidden = YES;
             
-            emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 15.0, 53.0);
+            emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 53.0);
         }
         
-        self.emojiBtn = [self addButton:@"plv_emoji.png" selectedImgName:@"plv_keyboard.png" action:@selector(emojiAction:) inView:self];
+        self.emojiBtn = [self addButton:@"plv_emoji_off" selectedImgName:@"plv_emoji_on" action:@selector(emojiAction:) inView:self];
         self.emojiBtn.alpha = 0.5;
-        [self remakeConstraints:self.emojiBtn margin:emojiMagin size:CGSizeMake(20.0, 20.0) baseView:self];
+        [self remakeConstraints:self.emojiBtn margin:emojiMagin size:CGSizeMake(28.0, 28.0) baseView:self];
         
         CGFloat faceHeight = 200.0 + self.bottomHeight;
         CGFloat moreHeight = 104.0 + self.bottomHeight;
@@ -237,7 +238,7 @@ static BOOL nickNameSetted = NO;
         [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 48.0) size:CGSizeMake(28.0, 28.0) baseView:self];
         self.moreBtn.hidden = NO;
         [self remakeConstraints:self.moreBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-        [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 15.0, 91.0) size:CGSizeMake(20.0, 20.0) baseView:self];
+        [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 91.0) size:CGSizeMake(28.0, 28.0) baseView:self];
     }
 }
 
@@ -361,18 +362,18 @@ static BOOL nickNameSetted = NO;
         if (flag) {
             CGRect keyBoardFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
             CGRect covertRect = [[UIApplication sharedApplication].delegate.window convertRect:keyBoardFrame toView:weakSelf.superview];
-            rect.origin.y = covertRect.origin.y - rect.size.height + weakSelf.bottomHeight + 1.0;
+            rect.origin.y = covertRect.origin.y - rect.size.height + weakSelf.bottomHeight;
             faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
             moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
         } else {
             if (weakSelf.emojiBtn.selected) {
                 faceRect.origin.y = weakSelf.faceOriginRect.origin.y - faceRect.size.height;
                 moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
-                rect.origin.y = faceRect.origin.y - rect.size.height + weakSelf.bottomHeight + 1.0;
+                rect.origin.y = faceRect.origin.y - rect.size.height + weakSelf.bottomHeight;
             } else if (self.moreBtn.selected) {
                 faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
                 moreRect.origin.y = weakSelf.moreOriginRect.origin.y - moreRect.size.height;
-                rect.origin.y = moreRect.origin.y - rect.size.height + weakSelf.bottomHeight + 1.0;
+                rect.origin.y = moreRect.origin.y - rect.size.height + weakSelf.bottomHeight;
             } else {
                 faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
                 moreRect.origin.y = weakSelf.moreOriginRect.origin.y;

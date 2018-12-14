@@ -21,6 +21,7 @@ UIColor *ViewBackgroupColor;
 
 @implementation ZNavigationController
 
+#pragma mark - life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -39,7 +40,7 @@ UIColor *ViewBackgroupColor;
     ViewBackgroupColor = [UIColor whiteColor];
     
     self.navigationBar.barTintColor = NavBackgroupColor;
-    self.navigationBar.titleTextAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0], NSForegroundColorAttributeName:NormalColor};
+    self.navigationBar.titleTextAttributes = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:17.0], NSForegroundColorAttributeName : NormalColor};
 }
 
 #pragma mark - view controls
@@ -49,6 +50,10 @@ UIColor *ViewBackgroupColor;
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
 
 - (BOOL)prefersStatusBarHidden {

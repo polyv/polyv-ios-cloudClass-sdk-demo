@@ -32,11 +32,6 @@
 @synthesize pptFlag;
 
 #pragma mark - life cycle
-
-- (void)dealloc {
-    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self loadSkinView:PLVPlayerSkinViewTypeCloudClassLive];
@@ -84,6 +79,20 @@
 #pragma mark - PLVBaseMediaViewController
 - (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
     [self dealDeviceOrientationDidChangeSubAnimation:rotationTransform];
+    
+    if (self.skinView.fullscreen) {
+        [self.view insertSubview:self.linkMicVC.view belowSubview:self.skinView];
+        CGRect rect = CGRectMake(0.0, 0.0, [UIScreen mainScreen].bounds.size.width, self.linkMicVC.view.frame.size.height);
+        if (@available(iOS 11.0, *)) {
+            CGRect safeFrame = [UIApplication sharedApplication].delegate.window.safeAreaLayoutGuide.layoutFrame;
+            rect.origin.x = safeFrame.origin.x;
+            rect.size.width -= rect.origin.x * 2.0;
+        }
+        self.linkMicVC.view.frame = rect;
+    } else {
+        self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
+        [self.view.superview insertSubview:self.linkMicVC.view belowSubview:self.view];
+    }
 }
 
 - (void)loadPlayer {
