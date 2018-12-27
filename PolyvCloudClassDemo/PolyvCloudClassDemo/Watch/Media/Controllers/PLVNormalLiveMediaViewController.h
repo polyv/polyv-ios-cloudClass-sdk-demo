@@ -9,7 +9,7 @@
 #import "PLVBaseMediaViewController.h"
 #import "PLVLiveMediaProtocol.h"
 
-//普通直播类 - 继承于 PLVBaseMediaViewController，实现了 PLVLiveMediaProtocol 协议（功能：1.刷新；2.码率切换；3.重连）
+/// 普通直播类 - 继承于 PLVBaseMediaViewController，实现了 PLVLiveMediaProtocol 协议（功能：1.刷新；2.码率切换；3.重连）
 @interface PLVNormalLiveMediaViewController : PLVBaseMediaViewController <PLVLiveMediaProtocol>
 
 @end

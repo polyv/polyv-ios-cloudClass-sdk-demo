@@ -192,7 +192,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 
 #pragma mark - network request
 - (void)loginRequest {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
     [hud.label setText:@"登录中..."];
     __weak typeof(self) weakSelf = self;
     if (!self.liveSelectView.hidden) {
@@ -240,6 +240,8 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVLiveViewController *liveVC = [PLVLiveViewController new];
     liveVC.liveType = [@"ppt" isEqualToString:liveType] ? PLVLiveViewControllerTypeCloudClass : PLVLiveViewControllerTypeLive;
     liveVC.playAD = !liveing;
+    //liveVC.nickName = @"trump"; // 设置自定义聊天室用户名
+    //liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
     [vc presentViewController:liveVC animated:YES completion:nil];
 }
 

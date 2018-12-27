@@ -44,7 +44,6 @@
         
         [self setupUI];
         
-        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
         [[UIScreen mainScreen] addObserver:self forKeyPath:@"brightness" options:NSKeyValueObservingOptionNew context:nil];
     }
@@ -54,7 +53,6 @@
 - (void)dealloc {
     [[UIScreen mainScreen] removeObserver:self forKeyPath:@"brightness"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 #pragma mark - setup

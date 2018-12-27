@@ -7,7 +7,6 @@
 //
 
 #import "PLVTextInputView.h"
-#import "objc/runtime.h"
 #import <Masonry/Masonry.h>
 #import "PLVFaceView.h"
 #import "PLVEmojiModel.h"
@@ -142,16 +141,6 @@ static BOOL nickNameSetted = NO;
 @implementation PLVTextInputView
 
 #pragma mark - life cycle
-+ (void)load {//必须，runtime置换UIInputWindowController的supportedInterfaceOrientations方法，防止横屏时，键盘接收到弹出事件崩溃
-    Method fromMethod = class_getInstanceMethod(objc_getClass("UIInputWindowController"), @selector(supportedInterfaceOrientations));
-    Method toMethod = class_getInstanceMethod([self class], @selector(app_supportedInterfaceOrientations));
-    method_exchangeImplementations(fromMethod, toMethod);
-}
-    
-- (UIInterfaceOrientationMask)app_supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
-}
-
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -246,6 +235,18 @@ static BOOL nickNameSetted = NO;
     nickNameSetted = setted;
 }
 
+- (void)clearResource {
+    if (@available(iOS 9.0, *)) {
+    } else {
+        nickNameSetted = YES;
+        [self.textView resignFirstResponder];
+        self.textView.inputView = [[UIView alloc] initWithFrame:CGRectZero];
+        [self.textView reloadInputViews];
+        [self.textView becomeFirstResponder];
+
+    }
+}
+
 - (void)tapAction {
     [self.superview removeGestureRecognizer:self.tap];
     self.textView.inputView = nil;
@@ -258,6 +259,13 @@ static BOOL nickNameSetted = NO;
 #pragma mark - Action
 - (IBAction)onlyTeacherAction:(id)sender {
     self.userBtn.selected = !self.userBtn.selected;
+    if (self.disableOtherButtonsInTeacherMode) {
+        self.textView.editable = !self.userBtn.selected;
+        self.emojiBtn.enabled = !self.userBtn.selected;
+        self.flowerBtn.enabled = !self.userBtn.selected;
+        self.moreBtn.enabled = !self.userBtn.selected;
+    }
+    [self tapAction];
     if (self.delegate && [self.delegate respondsToSelector:@selector(textInputView:onlyTeacher:)]) {
         [self.delegate textInputView:self onlyTeacher:self.userBtn.selected];
     }
@@ -356,6 +364,8 @@ static BOOL nickNameSetted = NO;
     NSTimeInterval duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     duration = duration < 0.3 ? 0.3 : duration;
     [UIView animateWithDuration:duration delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        [weakSelf followKeyboardAnimation:flag ? flag : (weakSelf.emojiBtn.selected || weakSelf.moreBtn.selected)];
+        
         CGRect rect = weakSelf.frame;
         CGRect faceRect = weakSelf.faceView.frame;
         CGRect moreRect = weakSelf.moreView.frame;
@@ -367,12 +377,14 @@ static BOOL nickNameSetted = NO;
             moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
         } else {
             if (weakSelf.emojiBtn.selected) {
-                faceRect.origin.y = weakSelf.faceOriginRect.origin.y - faceRect.size.height;
+                [weakSelf.superview addSubview:weakSelf.faceView];
+                faceRect.origin.y = weakSelf.faceOriginRect.origin.y - faceRect.size.height + 100.0;
                 moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
                 rect.origin.y = faceRect.origin.y - rect.size.height + weakSelf.bottomHeight;
-            } else if (self.moreBtn.selected) {
+            } else if (weakSelf.moreBtn.selected) {
+                [weakSelf.superview addSubview:weakSelf.moreView];
                 faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
-                moreRect.origin.y = weakSelf.moreOriginRect.origin.y - moreRect.size.height;
+                moreRect.origin.y = weakSelf.moreOriginRect.origin.y - moreRect.size.height + 100.0;
                 rect.origin.y = moreRect.origin.y - rect.size.height + weakSelf.bottomHeight;
             } else {
                 faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
@@ -380,7 +392,6 @@ static BOOL nickNameSetted = NO;
                 rect.origin.y = faceRect.origin.y - rect.size.height;
             }
         }
-        [self followKeyboardAnimation:flag ? flag : weakSelf.emojiBtn.selected];
         
         weakSelf.frame = rect;
         weakSelf.faceView.frame = faceRect;

@@ -11,7 +11,6 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "PLVEmojiModel.h"
 #import "PCCUtils.h"
-#import "PLVPhotoBrowser.h"
 
 #define DEFAULT_CELL_HEIGHT 44.0
 #define CHAT_TEXT_FONT [UIFont systemFontOfSize:14.0]
@@ -150,8 +149,8 @@
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
     NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
-    // -10 = 10(顶部间隔)-10(PLVCRLabel上内边距)-10(PLVCRLabel上内边距)
-    return [self autoCalculateSize:CGSizeMake(270, MAXFLOAT) attributedContent:attributedStr].height - 10;
+    // 30 = 10(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
+    return [self autoCalculateSize:CGSizeMake(270, MAXFLOAT) attributedContent:attributedStr].height + 30.0;
 }
 
 @end
@@ -178,7 +177,11 @@
         self.actorLB.layer.cornerRadius = 9.0;
         self.actorLB.layer.masksToBounds = YES;
         self.actorLB.textColor = [UIColor whiteColor];
-        self.actorLB.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        if (@available(iOS 8.2, *)) {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        } else {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0];
+        }
         self.actorLB.backgroundColor = UIColorFromRGB(0x2196F3);
         self.actorLB.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.actorLB];
@@ -275,8 +278,8 @@
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
     NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
-    // +13 = 10+18+5(顶部间隔)-10(PLVCRLabel上内边距)-10(PLVCRLabel上内边距)
-    return [self autoCalculateSize:CGSizeMake(260, MAXFLOAT) attributedContent:attributedStr].height + 13;
+    // +53 = 10+18+5(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
+    return [self autoCalculateSize:CGSizeMake(260, MAXFLOAT) attributedContent:attributedStr].height + 53.0;
 }
 
 @end
@@ -464,7 +467,11 @@
         self.actorLB.layer.cornerRadius = 9.0;
         self.actorLB.layer.masksToBounds = YES;
         self.actorLB.textColor = [UIColor whiteColor];
-        self.actorLB.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        if (@available(iOS 8.2, *)) {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        } else {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0];
+        }
         self.actorLB.backgroundColor = UIColorFromRGB(0x2196F3);
         self.actorLB.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.actorLB];

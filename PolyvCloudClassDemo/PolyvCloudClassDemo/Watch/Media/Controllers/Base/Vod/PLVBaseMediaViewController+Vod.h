@@ -9,7 +9,7 @@
 #import "PLVBaseMediaViewController.h"
 #import <PolyvCloudClassSDK/PLVVodPlayerController.h>
 
-//回放播放器类别 - PLVBaseMediaViewController 的 Vod 类别（功能：1.seek；2.倍速）
+/// 回放播放器类别 - PLVBaseMediaViewController 的 Vod 类别（功能：1.seek；2.倍速）
 @interface PLVBaseMediaViewController (Vod) <PLVVodPlayerControllerDelegate>
 
 @end

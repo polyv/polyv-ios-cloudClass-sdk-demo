@@ -31,6 +31,7 @@
     self.skinShowed = YES;
     self.originFrame = CGRectZero;
     self.curOrientation = UIDeviceOrientationPortrait;
+    self.view.autoresizingMask = UIViewAutoresizingNone;
     
     self.mainView = [[UIView alloc] initWithFrame:self.view.bounds];
     self.mainView.backgroundColor = BlueBackgroundColor;
@@ -46,7 +47,7 @@
 }
 
 - (void)dealloc {
-    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
+    NSLog(@"%s", __FUNCTION__);
 }
 
 #pragma mark - public clear
@@ -144,7 +145,7 @@
         self.zoomAnimationing = YES;
         
         __weak typeof(self) weakSelf = self;
-        [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)(orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown ? UIDeviceOrientationPortrait : orientation) animated:YES];
+        [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)(orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown || orientation == UIDeviceOrientationUnknown ? UIDeviceOrientationPortrait : orientation) animated:YES];
         [UIView animateWithDuration:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             weakSelf.skinView.fullscreen = fullscreen;
             if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(statusBarAppearanceNeedsUpdate:)]) {

@@ -49,6 +49,9 @@ static PCCUtils *chatroomHud = nil;
 
 + (void)showHUDWithTitle:(NSString *)title detail:(NSString *)detail view:(UIView *)view {
     NSLog(@"HUD info title:%@,detail:%@",title,detail);
+    if (view == nil) {
+        return;
+    }
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     hud.mode = MBProgressHUDModeText;
     hud.label.text = title;
@@ -65,7 +68,11 @@ static PCCUtils *chatroomHud = nil;
     if (chatroomHud.messageLabel) {
         [chatroomHud.messageLabel removeFromSuperview];
     }
-    chatroomHud.messageLabel = [self addLabel:message font:[UIFont systemFontOfSize:12.0 weight:UIFontWeightMedium] textAlignment:NSTextAlignmentCenter inView:view];
+    if (@available(iOS 8.2, *)) {
+        chatroomHud.messageLabel = [self addLabel:message font:[UIFont systemFontOfSize:12.0 weight:UIFontWeightMedium] textAlignment:NSTextAlignmentCenter inView:view];
+    } else {
+        chatroomHud.messageLabel = [self addLabel:message font:[UIFont systemFontOfSize:12.0] textAlignment:NSTextAlignmentCenter inView:view];
+    }
     chatroomHud.messageLabel.backgroundColor = [UIColor colorWithWhite:0 alpha:0.65];
     chatroomHud.messageLabel.clipsToBounds = YES;
     chatroomHud.messageLabel.layer.cornerRadius = 16.0;
@@ -104,11 +111,23 @@ static PCCUtils *chatroomHud = nil;
 }
 
 #pragma mark - Alert
-
 + (void)presentAlertViewController:(NSString *)title message:(NSString *)message inViewController:(UIViewController *)vc {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
     [vc presentViewController:alertController animated:YES completion:nil];
+}
+
+#pragma mark - UIDevice UIInterfaceOrientationMaskPortrait
++ (void)deviceOnInterfaceOrientationMaskPortrait {
+    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
+        SEL selector = NSSelectorFromString(@"setOrientation:");
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
+        [invocation setSelector:selector];
+        [invocation setTarget:[UIDevice currentDevice]];
+        int val = UIDeviceOrientationPortrait;//强制把设备UIDevice的方向设置为竖屏
+        [invocation setArgument:&val atIndex:2];//从2开始，因为0 1 两个参数已经被selector和target占用
+        [invocation invoke];
+    }
 }
 
 @end

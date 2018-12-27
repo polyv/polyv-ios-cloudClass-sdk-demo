@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-//回放播放器基类协议
+/// 回放播放器基类协议
 @protocol PLVVodMediaProtocol <NSObject>
 
-@property (nonatomic, strong) NSString *vodId;//必须，不能为空
+/// 必须，不能为空
+@property (nonatomic, strong) NSString *vodId;
 
 @end

@@ -20,8 +20,13 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewType) {
 
 @property (nonatomic, weak) id<PLVTextInputViewDelegate> delegate;
 
+@property (nonatomic, assign) BOOL disableOtherButtonsInTeacherMode;
+
 - (void)loadViews:(PLVTextInputViewType)type enableMore:(BOOL)enableMore;
 - (void)nickNameSetted:(BOOL)setted;
+
+//退出前调用
+- (void)clearResource;
 
 //横屏时调用，隐藏键盘
 - (void)tapAction;

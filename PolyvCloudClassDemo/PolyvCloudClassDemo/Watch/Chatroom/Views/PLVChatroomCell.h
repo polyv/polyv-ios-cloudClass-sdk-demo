@@ -7,99 +7,136 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PLVPhotoBrowser.h"
 
 /// cell 类型
 typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
-    PLVChatroomCellTypeSpeakOwn,      // 自己发言
-    PLVChatroomCellTypeSpeakOther,    // 他人发言
-    PLVChatroomCellTypeImageSend,     // 发送图片
-    PLVChatroomCellTypeImageReceived, // 接收图片
-    PLVChatroomCellTypeFlower,        // 送花效果
-    PLVChatroomCellTypeSystem,        // 系统样式
-    PLVChatroomCellTypeTime,          // 时间标签
+    /// 自己发言
+    PLVChatroomCellTypeSpeakOwn,
+    /// 他人发言
+    PLVChatroomCellTypeSpeakOther,
+    /// 发送图片
+    PLVChatroomCellTypeImageSend,
+    /// 接收图片
+    PLVChatroomCellTypeImageReceived,
+    /// 送花效果
+    PLVChatroomCellTypeFlower,
+    /// 系统样式
+    PLVChatroomCellTypeSystem,
+    /// 时间标签
+    PLVChatroomCellTypeTime,
 };
 
+/// 聊天室单元格基类
 @interface PLVChatroomCell : UITableViewCell
 
-/// cell height
+/// cell高度
 @property (nonatomic, readonly) CGFloat height;
 
+/// 初始化
 - (instancetype)initWithReuseIdentifier:(NSString *)indentifier;
 
+/// 根据content计算cell高度
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content;
 
 @end
 
+/// 自己发言的Cell
 @interface PLVChatroomSpeakOwnCell : PLVChatroomCell
 
+/// 发言内容
 @property (nonatomic, strong) NSString *speakContent;
 
 @end
 
+/// 其他人发言的Cell
 @interface PLVChatroomSpeakOtherCell : PLVChatroomCell
 
+/// 发言者的头像URL
 @property (nonatomic, strong) NSString *avatar;
+/// 发言者的头衔
 @property (nonatomic, strong) NSString *actor;
+/// 发言者的昵称
 @property (nonatomic, strong) NSString *nickName;
+/// 发言者的发言内容
 @property (nonatomic, strong) NSString *speakContent;
-
-// 头衔自定义颜色
+/// 头衔字体颜色
 @property (nonatomic, strong) UIColor *actorTextColor;
+/// 头衔背景颜色
 @property (nonatomic, strong) UIColor *actorBackgroundColor;
 
 @end
 
 @protocol PLVChatroomImageSendCellDelegate;
 
+/// 上传图片的Cell
 @interface PLVChatroomImageSendCell : PLVChatroomCell
 
+/// delegate（上传失败，点击刷新时回调）
 @property (nonatomic, weak) id<PLVChatroomImageSendCellDelegate> delegate;
+/// 图片Id
 @property (nonatomic, strong) NSString *imgId;
+/// 图片
 @property (nonatomic, strong) UIImage *image;
+/// 图片大小
 @property (nonatomic, assign) CGSize imageViewSize;
-
+/// 刷新按钮
 @property (nonatomic, strong) UIButton *refreshBtn;
 
+/// 更新上传进度
 - (void)uploadProgress:(CGFloat)progress;
 
+/// 鉴黄失败
 - (void)checkFail:(BOOL)fail;
 
 @end
 
 @protocol PLVChatroomImageSendCellDelegate <NSObject>
 
+/// 上传失败，点击刷新时回调
 - (void)refreshUpload:(PLVChatroomImageSendCell *)sendCell;
 
 @end
 
+/// 接收图片的Cell
 @interface PLVChatroomImageReceivedCell : PLVChatroomCell
 
+/// 发送人头像URL
 @property (nonatomic, strong) NSString *avatar;
+/// 发送人头衔
 @property (nonatomic, strong) NSString *actor;
+/// 发送人昵称
 @property (nonatomic, strong) NSString *nickName;
+/// 图片URL
 @property (nonatomic, strong) NSString *imgUrl;
-
+/// 图片大小
 @property (nonatomic, assign) CGSize imageViewSize;
-
-// 头衔自定义颜色
+// 头衔字体颜色
 @property (nonatomic, strong) UIColor *actorTextColor;
+// 头衔背景颜色
 @property (nonatomic, strong) UIColor *actorBackgroundColor;
 
 @end
 
+/// 送花或点赞的Cell
 @interface PLVChatroomFlowerCell : PLVChatroomCell
 
+/// icon图片（送花）
 @property (nonatomic, strong) UIImageView *imgView;
+/// 送花语或点赞语
 @property (nonatomic, strong) NSString *content;
 
 @end
 
+/// 系统信息的Cell
 @interface PLVChatroomSystemCell : PLVChatroomCell
 
+/// 系统信息内容
 @property (nonatomic, strong) NSString *content;
 
 @end
 
+/// 时间Cell
 @interface PLVChatroomTimeCell : PLVChatroomCell
 
 @end

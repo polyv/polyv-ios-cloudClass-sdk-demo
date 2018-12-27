@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+/// 登录类
 @interface PLVLoginViewController : UIViewController
 
 @end
