@@ -39,7 +39,13 @@
     self.device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     [self.device lockForConfiguration:nil];
     if (self.device.position == AVCaptureDevicePositionFront || self.device.position == AVCaptureDevicePositionUnspecified) {
-        [self.device setFlashMode:AVCaptureFlashModeOff];
+        if ([self.device isFlashModeSupported:AVCaptureFlashModeOff]) {
+            [self.device setFlashMode:AVCaptureFlashModeOff];
+        } else if ([self.device isFlashModeSupported:AVCaptureFlashModeOn]) {
+            [self.device setFlashMode:AVCaptureFlashModeOn];
+        } else if ([self.device isFlashModeSupported:AVCaptureFlashModeOn]) {
+            [self.device setFlashMode:AVCaptureFlashModeAuto];
+        }
     } else if ([self.device isFlashModeSupported:AVCaptureFlashModeAuto]) {
         [self.device setFlashMode:AVCaptureFlashModeAuto];
     }

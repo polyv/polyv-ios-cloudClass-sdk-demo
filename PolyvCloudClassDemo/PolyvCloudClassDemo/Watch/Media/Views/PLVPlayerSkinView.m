@@ -352,6 +352,14 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     [self.codeRateBtn setTitle:codeRate forState:UIControlStateNormal];
 }
 
+- (void)linkMicStatus:(BOOL)select {
+    if (select) {
+        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_linkmic"] forState:UIControlStateNormal];
+    } else {
+        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_hangup"] forState:UIControlStateNormal];
+    }
+}
+
 - (void)showMessage:(NSString *)message {
     UILabel *messageLabel = [self addLabel:message fontSize:17.0 textAlignment:NSTextAlignmentCenter inView:self.superview];
     messageLabel.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.65];
@@ -390,14 +398,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 - (NSTimeInterval)getCurrentTime {
     return self.duration * self.slider.value;
-}
-
-- (void)linkMicStatus:(BOOL)select {
-    if (select) {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_linkmic"] forState:UIControlStateNormal];
-    } else {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_hangup"] forState:UIControlStateNormal];
-    }
 }
 
 #pragma mark - guesture

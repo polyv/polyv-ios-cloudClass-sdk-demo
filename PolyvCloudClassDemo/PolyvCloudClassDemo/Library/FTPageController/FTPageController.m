@@ -113,6 +113,10 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     [self.pageViewController setViewControllers:initControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
     [self.view addSubview:self.pageViewController.view];
     [self addChildViewController:self.pageViewController];
+    self.pageViewController.view.clipsToBounds = NO;
+    for (UIView *subview in self.pageViewController.view.subviews) {
+        subview.clipsToBounds = NO;
+    }
 }
 
 - (void)viewDidLoad {

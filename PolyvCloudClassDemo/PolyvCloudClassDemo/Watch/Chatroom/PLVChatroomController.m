@@ -20,6 +20,7 @@
 #import "ZNavigationController.h"
 #import "ZPickerController.h"
 #import "PLVCameraViewController.h"
+#import "UIAlertController+UnRotate.h"
 
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
     PLVMarqueeViewTypeMarquee     = 1,// 跑马灯公告
@@ -105,10 +106,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     return teacherAnswer;
 }
 
-@implementation PLVChatroomController {
-    BOOL _loadMoreMessage;
-    CGFloat _contentHeight;
-}
+@implementation PLVChatroomController
 
 #pragma mark - Permission
 + (BOOL)havePermissionToWatchLive:(NSUInteger)roomId {
@@ -136,10 +134,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.chatroomQueue = [[PLVChatroomQueue alloc] init];
         self.chatroomQueue.delegate = self;
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(photoBrowserDidShowImageOnScreen) name:PLVPhotoBrowserDidShowImageOnScreenNotification object:nil];
 }
 
 - (void)dealloc {
-    NSLog(@"-[%@ %@] type:%ld", NSStringFromClass([self class]), NSStringFromSelector(_cmd), (long)self.type);
+    NSLog(@"%s type:%ld", __FUNCTION__, (long)self.type);
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - alloc / init
@@ -155,6 +156,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.view.frame = frame;
         self.scrollsToBottom = YES;
         self.moreMessageHistory = YES;
+        self.allowToSpeakInTeacherMode = YES;
         if (!forbiddenUsers) {
             forbiddenUsers = [NSMutableSet set];
         }
@@ -170,6 +172,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.likeTimer = nil;
     }
     [self.chatroomQueue clearTimer];
+    [self.inputView clearResource];
+    [PLVChatroomManager sharedManager].socketUser = nil;
 }
 
 - (void)loadSubViews {
@@ -202,6 +206,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     self.inputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds)-h, CGRectGetWidth(self.view.bounds), h)];
     self.inputView.delegate = self;
     [self.view addSubview:self.inputView];
+    self.inputView.disableOtherButtonsInTeacherMode = !self.allowToSpeakInTeacherMode;
     [self.inputView loadViews:self.type enableMore:NO];
     
     self.showLatestMessageBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -209,7 +214,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     self.showLatestMessageBtn.layer.masksToBounds = YES;
     [self.showLatestMessageBtn setTitle:@"有更多新消息，点击查看" forState:UIControlStateNormal];
     [self.showLatestMessageBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.showLatestMessageBtn.titleLabel setFont:[UIFont systemFontOfSize:12 weight:UIFontWeightMedium]];
+    if (@available(iOS 8.2, *)) {
+        [self.showLatestMessageBtn.titleLabel setFont:[UIFont systemFontOfSize:12 weight:UIFontWeightMedium]];
+    } else {
+        [self.showLatestMessageBtn.titleLabel setFont:[UIFont systemFontOfSize:12]];
+    }
     self.showLatestMessageBtn.backgroundColor = [UIColor colorWithRed:90/255.0 green:200/255.0 blue:250/255.0 alpha:1];
     self.showLatestMessageBtn.hidden = YES;
     [self.showLatestMessageBtn addTarget:self action:@selector(loadMoreMessageBtnAction) forControlEvents:UIControlEventTouchUpInside];
@@ -413,12 +422,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)addModel:(PLVChatroomModel *)model {
-    if (model.type == PLVChatroomModelTypeNotDefine)
+    if (model.type==PLVChatroomModelTypeNotDefine || model.type==PLVChatroomModelTypeSpeakOwnCensor)
         return;
     
     [self.chatroomData addObject:model];
     if (self.type < PLVTextInputViewTypePrivate) {
-        if (model.isTeacher) {
+        if (model.isTeacher || model.localMessageModel) {
             [self.teacherData addObject:model];
         }
         if (model.userType == PLVChatroomUserTypeManager) {
@@ -468,7 +477,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [self.tableView reloadData];
 }
 
-#pragma mark - private methods
+#pragma mark - Private methods
 - (BOOL)emitChatroomMessageWithObject:(PLVSocketChatRoomObject *)object {
     // 关闭房间、禁言只对聊天室发言有效
     if (self.type < PLVTextInputViewTypePrivate && object.eventType==PLVSocketChatRoomEventType_SPEAK) {
@@ -491,27 +500,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)scrollsToBottom:(BOOL)animated {
-    NSIndexPath *lastIndexPath;
-    if (self.type < PLVTextInputViewTypePrivate && self.showTeacherOnly) {
-        lastIndexPath = [NSIndexPath indexPathForRow:self.teacherData.count-1 inSection:0];
-    }else {
-        lastIndexPath = [NSIndexPath indexPathForRow:self.chatroomData.count-1 inSection:0];
+    CGFloat offsetY = self.tableView.contentSize.height - CGRectGetHeight(self.tableView.bounds);
+    if (offsetY < 0.0) {
+        offsetY = 0.0;
     }
-    
-    if (lastIndexPath.row < 1) {
-        return;
-    }
-    _loadMoreMessage = YES;
-    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:lastIndexPath];
-    if (cell) {
-        CGFloat offsetY = self.tableView.contentSize.height - CGRectGetHeight(self.tableView.bounds);
-        if (offsetY < 0) {
-            return;
-        }
-        [self.tableView setContentOffset:CGPointMake(0, offsetY) animated:animated];
-    } else {
-        [self.tableView scrollToRowAtIndexPath:lastIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:animated];
-    }
+    [self.tableView setContentOffset:CGPointMake(0, offsetY) animated:animated];
 }
 
 - (void)handleChatroomMessageHistory:(NSArray *)messageArr {
@@ -544,6 +537,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+#pragma mark Notifications
+- (void)photoBrowserDidShowImageOnScreen {
+    if (self.inputView) {
+        [self.inputView tapAction];
+    }
+}
+
 #pragma mark - Interaction
 - (void)showMarqueeWithMessage:(NSString *)message {
     if (!self.marqueeView) {
@@ -554,7 +554,10 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     self.marqueeView.hidden = NO;
     [self changeWelcomeViewFrame];
     
-    UIFont *font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+    UIFont *font = [UIFont systemFontOfSize:14.0];
+    if (@available(iOS 8.2, *)) {
+        font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
+    }
     NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:message font:font];
     
     [self.marqueeView.marqueeLabe setAttributedText:attributedStr];
@@ -571,11 +574,14 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)showNicknameAlert {
+    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
     UIAlertController *alertCtrl = [UIAlertController alertControllerWithTitle:nil message:@"请输入聊天昵称" preferredStyle:UIAlertControllerStyleAlert];
     [alertCtrl addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = @"简单易记的名称有助于让大家认识你哦";
     }];
-    [alertCtrl addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    [alertCtrl addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
+    }]];
     __weak typeof(self)weakSelf = self;
     __weak UIAlertController *alertCtrlRef = alertCtrl;
     [alertCtrl addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -591,6 +597,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } else {
             [PCCUtils showChatroomMessage:@"设置昵称不能为空！" addedToView:weakSelf.view];
         }
+        [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
     }]];
     [self presentViewController:alertCtrl animated:YES completion:nil];
 }
@@ -637,14 +644,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         CGFloat contentHeight = scrollView.contentSize.height;
         CGFloat contentOffsetY = scrollView.contentOffset.y;
         CGFloat bottomOffset = contentHeight - contentOffsetY;
-        if (contentHeight != _contentHeight) {
-            _contentHeight = contentHeight;
-            if (_loadMoreMessage) {
-                [scrollView setContentOffset:CGPointMake(0, contentHeight-viewHeight) animated:YES];
-            }
-        }
+
         if (bottomOffset < viewHeight + 1) { // tolerance
-            _loadMoreMessage = NO;
             self.scrollsToBottom = YES;
             self.showLatestMessageBtn.hidden = YES;
         } else {
@@ -739,6 +740,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     if (self.likeSoctetObjectBySelf == nil && self.socketUser != nil) {
         self.likeSoctetObjectBySelf = [PLVSocketChatRoomObject socketObjectWithJsonDict:@{PLVSocketIOChatRoom_LIKES_nick : self.socketUser.nickName}];
+        self.likeSoctetObjectBySelf.localMessage = YES;
     }
     if (self.likeSoctetObjectBySelf != nil) {
         [self handleLikeSocket:self.likeSoctetObjectBySelf];
@@ -749,6 +751,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [PCCUtils showChatroomMessage:on?@"只看讲师":@"查看所有人" addedToView:self.view];
     self.showTeacherOnly = on;
     [self.tableView reloadData];
+    [self scrollsToBottom:YES];
 }
 
 - (void)textInputView:(PLVTextInputView *)inputView nickNameSetted:(BOOL)nickNameSetted {
@@ -764,7 +767,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     ZPickerController *pickerVC = [[ZPickerController alloc] initWithPickerModer:PickerModerOfNormal];
     pickerVC.delegate = self;
     ZNavigationController *navigationController = [[ZNavigationController alloc] initWithRootViewController:pickerVC];
-    [self deviceOnInterfaceOrientationMaskPortrait];
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
     [(UIViewController *)self.delegate presentViewController:navigationController animated:YES completion:nil];
 }
 
@@ -772,21 +775,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
     PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
     cameraVC.delegate = self;
-    [self deviceOnInterfaceOrientationMaskPortrait];
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
     [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
-}
-
-#pragma mark - UIDevice UIInterfaceOrientationMaskPortrait
-- (void)deviceOnInterfaceOrientationMaskPortrait {
-    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
-        SEL selector = NSSelectorFromString(@"setOrientation:");
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
-        [invocation setSelector:selector];
-        [invocation setTarget:[UIDevice currentDevice]];
-        int val = UIInterfaceOrientationMaskPortrait;//弹出，弹入相册或照相机时，强制把设备UIDevice的方向设置为竖屏
-        [invocation setArgument:&val atIndex:2];//从2开始，因为0 1 两个参数已经被selector和target占用
-        [invocation invoke];
-    }
 }
 
 #pragma mark - PLVChatroomQueueDeleage
@@ -804,12 +794,17 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     rect.origin.x += rect.size.width;
     self.welcomeView.marqueeLabe.frame = rect;
     
-    UIFont *font = [UIFont systemFontOfSize:12.0 weight:UIFontWeightMedium];
-    CGSize textSize = [welcomeMessage.string sizeWithAttributes:@{NSFontAttributeName : font}];
+    UIFont *font_12 = [UIFont systemFontOfSize:12.0];
+    UIFont *font_10 = [UIFont systemFontOfSize:10.0];
+    if (@available(iOS 8.2, *)) {
+        font_12 = [UIFont systemFontOfSize:12.0 weight:UIFontWeightMedium];
+        font_10 = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+    }
+    CGSize textSize = [welcomeMessage.string sizeWithAttributes:@{NSFontAttributeName : font_12}];
     if (textSize.width + 6.0 > rect.size.width) {
-        self.welcomeView.marqueeLabe.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        self.welcomeView.marqueeLabe.font = font_10;
     } else {
-        self.welcomeView.marqueeLabe.font = font;
+        self.welcomeView.marqueeLabe.font = font_12;
     }
     [self.welcomeView.marqueeLabe setAttributedText:welcomeMessage];
     
@@ -842,11 +837,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)dismissPickerController:(ZPickerController*)pVC {
-    [self deviceOnInterfaceOrientationMaskPortrait];
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    [self.inputView tapAction];
     __weak typeof(self) weakSelf = self;
     [self dismissViewControllerAnimated:YES completion:^{
         [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
         [weakSelf setNeedsStatusBarAppearanceUpdate];
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
     }];
 }
 
@@ -856,11 +853,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)dismissCameraViewController:(PLVCameraViewController*)cameraVC {
-    [self deviceOnInterfaceOrientationMaskPortrait];
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    [self.inputView tapAction];
     __weak typeof(self) weakSelf = self;
     [self dismissViewControllerAnimated:YES completion:^{
         [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
         [weakSelf setNeedsStatusBarAppearanceUpdate];
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
     }];
 }
 

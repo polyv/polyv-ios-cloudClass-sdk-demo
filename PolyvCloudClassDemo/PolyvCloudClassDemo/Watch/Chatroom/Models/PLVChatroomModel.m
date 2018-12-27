@@ -7,12 +7,12 @@
 //
 
 #import "PLVChatroomModel.h"
-#import "PLVChatroomManager.h"
 #import "PCCUtils.h"
 
 @interface PLVChatroomModel ()
 
 @property (nonatomic, assign) BOOL teacher;
+@property (nonatomic, assign) BOOL localMessageModel;
 @property (nonatomic, strong) NSString *msgId;
 @property (nonatomic, assign) CGFloat cellHeight;
 @property (nonatomic, assign) PLVChatroomModelType type;
@@ -80,10 +80,12 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             }
             case PLVChatroomModelTypeImageSend: {
                 PLVChatroomImageSendCell *cell = [PLVChatroomImageSendCell new];
+                cell.imageViewSize = self.imageViewSize;
                 return [cell calculateCellHeightWithContent:nil];
             }
             case PLVChatroomModelTypeImageReceived: {
                 PLVChatroomImageReceivedCell *cell = [PLVChatroomImageReceivedCell new];
+                cell.imageViewSize = self.imageViewSize;
                 return [cell calculateCellHeightWithContent:nil];
             }
             default:
@@ -96,6 +98,7 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
 
 + (instancetype)modelWithObject:(PLVSocketChatRoomObject *)object {
     PLVChatroomModel *model = [PLVChatroomModel new];
+    model.localMessageModel = object.isLocalMessage;
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_SPEAK: {
             NSArray *speakValues = object.jsonDict[@"values"];
@@ -112,15 +115,17 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                         model.content = object.jsonDict[@"message"];
                     }
                 }else if (user) { // 用户发言信息
+                    model.type = PLVChatroomModelTypeSpeakOther;
                     model.msgId = object.jsonDict[@"id"];
                     model.speakContent = speakValues.firstObject;
                     [model handleUserInfomationWithUserInfo:user];
+                    
                     // 过滤掉自己的消息（开启聊天室审核后，服务器会广播所有审核后的消息，包含自己发送的消息）
-                    NSString *userId = [PLVChatroomManager sharedManager].socketUser.userId;
-                    if ([model.userId isEqualToString:userId]) {
-                        model.type = PLVChatroomModelTypeNotDefine;
-                    }else {
-                        model.type = PLVChatroomModelTypeSpeakOther;
+                    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+                    if (socketUser) {
+                        if ([model.userId isEqualToString:socketUser.userId]) {
+                            model.type = PLVChatroomModelTypeSpeakOwnCensor;
+                        }
                     }
                 }
             }
@@ -181,6 +186,7 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
 
 + (instancetype)modelWithObject:(PLVSocketChatRoomObject *)object flower:(BOOL)flower {
     PLVChatroomModel *model = [PLVChatroomModel new];
+    model.localMessageModel = object.localMessage;
     if (flower) {
         model.type = PLVChatroomModelTypeFlower;
         NSString *nickName = object.jsonDict[PLVSocketIOChatRoom_LIKES_nick];
@@ -197,7 +203,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
     NSString *indentifier = PLVNameStringWithChatroomModelType(self.type);
     PLVChatroomCell *cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
     switch (self.type) {
-        case PLVChatroomModelTypeSpeakOwn: {
+        case PLVChatroomModelTypeSpeakOwn:
+        case PLVChatroomModelTypeSpeakOwnCensor: {
             if (!cell) {
                 cell = [[PLVChatroomSpeakOwnCell alloc] initWithReuseIdentifier:indentifier];
             }

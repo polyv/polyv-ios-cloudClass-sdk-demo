@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '9.0'
+platform :ios, '8.0'
 
 target 'PolyvCloudClassDemo' do
   # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
@@ -8,6 +8,6 @@ target 'PolyvCloudClassDemo' do
   pod 'MBProgressHUD', '~> 1.1.0'
   
   # Pods for PolyvCloudClassDemo
-  pod 'PolyvCloudClassSDK', '~> 0.5.0' # polyv 云课堂 SDK
+  pod 'PolyvCloudClassSDK', '~> 0.6.0' # polyv 云课堂 SDK
 #  pod 'Starscream', '3.0.5'           # Xcode 10 以下添加
 end

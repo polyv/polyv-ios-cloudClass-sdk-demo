@@ -11,6 +11,8 @@
 #import <MBProgressHUD/MBProgressHUD.h>
 #import <Masonry/Masonry.h>
 
+NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification = @"PLVPhotoBrowserDidShowImageOnScreenNotification"; 
+
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 
@@ -19,6 +21,7 @@
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, assign) CGRect originFrame;
+@property (nonatomic, assign) CGFloat scale;
 
 @end
 
@@ -30,6 +33,7 @@
         return;
     }
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    self.scale = 1.0;
     
     self.backgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
     [self.backgroundView setBackgroundColor:[UIColor blackColor]];
@@ -61,7 +65,11 @@
         [largeImageView setFrame:CGRectMake(0, 0, SCREEN_WIDTH, newHeight)];
         [largeImageView setCenter:self.backgroundView.center];
         [self.backgroundView setAlpha:1];
-    } completion:nil];
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:PLVPhotoBrowserDidShowImageOnScreenNotification object:self];
+        }
+    }];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
     [self.backgroundView addGestureRecognizer:tapGesture];
@@ -85,21 +93,79 @@
 
 - (void)pinchGesture:(UIPinchGestureRecognizer *)recognizer {
     UIImageView *imageView = [self.backgroundView viewWithTag:10];
-    if (recognizer.state==UIGestureRecognizerStateBegan
-        || recognizer.state==UIGestureRecognizerStateChanged) {
+    
+    CGFloat oldScale = self.scale;
+    self.scale *= recognizer.scale;
+    if (self.scale < 1.0) {
+        self.scale = 1.0;
+        imageView.transform = CGAffineTransformIdentity;
+    } else {
         imageView.transform = CGAffineTransformScale(imageView.transform, recognizer.scale, recognizer.scale);
-        recognizer.scale = 1.0;
     }
+    
+    if (self.scale < oldScale) {
+        CGFloat imageWidth = SCREEN_WIDTH;
+        CGFloat dw = imageWidth * self.scale - SCREEN_WIDTH;
+        CGFloat dx = imageView.center.x;
+        if (dw > 0.0) {
+            if (dx < (SCREEN_WIDTH - dw) * 0.5) {
+                dx = (SCREEN_WIDTH - dw) * 0.5;
+            } else if (dx > (SCREEN_WIDTH + dw) * 0.5) {
+                dx = (SCREEN_WIDTH + dw) * 0.5;
+            }
+        } else {
+            dx = SCREEN_WIDTH * 0.5;
+        }
+
+        CGFloat imageHeight = SCREEN_WIDTH * imageView.image.size.height / imageView.image.size.width;
+        CGFloat dh = imageHeight * self.scale - SCREEN_HEIGHT;
+        CGFloat dy = imageView.center.y;
+        if (dh > 0.0) {
+            if (dy < (SCREEN_HEIGHT - dh) * 0.5) {
+                dy = (SCREEN_HEIGHT - dh) * 0.5;
+            } else if (dy > (SCREEN_HEIGHT + dh) * 0.5) {
+                dy = (SCREEN_HEIGHT + dh) * 0.5;
+            }
+        } else {
+            dy = SCREEN_HEIGHT * 0.5;
+        }
+
+        [imageView setCenter:CGPointMake(dx, dy)];
+    }
+    
+    recognizer.scale = 1.0;
 }
 
 - (void)panGseture:(UIPanGestureRecognizer *)recognizer {
     UIImageView *imageView = [self.backgroundView viewWithTag:10];
-    if (recognizer.state==UIGestureRecognizerStateBegan
-        || recognizer.state==UIGestureRecognizerStateChanged) {
-        CGPoint translation = [recognizer translationInView:self.backgroundView];
-        [imageView setCenter:CGPointMake(imageView.center.x + translation.x, imageView.center.y + translation.y)];
-        [recognizer setTranslation:CGPointZero inView:self.backgroundView];
+    CGPoint translation = [recognizer translationInView:self.backgroundView];
+    
+    CGFloat imageWidth = SCREEN_WIDTH;
+    CGFloat dw = imageWidth * self.scale - SCREEN_WIDTH;
+    CGFloat dx = imageView.center.x;
+    if (dw > 0.0) {
+        dx = imageView.center.x + translation.x;
+        if (dx < (SCREEN_WIDTH - dw) * 0.5) {
+            dx = (SCREEN_WIDTH - dw) * 0.5;
+        } else if (dx > (SCREEN_WIDTH + dw) * 0.5) {
+            dx = (SCREEN_WIDTH + dw) * 0.5;
+        }
     }
+    
+    CGFloat imageHeight = SCREEN_WIDTH * imageView.image.size.height / imageView.image.size.width;
+    CGFloat dh = imageHeight * self.scale - SCREEN_HEIGHT;
+    CGFloat dy = imageView.center.y;
+    if (dh > 0.0) {
+        dy = imageView.center.y + translation.y;
+        if (dy < (SCREEN_HEIGHT - dh) * 0.5) {
+            dy = (SCREEN_HEIGHT - dh) * 0.5;
+        } else if (dy > (SCREEN_HEIGHT + dh) * 0.5) {
+            dy = (SCREEN_HEIGHT + dh) * 0.5;
+        }
+    }
+    
+    [imageView setCenter:CGPointMake(dx, dy)];
+    [recognizer setTranslation:CGPointZero inView:self.backgroundView];
 }
 
 - (void)downloadButtonBeClicked {

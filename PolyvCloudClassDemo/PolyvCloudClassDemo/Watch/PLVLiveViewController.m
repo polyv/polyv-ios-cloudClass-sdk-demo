@@ -7,6 +7,7 @@
 //
 
 #import "PLVLiveViewController.h"
+#import "objc/runtime.h"
 #import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 #import <PolyvBusinessSDK/PolyvBusinessSDK.h>
 #import "PLVNormalLiveMediaViewController.h"
@@ -34,9 +35,7 @@
 @property (nonatomic, strong) FTPageController *pageController;
 @property (nonatomic, strong) PLVChatroomController *publicChatroomController;
 @property (nonatomic, strong) PLVChatroomController *privateChatroomController;
-
-@property (nonatomic, strong) NSString *nickName;//聊天室用户昵称
-@property (nonatomic, strong) NSString *avatarUrl;//聊天室用户头像地址，HTTPS 协议地址
+@property (nonatomic, assign) BOOL idleTimerDisabled;
 
 @end
 
@@ -45,6 +44,10 @@
 #pragma mark - life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self switchKeyboardMethod];
+    self.idleTimerDisabled = [UIApplication sharedApplication].idleTimerDisabled;
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
+    
     self.view.backgroundColor = [UIColor whiteColor];
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     self.channelId = liveConfig.channelId.integerValue;
@@ -60,7 +63,26 @@
 }
 
 - (void)dealloc {
-    NSLog(@"-[%@ %@]", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
+    NSLog(@"%s", __FUNCTION__);
+    [UIApplication sharedApplication].idleTimerDisabled = self.idleTimerDisabled;
+    Method fromMethod = class_getInstanceMethod(objc_getClass("UIInputWindowController"), @selector(supportedInterfaceOrientations));
+    Method toMethod = class_getInstanceMethod([self class], @selector(app_supportedAllInterfaceOrientations));
+    method_exchangeImplementations(fromMethod, toMethod);
+}
+
+#pragma mark - runtime switch keyboard supportedInterfaceOrientations
+- (void)switchKeyboardMethod {//必须，runtime置换UIInputWindowController的supportedInterfaceOrientations方法，防止横屏时，键盘接收到弹出事件崩溃
+    Method fromMethod = class_getInstanceMethod(objc_getClass("UIInputWindowController"), @selector(supportedInterfaceOrientations));
+    Method toMethod = class_getInstanceMethod([self class], @selector(app_supportedPortraitInterfaceOrientations));
+    method_exchangeImplementations(fromMethod, toMethod);
+}
+
+- (UIInterfaceOrientationMask)app_supportedPortraitInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (UIInterfaceOrientationMask)app_supportedAllInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
 }
 
 #pragma mark - init
@@ -126,6 +148,7 @@
     // public chatroom
     self.publicChatroomController = [PLVChatroomController chatroomWithType:self.liveType == PLVLiveViewControllerTypeLive ? PLVTextInputViewTypeNormalPublic : PLVTextInputViewTypeCloudClassPublic roomId:self.channelId frame:chatroomFrame];
     self.publicChatroomController.delegate = self;
+    //self.publicChatroomController.allowToSpeakInTeacherMode = NO;
     [self.publicChatroomController loadSubViews];
     
     self.pageController = [[FTPageController alloc] initWithTitles:@[@"聊天"] controllers:@[self.publicChatroomController]];
@@ -188,6 +211,7 @@
 
 #pragma mark - exit
 - (void)exitCurrentController {//退出前释放播放器，连麦，socket资源
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
     [self.mediaVC clearResource];
     [self.linkMicVC clearResource];
     [self.publicChatroomController clearResource];
@@ -320,6 +344,18 @@
 }
 
 - (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag {
+    CGRect rect = self.view.frame;
+    if (!self.mediaVC.skinView.fullscreen) {
+        rect.origin.y = flag ? -100.0 : 0.0;//在 PLVTextInputView.m 键盘控件里的 followKeyboardAnimation 方法需要使用 100.0 这个值，两边要一致
+        if (flag) {
+            rect.size.height = [UIScreen mainScreen].bounds.size.height + 100.0;
+        } else {
+            rect.size.height = [UIScreen mainScreen].bounds.size.height;
+        }
+    } else {
+        rect.origin.y = 0.0;
+    }
+    self.view.frame = rect;
     if (flag) {
         CGRect linkMicRect = self.linkMicVC.view.frame;
         linkMicRect = CGRectMake(0.0, self.mediaVC.view.frame.origin.y + self.mediaVC.view.frame.size.height - linkMicRect.size.height, linkMicRect.size.width, linkMicRect.size.height);

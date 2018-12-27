@@ -6,8 +6,9 @@
 //  Copyright © 2018 polyv. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
+extern NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification;
 
 @interface PLVPhotoBrowser : NSObject
 

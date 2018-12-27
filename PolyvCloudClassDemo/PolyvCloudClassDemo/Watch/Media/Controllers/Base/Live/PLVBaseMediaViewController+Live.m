@@ -7,8 +7,8 @@
 //
 
 #import "PLVBaseMediaViewController+Live.h"
-#import <MBProgressHUD/MBProgressHUD.h>
 #import "PLVLiveMediaProtocol.h"
+#import "MBProgressHUD+Rotate.h"
 
 @interface PLVBaseMediaViewController () <PLVLiveMediaProtocol, PLVPlayerSkinViewDelegate>
 
@@ -22,7 +22,8 @@
         self.reOpening = YES;
         MBProgressHUD *hud = nil;
         if (showHud) {
-            hud = [MBProgressHUD showHUDAddedTo:self.view.superview animated:YES];
+            hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
+            [hud addDeviceOrientationDidChangeNotification];
             [hud.label setText:@"加载JSON..."];
         }
         

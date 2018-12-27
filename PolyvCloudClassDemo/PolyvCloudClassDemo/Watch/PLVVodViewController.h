@@ -8,13 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+/// 回放类型
 typedef NS_ENUM(NSInteger, PLVVodViewControllerType) {
-    PLVVodViewControllerTypeLive       = 1,//普通直播
-    PLVVodViewControllerTypeCloudClass = 2 //云课堂
+    /// 普通直播
+    PLVVodViewControllerTypeLive = 1,
+    /// 云课堂
+    PLVVodViewControllerTypeCloudClass = 2
 };
 
+/// 回放控制器
 @interface PLVVodViewController : UIViewController
 
-@property (nonatomic, assign) PLVVodViewControllerType vodType;//回放类型（1：普通直播；2：云课堂）
+/// 回放类型（1：普通直播；2：云课堂）
+@property (nonatomic, assign) PLVVodViewControllerType vodType;
 
 @end
