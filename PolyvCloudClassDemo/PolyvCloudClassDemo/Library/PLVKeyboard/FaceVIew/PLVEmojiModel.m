@@ -33,7 +33,8 @@ return _instance; \
 
 @interface PLVEmojiModelManager ()
 
-@property (nonatomic) NSBundle *emotionBundle;
+@property (nonatomic, strong) NSBundle *emotionBundle;
+@property (nonatomic, strong) NSRegularExpression *regularExpression;
 
 @end
 
@@ -46,6 +47,7 @@ CREATE_SHARED_MANAGER(PLVEmojiModelManager)
     if (self) {
         NSString *path = [[NSBundle mainBundle] pathForResource:@"Emotion" ofType:@"bundle"];
         self.emotionBundle = [NSBundle bundleWithPath:path];
+        self.regularExpression = [NSRegularExpression regularExpressionWithPattern:@"\\[[^\\[]{1,5}\\]" options:kNilOptions error:nil];
     }
     
     return self;
@@ -57,13 +59,11 @@ CREATE_SHARED_MANAGER(PLVEmojiModelManager)
 }
 
 - (NSMutableAttributedString *)convertTextEmotionToAttachment:(NSString *)text font:(UIFont *)font {
-    NSRegularExpression *regularExpression = [NSRegularExpression regularExpressionWithPattern:@"\\[[^\\[]{1,5}\\]" options:kNilOptions error:nil];
     NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName:font}];
-    while(YES) {
-        NSRange range = [regularExpression rangeOfFirstMatchInString:attributeString.string options:kNilOptions range:NSMakeRange(0, attributeString.string.length)];
-        if (range.location == NSNotFound)
-            break;
-        
+    NSArray<NSTextCheckingResult *> *matchArray = [self.regularExpression matchesInString:attributeString.string options:kNilOptions range:NSMakeRange(0, attributeString.length)];
+    NSUInteger offset = 0;
+    for (NSTextCheckingResult *result in matchArray) {
+        NSRange range = NSMakeRange(result.range.location - offset, result.range.length);
         NSTextAttachment *attachMent = [[NSTextAttachment alloc] init];
         NSString *imageText = [attributeString.string substringWithRange:NSMakeRange(range.location, range.length)];
         NSString *imageName = self.emotionDictionary[imageText];
@@ -72,8 +72,9 @@ CREATE_SHARED_MANAGER(PLVEmojiModelManager)
         attachMent.image = image;
         attachMent.bounds = CGRectMake(0, font.descender, font.lineHeight, font.lineHeight);
         
-        NSAttributedString *str = [NSAttributedString attributedStringWithAttachment:attachMent];
-        [attributeString replaceCharactersInRange:range withAttributedString:str];
+        NSAttributedString *emojiAttrStr = [NSAttributedString attributedStringWithAttachment:attachMent];
+        [attributeString replaceCharactersInRange:range withAttributedString:emojiAttrStr];
+        offset += result.range.length - emojiAttrStr.length;
     }
     
     return attributeString;

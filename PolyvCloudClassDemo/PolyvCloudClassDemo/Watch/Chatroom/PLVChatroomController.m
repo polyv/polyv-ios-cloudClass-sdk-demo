@@ -80,6 +80,7 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 @property (nonatomic, strong) PLVChatroomQueue *chatroomQueue;
 @property (nonatomic, assign) NSUInteger likeCountOfHttp;//代码setter，getter likeCountOfHttp 时要保证线程安全
 @property (nonatomic, assign) NSUInteger likeCountOfSocket;//代码setter，getter likeCountOfSocket 时要保证线程安全
+@property (nonatomic, strong) NSTimer *reloadTableTimer;//定时器，每秒调用 UITableView reload
 @property (nonatomic, strong) NSTimer *likeTimer;
 @property (nonatomic, assign) NSUInteger likeTiming;
 @property (nonatomic, strong) PLVSocketChatRoomObject *likeSoctetObjectBySelf;
@@ -91,6 +92,7 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 @property (nonatomic, assign) NSUInteger startIndex;
 
 @property (nonatomic, assign) NSUInteger onlineCount;
+@property (atomic, assign) BOOL addNewModel;
 
 @end
 
@@ -171,6 +173,10 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         [self.likeTimer invalidate];
         self.likeTimer = nil;
     }
+    if (self.reloadTableTimer) {
+        [self.reloadTableTimer invalidate];
+        self.reloadTableTimer = nil;
+    }
     [self.chatroomQueue clearTimer];
     [self.inputView clearResource];
     [PLVChatroomManager sharedManager].socketUser = nil;
@@ -229,6 +235,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         make.size.mas_equalTo(CGSizeMake(185, 30));
         make.bottom.equalTo(self.inputView.mas_top).offset(-10);
     }];
+    
+    self.reloadTableTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(reloadTable) userInfo:nil repeats:YES];
+    [self.reloadTableTimer fire];
 }
 
 - (void)setSocketUser:(PLVSocketObject *)socketUser {
@@ -437,12 +446,10 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         }
     }
     
-    [self.tableView reloadData];
-    
-    if (model.type == PLVChatroomModelTypeSpeakOwn || self.scrollsToBottom) {
-        [self scrollsToBottom:YES];
-    } else if (self.type < PLVTextInputViewTypePrivate && !self.showTeacherOnly) {
-        self.showLatestMessageBtn.hidden = NO;
+    self.addNewModel = YES;
+    if (model.localMessageModel) {
+        self.scrollsToBottom = YES;
+        [self reloadTable];
     }
     
     if (self.type < PLVTextInputViewTypePrivate && model.speakContent) {
@@ -591,7 +598,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             if (textField.text.length > 20) {
                 [PCCUtils showChatroomMessage:@"昵称字符串不超过20个字符！" addedToView:weakSelf.view];
             } else {
-                PLVSocketChatRoomObject *newNickname = [PLVSocketChatRoomObject chatRoomObjectForNewNickNameWithLoginObject:self.socketUser nickName:textField.text];
+                PLVSocketChatRoomObject *newNickname = [PLVSocketChatRoomObject chatRoomObjectForNewNickNameWithLoginObject:[PLVChatroomManager sharedManager].socketUser nickName:textField.text];
                 [weakSelf emitChatroomMessageWithObject:newNickname];
             }
         } else {
@@ -664,6 +671,19 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         }
     }
     return sessionId;
+}
+
+#pragma mark - reloadTableTimer poll
+- (void)reloadTable {
+    if (self.addNewModel) {
+        self.addNewModel = NO;
+        [self.tableView reloadData];
+        if (self.scrollsToBottom) {
+            [self scrollsToBottom:YES];
+        } else if (self.type < PLVTextInputViewTypePrivate && !self.showTeacherOnly) {
+            self.showLatestMessageBtn.hidden = NO;
+        }
+    }
 }
 
 #pragma mark - likeTimer poll

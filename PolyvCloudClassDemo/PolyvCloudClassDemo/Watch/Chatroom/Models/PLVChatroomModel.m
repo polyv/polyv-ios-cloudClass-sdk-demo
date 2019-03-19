@@ -66,32 +66,35 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
 #pragma mark - setter/getter
 
 - (CGFloat)cellHeight {
-    if (_cellHeight) {
-        return _cellHeight;
-    }else {
+    if (!_cellHeight) {
         switch (self.type) {
             case PLVChatroomModelTypeSpeakOwn: {
                 PLVChatroomSpeakOwnCell *cell = [PLVChatroomSpeakOwnCell new];
-                return [cell calculateCellHeightWithContent:self.speakContent];
-            }
+                _cellHeight = [cell calculateCellHeightWithContent:self.speakContent];
+            } break;
             case PLVChatroomModelTypeSpeakOther: {
-                PLVChatroomSpeakOtherCell *cell = [PLVChatroomSpeakOtherCell new];
-                return [cell calculateCellHeightWithContent:self.speakContent];
-            }
+                static PLVChatroomSpeakOtherCell *cell = nil;
+                if (cell == nil) {
+                    cell = [PLVChatroomSpeakOtherCell new];
+                }
+                _cellHeight = [cell calculateCellHeightWithContent:self.speakContent];
+            } break;
             case PLVChatroomModelTypeImageSend: {
                 PLVChatroomImageSendCell *cell = [PLVChatroomImageSendCell new];
                 cell.imageViewSize = self.imageViewSize;
-                return [cell calculateCellHeightWithContent:nil];
-            }
+                _cellHeight = [cell calculateCellHeightWithContent:nil];
+            } break;
             case PLVChatroomModelTypeImageReceived: {
                 PLVChatroomImageReceivedCell *cell = [PLVChatroomImageReceivedCell new];
                 cell.imageViewSize = self.imageViewSize;
-                return [cell calculateCellHeightWithContent:nil];
-            }
+                _cellHeight = [cell calculateCellHeightWithContent:nil];
+            } break;
             default:
-                return [[PLVChatroomCell new] calculateCellHeightWithContent:nil];
+                _cellHeight = [[PLVChatroomCell new] calculateCellHeightWithContent:nil];
+                break;
         }
     }
+    return _cellHeight;
 }
 
 #pragma mark - init

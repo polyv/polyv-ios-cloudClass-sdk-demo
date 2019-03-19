@@ -10,12 +10,13 @@
 #import "ZJZDanMuLabel.h"
 #import "ZJZDanMuDefine.h"
 
-@interface ZJZDanMu ()
+@interface ZJZDanMu () <ZJZDanMuLabelDelegate>
 
 @property (nonatomic, assign) NSUInteger            rollChannel;
 @property (nonatomic, strong) NSMutableDictionary   *rollChannelDict;
 @property (nonatomic, strong) NSMutableDictionary   *fadeChannelDict;
 @property (nonatomic, assign) CGRect                currentFrame;
+@property (nonatomic, strong) NSMutableArray *dmLabelArray;
 
 @end
 
@@ -27,6 +28,7 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.currentFrame = frame;
+        self.dmLabelArray = [[NSMutableArray alloc] initWithCapacity:100];
         
         [self dmInitChannel];
         
@@ -53,7 +55,21 @@
 
 - (void)insertScrollDML:(NSMutableAttributedString *)content {
     NSUInteger bestChannel = [self dmBestRollChannel];
-    ZJZDanMuLabel *zjzDML = [ZJZDanMuLabel dmInitDML:content dmlOriginY:bestChannel * KZJZDMHEIGHT + 5 superFrame:self.currentFrame style:ZJZDMLRoll];
+    ZJZDanMuLabel *zjzDML = nil;
+    @synchronized (self) {
+        if (self.dmLabelArray.count > 0) {
+            zjzDML = self.dmLabelArray[self.dmLabelArray.count - 1];
+            [self.dmLabelArray removeLastObject];
+        }
+    }
+    
+    if (zjzDML != nil) {
+        [zjzDML makeup:content dmlOriginY:bestChannel * KZJZDMHEIGHT + 5 superFrame:self.currentFrame style:ZJZDMLRoll];
+    } else {
+        zjzDML = [ZJZDanMuLabel dmInitDML:content dmlOriginY:bestChannel * KZJZDMHEIGHT + 5 superFrame:self.currentFrame style:ZJZDMLRoll];
+        zjzDML.delegate = self;
+    }
+    
     [self addSubview:zjzDML];
     [zjzDML dmBeginAnimation];
     [self insertDMQueue:zjzDML channel:bestChannel];
@@ -168,6 +184,13 @@
     self.currentFrame = frame;
     
     [self dmInitChannel];
+}
+
+#pragma mark - ZJZDanMuLabelDelegate
+- (void)endScrollAnimation:(ZJZDanMuLabel *)dmLabel {
+    @synchronized (self) {
+        [self.dmLabelArray addObject:dmLabel];
+    }
 }
 
 @end

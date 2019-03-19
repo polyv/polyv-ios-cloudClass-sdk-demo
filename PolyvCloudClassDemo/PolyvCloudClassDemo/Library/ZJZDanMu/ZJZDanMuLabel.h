@@ -19,8 +19,11 @@ typedef NS_ENUM(NSUInteger, ZJZDMLStyle) {
     ZJZDMLFade
 };
 
+@protocol ZJZDanMuLabelDelegate;
+
 @interface ZJZDanMuLabel : UILabel
 
+@property (nonatomic, weak) id<ZJZDanMuLabelDelegate> delegate;
 @property (nonatomic, assign) ZJZDMLState                   zjzDMLState;
 @property (nonatomic, assign) ZJZDMLStyle                   zjzDMLStyle;
 
@@ -36,7 +39,15 @@ typedef NS_ENUM(NSUInteger, ZJZDMLStyle) {
 /* 创建 */
 + (instancetype)dmInitDML:(NSMutableAttributedString *)content dmlOriginY:(CGFloat)dmlOriginY superFrame:(CGRect)superFrame style:(ZJZDMLStyle)style;
 
+- (void)makeup:(NSMutableAttributedString *)content dmlOriginY:(CGFloat)dmlOriginY superFrame:(CGRect)superFrame style:(ZJZDMLStyle)style;
+
 /* 开始弹幕动画 */
 - (void)dmBeginAnimation;
+
+@end
+
+@protocol ZJZDanMuLabelDelegate <NSObject>
+
+- (void)endScrollAnimation:(ZJZDanMuLabel *)dmLabel;
 
 @end

@@ -22,12 +22,16 @@
 + (instancetype)dmInitDML:(NSMutableAttributedString *)content dmlOriginY:(CGFloat)dmlOriginY superFrame:(CGRect)superFrame style:(ZJZDMLStyle)style
 {
     ZJZDanMuLabel *dmLabel = [[ZJZDanMuLabel alloc] init];
-    dmLabel.superFrame = superFrame;
-    dmLabel.zjzDMLStyle = style;
-    
-    [dmLabel dmInitWithContent:content dmlOriginY:dmlOriginY];
+    [dmLabel makeup:content dmlOriginY:dmlOriginY superFrame:superFrame style:style];
     
     return dmLabel;
+}
+
+- (void)makeup:(NSMutableAttributedString *)content dmlOriginY:(CGFloat)dmlOriginY superFrame:(CGRect)superFrame style:(ZJZDMLStyle)style {
+    self.superFrame = superFrame;
+    self.zjzDMLStyle = style;
+    
+    [self dmInitWithContent:content dmlOriginY:dmlOriginY];
 }
 
 /* 初始化 */
@@ -110,11 +114,13 @@
 
 /* 移除弹幕 */
 - (void)removeDanmu {
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         self.zjzDMLState = ZJZDMLStateFinish;
         [self.layer removeAllAnimations];
         [self removeFromSuperview];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(endScrollAnimation:)]) {
+            [self.delegate endScrollAnimation:self];
+        }
     });
 }
 
