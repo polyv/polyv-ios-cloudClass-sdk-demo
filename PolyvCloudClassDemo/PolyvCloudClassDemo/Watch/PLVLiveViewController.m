@@ -184,6 +184,7 @@
                 // private chatroom
                 weakSelf.privateChatroomController = [PLVChatroomController chatroomWithType:PLVTextInputViewTypePrivate roomId:self.channelId frame:self.publicChatroomController.view.frame];
                 weakSelf.privateChatroomController.delegate = weakSelf;
+                weakSelf.privateChatroomController.socketUser = weakSelf.publicChatroomController.socketUser;
                 [weakSelf.privateChatroomController loadSubViews];
                 [weakSelf.pageController addPageWithTitle:@"私聊" controller:weakSelf.privateChatroomController];
                 break;

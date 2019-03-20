@@ -73,11 +73,11 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                 _cellHeight = [cell calculateCellHeightWithContent:self.speakContent];
             } break;
             case PLVChatroomModelTypeSpeakOther: {
-                static PLVChatroomSpeakOtherCell *cell = nil;
-                if (cell == nil) {
-                    cell = [PLVChatroomSpeakOtherCell new];
+                static PLVChatroomSpeakOtherCell *speakOtherCell = nil;
+                if (speakOtherCell == nil) {
+                    speakOtherCell = [PLVChatroomSpeakOtherCell new];
                 }
-                _cellHeight = [cell calculateCellHeightWithContent:self.speakContent];
+                _cellHeight = [speakOtherCell calculateCellHeightWithContent:self.speakContent];
             } break;
             case PLVChatroomModelTypeImageSend: {
                 PLVChatroomImageSendCell *cell = [PLVChatroomImageSendCell new];
@@ -85,9 +85,12 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                 _cellHeight = [cell calculateCellHeightWithContent:nil];
             } break;
             case PLVChatroomModelTypeImageReceived: {
-                PLVChatroomImageReceivedCell *cell = [PLVChatroomImageReceivedCell new];
-                cell.imageViewSize = self.imageViewSize;
-                _cellHeight = [cell calculateCellHeightWithContent:nil];
+                static PLVChatroomImageReceivedCell *imageReceivedCell = nil;
+                if (imageReceivedCell == nil) {
+                    imageReceivedCell = [PLVChatroomImageReceivedCell new];
+                }
+                imageReceivedCell.imageViewSize = self.imageViewSize;
+                _cellHeight = [imageReceivedCell calculateCellHeightWithContent:nil];
             } break;
             default:
                 _cellHeight = [[PLVChatroomCell new] calculateCellHeightWithContent:nil];
