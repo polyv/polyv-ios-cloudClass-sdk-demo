@@ -121,7 +121,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
             self.loginBtn.alpha = 1.0;
         }
     } else {
-        if ([self checkTextField:self.vIdTF] || [self checkTextField:self.appIDTF] || [self checkTextField:self.userIDTF]) {
+        if ([self checkTextField:self.vIdTF] || [self checkTextField:self.appIDTF] || [self checkTextField:self.userIDTF] || [self checkTextField:self.channelIdTF] ) {
             self.loginBtn.enabled = NO;
             self.loginBtn.alpha = 0.4;
         } else {
@@ -157,37 +157,27 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
         
         NSArray *vodLoginInfo = [[NSUserDefaults standardUserDefaults] objectForKey:NSUserDefaultKey_VodLoginInfo];
         if (vodLoginInfo) {
-            self.vIdTF.text = vodLoginInfo[0];
-            self.appIDTF.text = vodLoginInfo[1];
+            self.channelIdTF.text = vodLoginInfo[0];
+            self.userIDTF.text = vodLoginInfo[1];
+            self.appIDTF.text = vodLoginInfo[2];
+            self.vIdTF.text = vodLoginInfo[3];
         } else {
             PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
             PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
-            self.vIdTF.text = vodConfig.vodId;
+            self.channelIdTF.text = liveConfig.channelId;
+            self.userIDTF.text = liveConfig.userId;
             self.appIDTF.text = liveConfig.appId;
+            self.vIdTF.text = vodConfig.vodId;
         }
         [self refreshLoginBtnUI];
     }
 }
 
 - (void)switchScenes:(BOOL)flag {
-    CGFloat y = flag ? 365.0 : 460.0;
-    
     self.liveSelectView.hidden = flag;
     self.vodSelectView.hidden = !flag;
-    self.channelIdTF.hidden = flag;
-    self.userIDTF.hidden = flag;
-    self.userLineView.hidden = flag;
     self.appSecretTF.hidden = flag;
-    self.appSecretLineView.hidden = flag;
     self.vIdTF.hidden = !flag;
-    
-    __weak typeof(self) weakSelf = self;
-    [self.loginBtn mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(weakSelf.loginBtn.superview);
-        make.top.equalTo(weakSelf.loginBtn.superview.mas_top).offset(y);
-        make.width.mas_equalTo(320.0);
-        make.height.mas_equalTo(48.0);
-    }];
 }
 
 #pragma mark - network request
@@ -211,9 +201,9 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
             [weakSelf presentToAlertViewControllerWithError:error inViewController:weakSelf];
         }];
     } else {
-        [[NSUserDefaults standardUserDefaults] setObject:@[self.vIdTF.text, self.appIDTF.text] forKey:NSUserDefaultKey_VodLoginInfo];
+        [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.userIDTF.text, self.appIDTF.text, self.vIdTF.text] forKey:NSUserDefaultKey_VodLoginInfo];
         
-        [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
+        [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
             [PLVLiveVideoAPI getVodType:self.vIdTF.text completion:^(BOOL vodType) {
                 [hud hideAnimated:YES];
                 [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType];
@@ -240,16 +230,23 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVLiveViewController *liveVC = [PLVLiveViewController new];
     liveVC.liveType = [@"ppt" isEqualToString:liveType] ? PLVLiveViewControllerTypeCloudClass : PLVLiveViewControllerTypeLive;
     liveVC.playAD = !liveing;
-    //liveVC.nickName = @"trump"; // 设置自定义聊天室用户名
-    //liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
+    
+    // 抽奖功能必须固定唯一的 nickName 和 userId，如果忘了填写上次的中奖信息，有固定的 userId 还会再次弹出相关填写页面
+//    liveVC.nickName = @"iOS user"; // 设置登录聊天室的用户名
+//    liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
+   
     [vc presentViewController:liveVC animated:YES completion:nil];
 }
 
 - (void)presentToVodViewControllerFromViewController:(UIViewController *)vc vodType:(BOOL)vodType {
     //必需先设置 PLVVodConfig 单例里需要的信息，因为在后面的加载中需要使用
     PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
+    PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     vodConfig.vodId = self.vIdTF.text;
-    vodConfig.appId = self.appIDTF.text;
+    liveConfig.appId = self.appIDTF.text;
+    // 用于回放跑马灯显示
+    liveConfig.channelId = self.channelIdTF.text;
+    liveConfig.userId = self.userIDTF.text;
     
     PLVVodViewController *vodVC = [PLVVodViewController new];
     vodVC.vodType = vodType ? PLVVodViewControllerTypeCloudClass : PLVVodViewControllerTypeLive;

@@ -28,11 +28,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 授权失败的回调
 - (void)chatroom:(PLVChatroomController *)chatroom didOpenError:(PLVChatroomErrorCode)code;
 
-/// 发送Socket信息，传递PLVSocketChatRoomObject对象，由外层发送
+/// 聊天室消息回调
 - (void)chatroom:(PLVChatroomController *)chatroom emitSocketObject:(PLVSocketChatRoomObject *)object;
-
-/// 用户昵称设置回调
-- (void)chatroom:(PLVChatroomController *)chatroom nickNameRenamed:(NSString *)newName success:(BOOL)success message:(NSString *)message;
 
 /// 输入键盘弹出弹入回调，由外层实现相关逻辑
 - (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag;
@@ -41,8 +38,14 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 - (NSString *)currentChannelSessionId:(PLVChatroomController *)chatroom;
 
 @optional
-/// 发言，传递content，由外层发送
+/// 发言回调，可用于弹幕显示
 - (void)chatroom:(PLVChatroomController *)chatroom didSendSpeakContent:(NSString *)content;
+
+/// 自定义消息回调
+- (void)chatroom:(PLVChatroomController *)chatroom emitCustomEvent:(NSString *)event emitMode:(int)emitMode data:(NSDictionary *)data tip:(NSString *)tip;
+
+/// 回调HUD消息
+- (void)chatroom:(PLVChatroomController *)chatroom showMessage:(NSString *)message;
 
 @end
 
@@ -60,15 +63,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 是否关闭
 @property (nonatomic, getter=isClosed, readonly) BOOL closed;
 
-/// 键盘控件
-@property (nonatomic, strong, readonly) PLVTextInputView *inputView;
-
 /// delegate
 @property (nonatomic, weak) id<PLVChatroomDelegate> delegate;
-
-/// 登录 socket 的用户对象（必传，否则无法提交聊天室相关消息）
-/// 该属性逐渐废弃，使用 PLVChatroomManager 中的 socketUser 值
-@property (nonatomic, strong) PLVSocketObject *socketUser;
 
 /// 各类开关信息
 @property (nonatomic, strong) NSDictionary *switchInfo;
@@ -76,22 +72,66 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 只看讲师模式下是否允许发言、点赞、送花等操作，默认 YES（公聊模式属性）
 @property (nonatomic, assign) BOOL allowToSpeakInTeacherMode;
 
-/// 是否有观看直播权限
+/**
+ 是否有观看直播权限
+
+ @param roomId 房间号
+ @return YES/NO
+ */
 + (BOOL)havePermissionToWatchLive:(NSUInteger)roomId;
 
-/// 便利初始化
-+ (instancetype)chatroomWithType:(PLVTextInputViewType)type roomId:(NSUInteger)roomId frame:(CGRect)frame;
-
-/// 初始化
+/**
+ 聊天室初始化方法
+ 
+ @param type 聊天室类型
+ @param roomId 房间号
+ @param frame frame
+ @return PLVChatroomController
+ */
 - (instancetype)initChatroomWithType:(PLVTextInputViewType)type roomId:(NSUInteger)roomId frame:(CGRect)frame;
 
-/// 准备退出时，必须清空定时器资源
-- (void)clearResource;
+/**
+ 聊天室便利初始化方法
 
-/// 加载子视图
+ @param type 聊天室类型
+ @param roomId 房间号
+ @param frame frame
+ @return PLVChatroomController
+ */
++ (instancetype)chatroomWithType:(PLVTextInputViewType)type roomId:(NSUInteger)roomId frame:(CGRect)frame;
+
+/**
+ 加载子视图
+ */
 - (void)loadSubViews;
 
-/// 添加新事件
+/**
+ 准备退出时，必须清空定时器资源
+ */
+- (void)clearResource;
+
+/**
+ 还原聊天室状态
+ */
+- (void)recoverChatroomStatus;
+
+/**
+ 添加新事件
+
+ @param object PLVSocketChatRoomObject
+ */
 - (void)addNewChatroomObject:(PLVSocketChatRoomObject *)object;
+
+/**
+ 添加自定义事件
+
+ @param customeMessage 自定义消息内容
+ @param mine 自己消息类型
+ */
+- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine;
+
+#pragma mark - chatInputView
+
+- (void)tapChatInputView;
 
 @end

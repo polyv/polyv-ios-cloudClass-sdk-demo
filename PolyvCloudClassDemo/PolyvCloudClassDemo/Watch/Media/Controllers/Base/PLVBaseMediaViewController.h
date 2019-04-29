@@ -12,8 +12,13 @@
 
 #define BlueBackgroundColor [UIColor colorWithRed:215.0 / 255.0 green:242.0 / 255.0 blue:254.0 / 255.0 alpha:1.0]
 
-@protocol PLVBaseMediaViewControllerDelegate;
+/// 错误码
+typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
+    /// 自定义跑马灯校验失败
+    PLVBaseMediaErrorCodeMarqueeFailed = - 10000,
+};
 
+@protocol PLVBaseMediaViewControllerDelegate;
 /// 播放器基类 - 继承于 UIViewController（功能：1.清空播放器资源；2.加载皮肤；3.显示或隐藏皮肤；4.退出；5.横竖屏切换）
 @interface PLVBaseMediaViewController : UIViewController
 
@@ -29,6 +34,9 @@
 @property (nonatomic, assign, readonly) CGRect originFrame;
 /// 设备的当前方向，横竖屏切换动画需要使用
 @property (nonatomic, assign, readonly) UIDeviceOrientation curOrientation;
+
+/// 登录用户名类型跑马灯显示内容
+@property (nonatomic, strong) NSString *nickName;
 
 #pragma mark - public
 /// 准备退出时，必须清空播放器资源
@@ -51,14 +59,17 @@
 /// 切换主副屏的操作，直播子类 PLVPPTLiveMediaViewController 需要要重写实现，兼容连麦的窗口切换
 - (void)switchAction:(BOOL)manualControl;
 
+/// 设置跑马灯
+- (void)setupMarquee:(PLVLiveVideoChannel *)channel customNick:(NSString *)customNick;
+
 @end
 
 @protocol PLVBaseMediaViewControllerDelegate <NSObject>
 
 /// 退出，退出前要手动调用clearResource，释放相关资源
-- (void)quit:(PLVBaseMediaViewController *)mediaVC;
+- (void)quit:(PLVBaseMediaViewController *)mediaVC error:(NSError *)error;
 
 /// 横竖屏切换前，更新Status Bar的状态
-- (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC;
+- (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC rotationTransform:(CGAffineTransform)rotationTransform;
 
 @end

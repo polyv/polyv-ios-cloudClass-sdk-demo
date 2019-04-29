@@ -30,6 +30,9 @@
     NSString *iv = @"2u9gDPKdX6GyQJKU";/// 加密向量
     [PLVVodConfig settingsWithConfigString:configString key:key iv:iv error:&error];
     
+    // 配置统计后台参数：用户Id、用户昵称及自定义参数
+    [PLVLiveVideoConfig setViewLogParam:nil param2:nil param4:nil param5:nil];
+    
     return YES;
 }
 

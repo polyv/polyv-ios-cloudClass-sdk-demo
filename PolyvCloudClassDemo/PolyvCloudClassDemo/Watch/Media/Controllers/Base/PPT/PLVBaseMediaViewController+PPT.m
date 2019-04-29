@@ -75,6 +75,7 @@
     self.pptVC = [[PLVPPTViewController alloc] init];
     self.pptVC.delegate = self;
     self.pptVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    //[self.pptVC.backgroundImgView setContentMode:UIViewContentModeScaleAspectFit];
     UIView *displayView = self.pptOnSecondaryView ? self.secondaryView : self.mainView;
     self.pptVC.view.frame = displayView.bounds;
     [displayView insertSubview:self.pptVC.view atIndex:0];

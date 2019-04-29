@@ -6,19 +6,7 @@
 //  Copyright © 2017年 io.hzlzh.yunshouyi. All rights reserved.
 //
 
-#import "PLVEmojiModel.h"
-
-@implementation PLVEmojiModel
-
-+ (instancetype)modelWithDictionary:(NSDictionary *)data {
-    PLVEmojiModel *model = [PLVEmojiModel new];
-    model.text = [NSString stringWithFormat:@"[%@]",data[@"text"]];
-    model.imagePNG = data[@"image"];
-    
-    return model;
-}
-
-@end
+#import "PLVEmojiManager.h"
 
 #define CREATE_SHARED_MANAGER(CLASS_NAME) \
 + (instancetype)sharedManager { \
@@ -31,28 +19,56 @@ _instance = [[CLASS_NAME alloc] init]; \
 return _instance; \
 }
 
-@interface PLVEmojiModelManager ()
+@implementation PLVEmojiModel
+
++ (instancetype)modelWithDictionary:(NSDictionary *)data {
+    PLVEmojiModel *model = [PLVEmojiModel new];
+    model.text = [NSString stringWithFormat:@"[%@]",data[@"text"]];
+    model.imagePNG = data[@"image"];
+    return model;
+}
+
+@end
+
+@interface PLVEmojiManager ()
 
 @property (nonatomic, strong) NSBundle *emotionBundle;
 @property (nonatomic, strong) NSRegularExpression *regularExpression;
 
 @end
 
-@implementation PLVEmojiModelManager
+@implementation PLVEmojiManager
 
-CREATE_SHARED_MANAGER(PLVEmojiModelManager)
+CREATE_SHARED_MANAGER(PLVEmojiManager)
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"Emotion" ofType:@"bundle"];
-        self.emotionBundle = [NSBundle bundleWithPath:path];
-        self.regularExpression = [NSRegularExpression regularExpressionWithPattern:@"\\[[^\\[]{1,5}\\]" options:kNilOptions error:nil];
+- (NSBundle *)emotionBundle {
+    if (!_emotionBundle) {
+        _emotionBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"Emotion" ofType:@"bundle"]];
     }
-    
-    return self;
+    return _emotionBundle;
 }
 
+- (NSRegularExpression *)regularExpression {
+    if (!_regularExpression) {
+        _regularExpression = [NSRegularExpression regularExpressionWithPattern:@"\\[[^\\[]{1,5}\\]" options:kNilOptions error:nil];
+    }
+    return _regularExpression;
+}
+
+- (NSMutableArray<PLVEmojiModel *> *)allEmojiModels {
+    if (!_allEmojiModels) {
+        [self loadEmotions];
+    }
+    return _allEmojiModels;
+}
+
+- (NSMutableDictionary *)emotionDictionary {
+    if (!_emotionDictionary) {
+        [self loadEmotions];
+    }
+    return _emotionDictionary;
+}
+#pragma mark - public
 
 - (UIImage *)imageForEmotionPNGName:(NSString *)pngName {
     return [UIImage imageNamed:pngName inBundle:self.emotionBundle compatibleWithTraitCollection:nil];
@@ -78,6 +94,27 @@ CREATE_SHARED_MANAGER(PLVEmojiModelManager)
     }
     
     return attributeString;
+}
+
+
+#pragma mark - private
+
+- (void)loadEmotions {
+    self.allEmojiModels = [NSMutableArray array];
+    self.emotionDictionary = [NSMutableDictionary dictionary];
+    
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"Emotions" ofType:@"plist"];
+    NSArray<NSDictionary *> *groups = [NSArray arrayWithContentsOfFile:path];  // 获取plist文件内容
+    for (NSDictionary *group in groups) {
+        if ([group[@"type"] isEqualToString:@"emoji"]) {
+            NSArray<NSDictionary *> *items = group[@"items"];
+            for (NSDictionary *item in items) {
+                PLVEmojiModel *model = [PLVEmojiModel modelWithDictionary:item];
+                [self.allEmojiModels addObject:model];
+                self.emotionDictionary[model.text] = model.imagePNG;
+            }
+        }
+    }
 }
 
 @end

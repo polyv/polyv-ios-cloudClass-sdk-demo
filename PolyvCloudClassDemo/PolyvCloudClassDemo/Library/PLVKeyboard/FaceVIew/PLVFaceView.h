@@ -17,8 +17,6 @@
 
 @required
 
-//- (void)selectedFacialView:(NSString *)str isDelete:(BOOL)isDelete;
-
 // 选择表情
 - (void)selectedEmoji:(PLVEmojiModel *)emojiModel;
 

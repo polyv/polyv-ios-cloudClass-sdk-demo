@@ -11,46 +11,48 @@
   */
 
 #import "PLVFacialView.h"
-#import "PLVEmoji.h"
-#import "PLVEmojiModel.h"
 
 @interface PLVFacialView ()
 
-@property (nonatomic, strong) NSBundle *emotionBundle;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIButton *sendBtn;
 @property (nonatomic, strong) NSTimer *timer;
 
 @end
 
-@implementation PLVFacialView
+@implementation PLVFacialView {
+    NSArray *_faces;
+}
+
+#pragma mark - Rewrite
+
+- (UIScrollView *)scrollView {
+    if (!_scrollView) {
+        _scrollView = [[UIScrollView alloc] init];
+        [self addSubview:_scrollView];
+        _scrollView.frame = CGRectMake(0.0, 0.0, self.bounds.size.width * 6.0 / 7.0, self.bounds.size.height);
+        _scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4.0, CGRectGetHeight(self.scrollView.bounds));
+        _scrollView.pagingEnabled = YES;
+    }
+    return _scrollView;
+}
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        PLVEmoji *emoji = [PLVEmoji sharedEmoji];
-        
-        // 参数配置
-        _faces = emoji.allEmojiModels;
-        // 参数配置
-        PLVEmojiModelManager *emojiManager = [PLVEmojiModelManager sharedManager];
-        emojiManager.emotionDictionary = emoji.emotionDictionary;
+        _faces = [PLVEmojiManager sharedManager].allEmojiModels;
     }
     return self;
 }
 
-//给faces设置位置
+#pragma mark - Public
+
 -(void)loadFacialView:(int)page size:(CGSize)size {
 	int maxRow = 5;
     int maxCol = 6;
     CGFloat itemWidth = self.scrollView.bounds.size.width / maxCol;
     CGFloat itemHeight = self.scrollView.bounds.size.height / maxRow;
-    
-    // 初始化bundle包
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"Emotion" ofType:@"bundle"];
-    self.emotionBundle = [NSBundle bundleWithPath:path];
 
-    // 添加表情
     for (int index = 0, row = 0; index < [_faces count]; row++) {
         int page = row / maxRow;
         CGFloat addtionWidth = page * CGRectGetWidth(self.scrollView.bounds);
@@ -66,7 +68,7 @@
                 [button addTarget:self action:@selector(selected:) forControlEvents:UIControlEventTouchUpInside];
                 
                 PLVEmojiModel *emojiModel = [_faces objectAtIndex:index];
-                [button setImage:[self imageForEmotionPNGName:emojiModel.imagePNG] forState:UIControlStateNormal];
+                [button setImage:[[PLVEmojiManager sharedManager] imageForEmotionPNGName:emojiModel.imagePNG] forState:UIControlStateNormal];
             } else {
                 break;
             }
@@ -95,6 +97,17 @@
     [self addSubview:self.sendBtn];
 }
 
+- (void)sendBtnEnable:(BOOL)enable {
+    self.sendBtn.enabled = enable;
+    if (enable) {
+        self.sendBtn.backgroundColor = [UIColor colorWithRed:43.0/ 255.0 green:152.0/ 255.0 blue:240.0/ 255.0 alpha:1.0];
+    } else {
+        self.sendBtn.backgroundColor = [UIColor colorWithRed:234.0 / 255.0 green:234.0/ 255.0 blue:234.0/ 255.0 alpha:1.0];
+    }
+}
+
+#pragma mark - Actions
+
 - (void)delBtnTouchBegin:(id)sender {
     self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(handleTimer:) userInfo:nil repeats:YES];
     [self.timer fire];
@@ -111,42 +124,16 @@
     }
 }
 
-- (IBAction)sendAction:(id)sender {
+- (void)sendAction:(UIButton *)sender {
     if (self.delegate) {
         [self.delegate send];
     }
-}
-
-- (void)sendBtnEnable:(BOOL)enable {
-    self.sendBtn.enabled = enable;
-    if (enable) {
-        self.sendBtn.backgroundColor = [UIColor colorWithRed:43.0/ 255.0 green:152.0/ 255.0 blue:240.0/ 255.0 alpha:1.0];
-    } else {
-        self.sendBtn.backgroundColor = [UIColor colorWithRed:234.0 / 255.0 green:234.0/ 255.0 blue:234.0/ 255.0 alpha:1.0];
-    }
-}
-
-#pragma mark - 重写
-- (UIScrollView *)scrollView {
-    if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] init];
-        [self addSubview:_scrollView];
-        _scrollView.frame = CGRectMake(0.0, 0.0, self.bounds.size.width * 6.0 / 7.0, self.bounds.size.height);
-        _scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4.0, CGRectGetHeight(self.scrollView.bounds));
-        _scrollView.pagingEnabled = YES;
-    }
-    return _scrollView;
 }
 
 -(void)selected:(UIButton *)bt {
     if (_delegate) {
         [_delegate selectedFacialView:[_faces objectAtIndex:bt.tag]];
     }
-}
-
-#pragma mark - 自定义方法
-- (UIImage *)imageForEmotionPNGName:(NSString *)pngName {
-    return [UIImage imageNamed:pngName inBundle:self.emotionBundle compatibleWithTraitCollection:nil];
 }
 
 @end

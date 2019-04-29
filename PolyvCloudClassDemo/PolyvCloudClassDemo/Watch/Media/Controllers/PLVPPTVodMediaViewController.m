@@ -7,7 +7,7 @@
 //
 
 #import "PLVPPTVodMediaViewController.h"
-#import <PolyvCloudClassSDK/PLVVodPlayerController.h>
+#import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 #import "PLVBaseMediaViewController+Vod.h"
 #import "PLVBaseMediaViewController+PPT.h"
 
@@ -21,6 +21,8 @@
 
 @synthesize player;
 @synthesize vodId;
+@synthesize channelId;
+@synthesize userId;
 @synthesize pptVC;
 @synthesize secondaryView;
 @synthesize originSecondaryFrame;
@@ -33,6 +35,16 @@
     
     [self loadSkinView:PLVPlayerSkinViewTypeCloudClassVod];
     self.skinView.controllView.hidden = YES;
+    
+    PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
+    if (liveConfig.channelId && liveConfig.userId) {
+        __weak typeof(self)weakSelf = self;
+        [PLVLivePlayerController loadLiveVideoChannelWithUserId:liveConfig.userId channelId:liveConfig.channelId.integerValue completion:^(PLVLiveVideoChannel *channel) {
+            [weakSelf setupMarquee:channel customNick:self.nickName];
+        } failure:^(NSError *error) {
+            NSLog(@"直播频道信息加载失败：%@",error);
+        }];
+    }
 }
 
 #pragma mark - PLVBaseMediaViewController

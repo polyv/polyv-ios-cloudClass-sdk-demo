@@ -8,6 +8,7 @@
 
 #import "PLVVodViewController.h"
 #import <PolyvBusinessSDK/PLVVodConfig.h>
+#import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import "PLVNormalVodMediaViewController.h"
 #import "PLVPPTVodMediaViewController.h"
 
@@ -23,9 +24,16 @@
 @implementation PLVVodViewController
 
 #pragma mark - life cycle
+- (void)dealloc {
+    NSLog(@"%s", __FUNCTION__);
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
+    PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     
     if (self.vodType == PLVVodViewControllerTypeCloudClass) {
         self.mediaVC = [[PLVPPTVodMediaViewController alloc] init];
@@ -34,8 +42,10 @@
     }
     
     self.mediaVC.delegate = self;
-    PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
-    self.mediaVC.vodId = vodConfig.vodId;//必须，不能为空
+    self.mediaVC.vodId = vodConfig.vodId; //必须，不能为空
+    self.mediaVC.channelId = liveConfig.channelId;
+    self.mediaVC.userId = liveConfig.userId;
+    
     CGFloat h = self.view.bounds.size.width * (self.vodType == PLVVodViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale) + [UIApplication sharedApplication].statusBarFrame.size.height;
     self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
     [self.view addSubview:self.mediaVC.view];
@@ -63,7 +73,7 @@
 }
 
 #pragma mark - PLVBaseMediaViewControllerDelegate
-- (void)quit:(PLVBaseMediaViewController *)mediaVC {
+- (void)quit:(PLVBaseMediaViewController *)mediaVC error:(NSError *)error {
     [self.mediaVC clearResource];
     [self dismissViewControllerAnimated:YES completion:nil];
 }

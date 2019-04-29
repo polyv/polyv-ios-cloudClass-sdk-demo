@@ -14,4 +14,9 @@
 /// 必须，不能为空
 @property (nonatomic, strong) NSString *vodId;
 
+/// optional, can be nil.
+@property (nonatomic, strong) NSString *channelId;
+/// optional, can be nil.
+@property (nonatomic, strong) NSString *userId;
+
 @end

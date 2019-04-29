@@ -56,10 +56,15 @@
         }
     }
     
-    __weak typeof(self) weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [weakSelf.pptVC refreshPPT:json];
-    });
+    if (((PLVLivePlayerController *)self.player).linkMic) {
+        [self.pptVC refreshPPT:json];
+    } else {
+        NSTimeInterval delay = 5000.0;
+        __weak typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+            [weakSelf.pptVC refreshPPT:json];
+        });
+    }
 }
 
 - (void)secondaryViewFollowKeyboardAnimation:(BOOL)flag {
@@ -176,6 +181,10 @@
 
 - (void)reconnectPlayer:(PLVLivePlayerController *)livePlayer {
     [self reOpenPlayer:nil showHud:NO];
+}
+
+- (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
+    [self setupMarquee:channel customNick:self.nickName];
 }
 
 @end

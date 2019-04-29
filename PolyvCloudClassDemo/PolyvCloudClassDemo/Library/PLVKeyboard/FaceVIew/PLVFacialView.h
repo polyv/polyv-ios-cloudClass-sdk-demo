@@ -11,13 +11,13 @@
   */
 
 #import <UIKit/UIKit.h>
-#import "PLVEmojiModel.h"
+#import "PLVEmojiManager.h"
 
 @protocol FacialViewDelegate
 
 @optional
 
-- (void)selectedFacialView:(PLVEmojiModel*)emojiModel;
+- (void)selectedFacialView:(PLVEmojiModel *)emojiModel;
 
 - (void)deleteEmoji;
 
@@ -26,9 +26,7 @@
 @end
 
 
-@interface PLVFacialView : UIView {
-	NSArray *_faces;
-}
+@interface PLVFacialView : UIView
 
 @property(nonatomic) id<FacialViewDelegate> delegate;
 

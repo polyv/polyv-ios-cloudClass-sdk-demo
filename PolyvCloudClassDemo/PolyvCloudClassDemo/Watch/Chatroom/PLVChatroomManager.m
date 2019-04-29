@@ -20,4 +20,82 @@ static PLVChatroomManager *manager = nil;
     return manager;
 }
 
+- (void)setLoginUser:(PLVSocketObject *)loginUser {
+    _loginUser = loginUser;
+    _defaultNick = loginUser.defaultUser;
+}
+
+#pragma mark - Public
+
+- (void)renameUserNick:(NSString *)newName {
+    if (self.loginUser) {
+        _defaultNick = NO;
+        [self.loginUser renameNickname:newName];
+        [self.socketUser renameNickname:newName];
+    }
+}
+
++ (PLVChatroomModel *)modelWithHistoryMessageDict:(NSDictionary *)messageDict {
+    PLVChatroomModel *model;
+    NSString *msgType = messageDict[@"msgType"];
+    NSString *msgSource = messageDict[@"msgSource"];
+    
+    if (msgType) {
+        if ([msgType isEqualToString:@"customMessage"]) { // 自定义消息
+            PLVChatroomCustomModel *customModel = [self modelWithCustomMessage:messageDict mine:NO];
+            if (customModel.defined) {
+                model = customModel;
+            }
+        }
+    } else if (msgSource) {
+        if ([msgSource isEqualToString:@"chatImg"]) { // 图片消息
+            NSDictionary *imageDict = @{@"EVENT":@"CHAT_IMG", @"values":@[messageDict[@"content"]], @"user":messageDict[@"user"]};
+            PLVSocketChatRoomObject * chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:imageDict];
+            model = [PLVChatroomModel modelWithObject:chatroomObject];
+        } // redpaper（红包）、get_redpaper（领红包）
+    } else {
+        NSString *uid = [NSString stringWithFormat:@"%@",messageDict[@"user"][@"uid"]];
+        if ([uid isEqualToString:@"1"] || [uid isEqualToString:@"2"]) {
+            // uid = 1，打赏消息；uid = 2，自定义消息
+        }else { // 发言消息
+            NSDictionary *speakDict = @{@"EVENT" : @"SPEAK", @"id" : messageDict[@"id"], @"values" : @[messageDict[@"content"]], @"user" : messageDict[@"user"]};
+            PLVSocketChatRoomObject * chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:speakDict];
+            model = [PLVChatroomModel modelWithObject:chatroomObject];
+        }
+    }
+    return model;
+}
+
+#pragma mark - 自定义消息处理
+
++ (PLVChatroomCustomModel *)modelWithCustomMessage:(NSDictionary *)customMessage mine:(BOOL)mine {
+    if (!customMessage || ![customMessage isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    
+    PLVChatroomCustomModel *customModel;
+    NSString *event = customMessage[@"EVENT"];
+    if ([customMessage[@"version"] integerValue] == 1) {
+        if (!mine) {
+            // 如果提交的消息广播返回了自己需要过滤掉此消息
+            NSString *userId = customMessage[@"user"][@"userId"];
+            if ([userId isEqualToString:manager.socketUser.userId]) {
+                return nil;
+            }
+        }
+        
+        // 自定义消息
+        if ([event isEqualToString:CUSTOM_EVENT_KOU]) {          // 扣1/2消息
+            customModel = [PLVChatroomCustomKouModel modelWithCustomMessage:customMessage];
+        } else {
+            customModel = [PLVChatroomCustomModel modelWithCustomMessage:customMessage];
+        }
+    }
+    
+    if (customModel) {
+        customModel.localMessageModel = mine;
+    }
+    return customModel;
+}
+
 @end

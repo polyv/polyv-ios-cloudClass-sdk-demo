@@ -9,12 +9,9 @@
 #import "PLVTextInputView.h"
 #import <Masonry/Masonry.h>
 #import "PLVFaceView.h"
-#import "PLVEmojiModel.h"
 #import "PLVKeyboardMoreView.h"
 
 #define PLVTextBackedStringAttributeName    @"PLVEmojiText"
-
-static BOOL nickNameSetted = NO;
 
 @interface PLVTextView : UITextView
 
@@ -67,8 +64,8 @@ static BOOL nickNameSetted = NO;
         NSRange range = NSMakeRange(result.range.location - offset, result.range.length);
         NSTextAttachment *attachMent = [[NSTextAttachment alloc] init];
         NSString *imageText = [attributeStr.string substringWithRange:range];
-        NSString *imageName = [PLVEmojiModelManager sharedManager].emotionDictionary[imageText];
-        attachMent.image = [[PLVEmojiModelManager sharedManager] imageForEmotionPNGName:imageName];
+        NSString *imageName = [PLVEmojiManager sharedManager].emotionDictionary[imageText];
+        attachMent.image = [[PLVEmojiManager sharedManager] imageForEmotionPNGName:imageName];
         attachMent.bounds = self.emojiFrame;
         
         NSMutableAttributedString *emojiAttrStr = [[NSMutableAttributedString alloc] initWithAttributedString:[NSAttributedString attributedStringWithAttachment:attachMent]];
@@ -107,9 +104,14 @@ static BOOL nickNameSetted = NO;
 - (void)paste:(id)sender {
     NSString *string = UIPasteboard.generalPasteboard.string;
     if (string.length) {
+        NSRange cursorRange = self.selectedRange;
+        NSUInteger newLength = self.text.length + string.length - cursorRange.length;
+        if (newLength > TEXT_MAX_COUNT) {
+            return;
+        }
+        
         NSAttributedString *attrStr = [self convertTextWithEmoji:string];
         
-        NSRange cursorRange = self.selectedRange;
         [self replaceCharactersInRange:cursorRange withAttributedString:attrStr];
         self.selectedRange = NSMakeRange(cursorRange.location + attrStr.length, 0);
         
@@ -139,6 +141,24 @@ static BOOL nickNameSetted = NO;
 @end
 
 @implementation PLVTextInputView
+
+- (PLVFaceView *)faceView {
+    if (!_faceView) {
+        _faceView = [[PLVFaceView alloc] initWithFrame:self.faceOriginRect];
+        _faceView.delegate = self;
+        [self.superview addSubview:_faceView];
+    }
+    return _faceView;
+}
+
+- (PLVKeyboardMoreView *)moreView {
+    if (!_moreView) {
+        _moreView = [[PLVKeyboardMoreView alloc] initWithFrame:self.moreOriginRect];
+        _moreView.delegate = self;
+        [self.superview addSubview:_moreView];
+    }
+    return _moreView;
+}
 
 #pragma mark - life cycle
 - (void)dealloc {
@@ -211,14 +231,7 @@ static BOOL nickNameSetted = NO;
             moreHeight += 55.0;
         }
         self.faceOriginRect = CGRectMake(0.0, self.frame.origin.y + self.frame.size.height, self.bounds.size.width, faceHeight);
-        self.faceView = [[PLVFaceView alloc] initWithFrame:self.faceOriginRect];
-        self.faceView.delegate = self;
-        [self.superview addSubview:self.faceView];
-        
         self.moreOriginRect = CGRectMake(0.0, self.frame.origin.y + self.frame.size.height, self.bounds.size.width, moreHeight);
-        self.moreView = [[PLVKeyboardMoreView alloc] initWithFrame:self.moreOriginRect];
-        self.moreView.delegate = self;
-        [self.superview addSubview:self.moreView];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -231,33 +244,30 @@ static BOOL nickNameSetted = NO;
     }
 }
 
-- (void)nickNameSetted:(BOOL)setted {
-    nickNameSetted = setted;
+- (void)tapAction {
+    if (self.inputState != PLVTextInputViewStateNormal) {
+        self.inputState = PLVTextInputViewStateNormal;
+        [self.superview removeGestureRecognizer:self.tap];
+        self.textView.inputView = nil;
+        self.emojiBtn.selected = NO;
+        self.moreBtn.selected = NO;
+        [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
+        [self endEditing:YES];
+    }
 }
 
 - (void)clearResource {
     if (@available(iOS 9.0, *)) {
     } else {
-        nickNameSetted = YES;
         [self.textView resignFirstResponder];
         self.textView.inputView = [[UIView alloc] initWithFrame:CGRectZero];
         [self.textView reloadInputViews];
         [self.textView becomeFirstResponder];
-
     }
 }
 
-- (void)tapAction {
-    [self.superview removeGestureRecognizer:self.tap];
-    self.textView.inputView = nil;
-    self.emojiBtn.selected = NO;
-    self.moreBtn.selected = NO;
-    [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
-    [self endEditing:YES];
-}
-
 #pragma mark - Action
-- (IBAction)onlyTeacherAction:(id)sender {
+- (void)onlyTeacherAction:(UIButton *)sender {
     self.userBtn.selected = !self.userBtn.selected;
     if (self.disableOtherButtonsInTeacherMode) {
         self.textView.editable = !self.userBtn.selected;
@@ -271,11 +281,12 @@ static BOOL nickNameSetted = NO;
     }
 }
 
-- (IBAction)emojiAction:(id)sender {
-    if (nickNameSetted) {
-        self.emojiBtn.selected = !self.emojiBtn.selected;
+- (void)emojiAction:(UIButton *)sender {
+    if ([self textInputViewShouldBeginEditing]) {
+        self.emojiBtn.selected = !sender.isSelected;
         self.moreBtn.selected = NO;
         if(self.emojiBtn.selected) {
+            self.inputState = PLVTextInputViewStateEmoji;
             [self.superview addGestureRecognizer:self.tap];
             self.textView.inputView = [[UIView alloc] initWithFrame:CGRectZero];
             [self.textView reloadInputViews];
@@ -285,25 +296,25 @@ static BOOL nickNameSetted = NO;
             [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
             [self.textView becomeFirstResponder];
         } else {
+            self.inputState = PLVTextInputViewStateSystem;
             self.textView.inputView = nil;
             [self.textView reloadInputViews];
             [self.textView becomeFirstResponder];
         }
     }
-    [self nickNameCallback];
 }
 
-- (IBAction)flowerAction:(id)sender {
-    if (nickNameSetted) {
+- (void)flowerAction:(UIButton *)sender {
+    if ([self textInputViewShouldBeginEditing]) {
         if (self.delegate && [self.delegate respondsToSelector:@selector(sendFlower:)]) {
             [self.delegate sendFlower:self];
         }
     }
-    [self nickNameCallback];
 }
 
-- (IBAction)moreAction:(id)sender {
-    if (nickNameSetted) {
+- (void)moreAction:(UIButton *)sender {
+    if ([self textInputViewShouldBeginEditing]) {
+        self.inputState = PLVTextInputViewStateMore;
         [self.superview addGestureRecognizer:self.tap];
         self.moreBtn.selected = YES;
         [self.textView resignFirstResponder];
@@ -316,7 +327,6 @@ static BOOL nickNameSetted = NO;
         }
         [self placeholderTextView];
     }
-    [self nickNameCallback];
 }
 
 #pragma mark - private
@@ -401,7 +411,9 @@ static BOOL nickNameSetted = NO;
 }
 
 - (void)checkSendBtnEnable:(BOOL)enable {
-    [self.faceView sendBtnEnable:enable];
+    if (_faceView) {
+        [_faceView sendBtnEnable:enable];
+    }
     self.textView.enablesReturnKeyAutomatically = !enable;
 }
 
@@ -409,12 +421,6 @@ static BOOL nickNameSetted = NO;
     if (self.textView.attributedText.length == 0 && !self.emojiBtn.selected) {
         self.textView.attributedText = self.textView.placeholderContent;
         [self checkSendBtnEnable:NO];
-    }
-}
-
-- (void)nickNameCallback {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textInputView:nickNameSetted:)]) {
-        [self.delegate textInputView:self nickNameSetted:nickNameSetted];
     }
 }
 
@@ -426,8 +432,17 @@ static BOOL nickNameSetted = NO;
     }
 }
 
+- (BOOL)textInputViewShouldBeginEditing {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textInputViewShouldBeginEditing:)]) {
+        return [self.delegate textInputViewShouldBeginEditing:self];
+    } else {
+        return YES;
+    }
+}
+
 #pragma mark - UIKeyboardNotification
 - (void)keyboardWillShow:(NSNotification *)notification {
+    self.inputState = PLVTextInputViewStateSystem;
     //TODO：中文键盘或第三方键盘第一次弹出时会收到两至三次弹出事件通知，现无法区分这种情况，会导致动画效果不连续流畅，暂无解决方案
     if (self.textView.isFirstResponder && !self.emojiBtn.selected && !self.moreBtn.selected) {
         [self.superview addGestureRecognizer:self.tap];
@@ -443,8 +458,7 @@ static BOOL nickNameSetted = NO;
 
 #pragma mark - UITextViewDelegate
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
-    [self nickNameCallback];
-    if (nickNameSetted) {
+    if ([self textInputViewShouldBeginEditing]) {
         if (self.textView.textColor == [UIColor lightGrayColor]) {
             self.textView.textColor = [UIColor blackColor];
             self.textView.attributedText = self.textView.emptyContent;
@@ -462,12 +476,26 @@ static BOOL nickNameSetted = NO;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if ([text isEqualToString:@"\n"]) {
-        [self sendText];
-        [self.textView resignFirstResponder];
+    // Prevent crashing undo bug
+    if(range.length + range.location > textView.text.length)
+    {
         return NO;
     }
-    return YES;
+    
+    if ([text isEqualToString:@"\n"]) {
+        [self sendText];
+        [textView resignFirstResponder];
+        return NO;
+    }
+    
+    // 当前文本框字符长度（中英文、表情键盘上表情为一个字符，系统emoji为两个字符）
+    NSUInteger newLength = [textView.text length] + [text length] - range.length;
+    if (newLength <= TEXT_MAX_COUNT) {
+        return YES;
+    }else {
+        NSLog(@"字数超限！");
+        return NO;
+    }
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -495,11 +523,15 @@ static BOOL nickNameSetted = NO;
 
 #pragma mark - DXFaceDelegate
 - (void)selectedEmoji:(PLVEmojiModel *)emojiModel {
-    NSRange cursorRange = self.textView.selectedRange;
-    NSAttributedString *emojiAttrStr = [self.textView convertTextWithEmoji:emojiModel.text];
-    [self.textView replaceCharactersInRange:cursorRange withAttributedString:emojiAttrStr];
-    self.textView.selectedRange = NSMakeRange(cursorRange.location + emojiAttrStr.length, 0);
-    [self textViewDidChange:self.textView];
+    if ([self.textView.text length] < TEXT_MAX_COUNT) {
+        NSRange cursorRange = self.textView.selectedRange;
+        NSAttributedString *emojiAttrStr = [self.textView convertTextWithEmoji:emojiModel.text];
+        [self.textView replaceCharactersInRange:cursorRange withAttributedString:emojiAttrStr];
+        self.textView.selectedRange = NSMakeRange(cursorRange.location + emojiAttrStr.length, 0);
+        [self textViewDidChange:self.textView];
+    }else {
+        NSLog(@"字数超限！");
+    }
 }
 
 - (void)deleteEvent {

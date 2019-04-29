@@ -7,9 +7,8 @@
 //
 
 #import "PLVChatroomCell.h"
-#import <Masonry/Masonry.h>
 #import <SDWebImage/UIImageView+WebCache.h>
-#import "PLVEmojiModel.h"
+#import "PLVEmojiManager.h"
 #import "PCCUtils.h"
 
 #define DEFAULT_CELL_HEIGHT 44.0
@@ -81,6 +80,10 @@
     return DEFAULT_CELL_HEIGHT;
 }
 
++ (CGFloat)calculateCellHeightWithModelDict:(NSDictionary *)modelDict mine:(BOOL)mine {
+    return DEFAULT_CELL_HEIGHT;
+}
+
 - (void)drawCornerRadiusWithView:(UIView *)view size:(CGSize)size roundingCorners:(UIRectCorner)corners {
     CGRect bounds = CGRectMake(0, 0, size.width, size.height);
     UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:bounds byRoundingCorners:corners cornerRadii:CGSizeMake(8, 8)];
@@ -98,16 +101,9 @@
     return rect.size;
 }
 
-#pragma mark - test
-+ (NSArray *)cellFromChatroom {
-    return [[NSBundle mainBundle] loadNibNamed:NSStringFromClass([self class]) owner:self options:nil];
++ (NSString *)cellIndetifier {
+    return NSStringFromClass([self class]);
 }
-//+ (NSString *)indentifyWithModel:(PLVChatroomModel *)model;
-//- (instancetype)initWithModel:(PLVChatroomModel *)model identifier:(NSString *)identifier{
-//    if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier]){
-//
-//    }
-//}
 
 @end
 
@@ -134,7 +130,7 @@
 
 - (void)setSpeakContent:(NSString *)speakContent {
     _speakContent = speakContent;
-    NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
     self.messageLB.attributedText = attributedStr;
     CGSize newSize = [self.messageLB sizeThatFits:CGSizeMake(270, MAXFLOAT)];
     [self drawCornerRadiusWithView:self.messageLB size:newSize roundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft|UIRectCornerBottomRight];
@@ -148,7 +144,7 @@
 }
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
-    NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
     // 30 = 10(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
     return [self autoCalculateSize:CGSizeMake(270, MAXFLOAT) attributedContent:attributedStr].height + 30.0;
 }
@@ -249,7 +245,7 @@
  */
 - (void)setSpeakContent:(NSString *)speakContent {
     _speakContent = speakContent;
-    NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
     self.messageLB.attributedText = attributedStr;
     CGSize newSize = [self.messageLB sizeThatFits:CGSizeMake(260, MAXFLOAT)];
     [self drawCornerRadiusWithView:self.messageLB size:newSize roundingCorners:UIRectCornerBottomLeft|UIRectCornerBottomRight|UIRectCornerTopRight];
@@ -277,7 +273,7 @@
 }
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
-    NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
     // +53 = 10+18+5(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
     return [self autoCalculateSize:CGSizeMake(260, MAXFLOAT) attributedContent:attributedStr].height + 53.0;
 }

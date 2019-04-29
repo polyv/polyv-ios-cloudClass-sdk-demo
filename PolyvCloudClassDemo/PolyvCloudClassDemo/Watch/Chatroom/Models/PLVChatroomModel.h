@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <PolyvBusinessSDK/PolyvBusinessSDK.h>
 #import "PLVChatroomCell.h"
-#import "PLVChatroomManager.h"
 
 /// model 类型
 typedef NS_ENUM(NSInteger, PLVChatroomModelType) {
@@ -33,6 +32,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomModelType) {
     PLVChatroomModelTypeSystem         = 8,
     /// 时间类型
     PLVChatroomModelTypeTime           = 9,
+    /// 自定义类型
+    PLVChatroomModelTypeCustom         = 10,
 };
 
 /// 用户类型
@@ -61,7 +62,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomUserType) {
 @property (nonatomic, readonly) PLVChatroomModelType type;
 
 /// 本地消息模型
-@property (nonatomic, readonly) BOOL localMessageModel;
+@property (nonatomic, assign) BOOL localMessageModel;
 
 /// 消息唯一 id，maybe nil.
 @property (nonatomic, strong, readonly) NSString *msgId;

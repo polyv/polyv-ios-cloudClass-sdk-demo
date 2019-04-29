@@ -8,6 +8,10 @@
 
 #import "PLVBaseMediaViewController.h"
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
+#import <PolyvCloudClassSDK/PLVVideoMarquee.h>
+#import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
+
+#define CloudClassBaseMediaErrorDomain @"net.polyv.cloudClassBaseMediaError"
 
 @interface PLVBaseMediaViewController () <PLVPlayerSkinViewDelegate, PLVPlayerControllerDelegate>
 
@@ -19,6 +23,8 @@
 @property (nonatomic, assign) BOOL skinShowed;//播放器皮肤是否已显示
 @property (nonatomic, assign) BOOL skinAnimationing;//播放器皮肤显示隐藏动画的开关
 @property (nonatomic, assign) BOOL zoomAnimationing;//横竖屏切换动画的开关
+
+@property (nonatomic, strong) PLVVideoMarquee *videoMarquee; // 视频跑马灯
 
 @end
 
@@ -114,8 +120,8 @@
 
 #pragma mark - PLVPlayerSkinViewDelegate
 - (void)quit:(PLVPlayerSkinView *)skinView {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(quit:)]) {
-        [self.delegate quit:self];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(quit:error:)]) {
+        [self.delegate quit:self error:nil];
     }
 }
 
@@ -148,11 +154,11 @@
         [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)(orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown || orientation == UIDeviceOrientationUnknown ? UIDeviceOrientationPortrait : orientation) animated:YES];
         [UIView animateWithDuration:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             weakSelf.skinView.fullscreen = fullscreen;
-            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(statusBarAppearanceNeedsUpdate:)]) {
-                //delegate回调隐藏或显示statusBar，一定要放在最前前执行，因为layout时需要用到安全区域，而statusBar的隐藏或显示会影响安全区域的y坐标
-                [weakSelf.delegate statusBarAppearanceNeedsUpdate:weakSelf];
-            }
             CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(angle);
+            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(statusBarAppearanceNeedsUpdate:rotationTransform:)]) {
+                //delegate回调隐藏或显示statusBar，一定要放在最前前执行，因为layout时需要用到安全区域，而statusBar的隐藏或显示会影响安全区域的y坐标
+                [weakSelf.delegate statusBarAppearanceNeedsUpdate:weakSelf rotationTransform:rotationTransform];
+            }
             weakSelf.view.transform = rotationTransform;
             if (!flip) {
                 weakSelf.view.frame = rect;
@@ -181,6 +187,87 @@
     self.skinView.codeRateItems = codeRateItems;
     [self.skinView layout];
     [self.skinView switchCodeRate:codeRate];
+}
+
+#pragma mark - 跑马灯
+
+- (void)setNickName:(NSString *)nickName {
+    _nickName = nickName;
+    if (self.videoMarquee && [self.player isKindOfClass:[PLVLivePlayerController class]]) {
+        if (((PLVLivePlayerController *)self.player).channel.marqueeType == PLVLiveMarqueeTypeNick) {
+            PLVMarqueeModel *model = self.videoMarquee.marqueeModel;
+            model.content = nickName;
+            self.videoMarquee.marqueeModel = model;
+        }
+    }
+}
+
+- (void)setupMarquee:(PLVLiveVideoChannel *)channel customNick:(NSString *)customNick  {
+    if (self.videoMarquee) {
+        return;
+    }
+    [self handleMarquee:channel customNick:customNick completion:^(PLVMarqueeModel *model, NSError *error) {
+        if (model) {
+            [self loadVideoMarqueeView:model];
+        } else if (error) {
+            if (error.code == PLVBaseMediaErrorCodeMarqueeFailed) {
+                if (self.delegate && [self.delegate respondsToSelector:@selector(quit:error:)]) {
+                    [self.delegate quit:self error:error];
+                }
+            } else {
+                NSLog(@"自定义跑马灯加载失败：%@",error);
+            }
+        } else {
+            NSLog(@"无跑马灯或跑马灯不显示");
+        }
+    }];
+}
+
+- (void)loadVideoMarqueeView:(PLVMarqueeModel *)model {
+    UIView *marqueeView = [[UIView alloc] initWithFrame:self.view.bounds];
+    marqueeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    marqueeView.backgroundColor = [UIColor clearColor];
+    if (self.skinView) {
+        [self.view insertSubview:marqueeView belowSubview:self.skinView];
+    } else {
+        [self.view addSubview:marqueeView];
+    }
+    
+    self.videoMarquee = [PLVVideoMarquee videoMarqueeWithMarqueeModel:model];
+    [self.videoMarquee showVideoMarqueeInView:marqueeView];
+}
+
+- (void)handleMarquee:(PLVLiveVideoChannel *)channel customNick:(NSString *)customNick completion:(void (^)(PLVMarqueeModel *model, NSError *error))completion {
+    switch (channel.marqueeType) {
+        case PLVLiveMarqueeTypeNick:
+            if (customNick) {
+                channel.marquee = customNick;
+            } else {
+                channel.marquee = @"自定义昵称";
+            }
+        case PLVLiveMarqueeTypeFixed: {
+            float alpha = channel.marqueeOpacity.floatValue/100.0;
+            PLVMarqueeModel *model = [PLVMarqueeModel marqueeModelWithContent:channel.marquee fontSize:channel.marqueeFontSize.unsignedIntegerValue fontColor:channel.marqueeFontColor alpha:alpha autoZoom:channel.marqueeAutoZoomEnabled];
+            completion(model, nil);
+        } break;
+        case PLVLiveMarqueeTypeURL: {
+            if (channel.marquee) {
+                [PLVLiveVideoAPI loadCustomMarquee:[NSURL URLWithString:channel.marquee] withChannelId:channel.channelId.unsignedIntegerValue userId:channel.userId completion:^(BOOL valid, NSDictionary *marqueeDict) {
+                    if (valid) {
+                        completion([PLVMarqueeModel marqueeModelWithMarqueeDict:marqueeDict], nil);
+                    } else {
+                        NSError *error = [NSError errorWithDomain:CloudClassBaseMediaErrorDomain code:PLVBaseMediaErrorCodeMarqueeFailed userInfo:@{NSLocalizedDescriptionKey:marqueeDict[@"msg"]}];
+                        completion(nil, error);
+                    }
+                } failure:^(NSError *error) {
+                    completion(nil, error);
+                }];
+            }
+        } break;
+        default:
+            completion(nil, nil);
+            break;
+    }
 }
 
 @end

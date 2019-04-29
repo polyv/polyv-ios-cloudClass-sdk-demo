@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define topBarHeight 44.0
+#define PageControllerTopBarHeight 44.0
 
 /**
  自定义分页控制器
@@ -22,7 +22,7 @@
 @property (nonatomic, assign) BOOL circulation;
 
 /**
- 通过添标题及其控制器初始化分页控制器
+ 通过标题及其控制器初始化分页控制器
 
  @param titles 子控制器标题
  @param controllers 子控制器

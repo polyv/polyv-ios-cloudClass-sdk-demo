@@ -9,10 +9,9 @@
 /* Begin PBXBuildFile section */
 		2207EAF521AE32F40011B0EB /* PLVChatroomQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */; };
 		220CB18C21B8C95B0034C384 /* PLVTextInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16B21B8C95B0034C384 /* PLVTextInputView.m */; };
-		220CB18D21B8C95B0034C384 /* PLVEmojiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16D21B8C95B0034C384 /* PLVEmojiModel.m */; };
+		220CB18D21B8C95B0034C384 /* PLVEmojiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16D21B8C95B0034C384 /* PLVEmojiManager.m */; };
 		220CB18E21B8C95B0034C384 /* PLVFaceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16E21B8C95B0034C384 /* PLVFaceView.m */; };
 		220CB18F21B8C95B0034C384 /* PLVFacialView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16F21B8C95B0034C384 /* PLVFacialView.m */; };
-		220CB19021B8C95B0034C384 /* PLVEmoji.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB17021B8C95B0034C384 /* PLVEmoji.m */; };
 		220CB19121B8C95B0034C384 /* PLVKeyboardMoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB17521B8C95B0034C384 /* PLVKeyboardMoreView.m */; };
 		220CB19221B8C95B0034C384 /* plv_input_user_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */; };
 		220CB19321B8C95B0034C384 /* plv_flower@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 220CB17B21B8C95B0034C384 /* plv_flower@2x.png */; };
@@ -71,6 +70,7 @@
 		22B4087321B7BB6B0087DF92 /* PCCUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D64521364C010076AF7D /* PCCUtils.m */; };
 		22B4087521B7BC030087DF92 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22142F532113094100062C6E /* AppDelegate.m */; };
 		22B4087621B7BC260087DF92 /* PLVPPTLiveMediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F765621ABA1600085F5DE /* PLVPPTLiveMediaViewController.m */; };
+		22B906FD21F56F400086D05A /* PLVChatroomCustomKouCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B906FC21F56F400086D05A /* PLVChatroomCustomKouCell.m */; };
 		22BF123F21816B54006127FD /* plv_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22BF123D21816B54006127FD /* plv_logo@2x.png */; };
 		22CE3D0721AD4C57002B1CFB /* PLVBaseMediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE3CFE21AD4C57002B1CFB /* PLVBaseMediaViewController.m */; };
 		22CE3D0821AD4C57002B1CFB /* PLVBaseMediaViewController+PPT.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE3D0021AD4C57002B1CFB /* PLVBaseMediaViewController+PPT.m */; };
@@ -123,6 +123,12 @@
 		6740D66D2136A42D0076AF7D /* README.mdown in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6672136A42D0076AF7D /* README.mdown */; };
 		6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D66A2136A42D0076AF7D /* MarqueeLabel.m */; };
 		6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */; };
+		677B4C7E21F1835A00E98E86 /* PLVChatroomCustomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 677B4C7D21F1835A00E98E86 /* PLVChatroomCustomModel.m */; };
+		677B4C8121F183C300E98E86 /* PLVChatroomCustomKouModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 677B4C8021F183C200E98E86 /* PLVChatroomCustomKouModel.m */; };
+		677B4C8621F1BDF300E98E86 /* plv_kou1_img@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8221F1BDF100E98E86 /* plv_kou1_img@3x.png */; };
+		677B4C8721F1BDF300E98E86 /* plv_kou1_img@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */; };
+		677B4C8821F1BDF300E98E86 /* plv_kou2_img@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */; };
+		677B4C8921F1BDF300E98E86 /* plv_kou2_img@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */; };
 		7DA0500F993E7C2EBAC36533 /* Pods_PolyvCloudClassDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76BF2A194BACB52A05EA1745 /* Pods_PolyvCloudClassDemo.framework */; };
 /* End PBXBuildFile section */
 
@@ -131,16 +137,14 @@
 		2207EAF321AE32F40011B0EB /* PLVChatroomQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomQueue.h; sourceTree = "<group>"; };
 		2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomQueue.m; sourceTree = "<group>"; };
 		220CB16B21B8C95B0034C384 /* PLVTextInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVTextInputView.m; sourceTree = "<group>"; };
-		220CB16D21B8C95B0034C384 /* PLVEmojiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVEmojiModel.m; sourceTree = "<group>"; };
+		220CB16D21B8C95B0034C384 /* PLVEmojiManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVEmojiManager.m; sourceTree = "<group>"; };
 		220CB16E21B8C95B0034C384 /* PLVFaceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVFaceView.m; sourceTree = "<group>"; };
 		220CB16F21B8C95B0034C384 /* PLVFacialView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVFacialView.m; sourceTree = "<group>"; };
-		220CB17021B8C95B0034C384 /* PLVEmoji.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVEmoji.m; sourceTree = "<group>"; };
 		220CB17121B8C95B0034C384 /* PLVKeyboardMoreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVKeyboardMoreView.h; sourceTree = "<group>"; };
-		220CB17221B8C95B0034C384 /* PLVEmojiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVEmojiModel.h; sourceTree = "<group>"; };
+		220CB17221B8C95B0034C384 /* PLVEmojiManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVEmojiManager.h; sourceTree = "<group>"; };
 		220CB17321B8C95B0034C384 /* PLVFacialView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVFacialView.h; sourceTree = "<group>"; };
 		220CB17421B8C95B0034C384 /* PLVFaceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVFaceView.h; sourceTree = "<group>"; };
 		220CB17521B8C95B0034C384 /* PLVKeyboardMoreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVKeyboardMoreView.m; sourceTree = "<group>"; };
-		220CB17621B8C95B0034C384 /* PLVEmoji.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVEmoji.h; sourceTree = "<group>"; };
 		220CB17721B8C95B0034C384 /* PLVTextInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVTextInputView.h; sourceTree = "<group>"; };
 		220CB17A21B8C95B0034C384 /* plv_input_user_normal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_normal@2x.png"; sourceTree = "<group>"; };
 		220CB17B21B8C95B0034C384 /* plv_flower@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_flower@2x.png"; sourceTree = "<group>"; };
@@ -220,6 +224,8 @@
 		22B4086D21B7A7F10087DF92 /* PLVBaseMediaViewController+Vod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PLVBaseMediaViewController+Vod.m"; sourceTree = "<group>"; };
 		22B4086E21B7A7F10087DF92 /* PLVVodMediaProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVVodMediaProtocol.h; sourceTree = "<group>"; };
 		22B4086F21B7A7F10087DF92 /* PLVBaseMediaViewController+Vod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PLVBaseMediaViewController+Vod.h"; sourceTree = "<group>"; };
+		22B906FB21F56F400086D05A /* PLVChatroomCustomKouCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVChatroomCustomKouCell.h; sourceTree = "<group>"; };
+		22B906FC21F56F400086D05A /* PLVChatroomCustomKouCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomCustomKouCell.m; sourceTree = "<group>"; };
 		22BF123D21816B54006127FD /* plv_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_logo@2x.png"; sourceTree = "<group>"; };
 		22CE3CFE21AD4C57002B1CFB /* PLVBaseMediaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVBaseMediaViewController.m; sourceTree = "<group>"; };
 		22CE3D0021AD4C57002B1CFB /* PLVBaseMediaViewController+PPT.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PLVBaseMediaViewController+PPT.m"; sourceTree = "<group>"; };
@@ -300,6 +306,14 @@
 		6740D66B2136A42D0076AF7D /* MarqueeLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarqueeLabel.h; sourceTree = "<group>"; };
 		6761E9EE218016F00026E8A6 /* PLVPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPhotoBrowser.h; sourceTree = "<group>"; };
 		6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPhotoBrowser.m; sourceTree = "<group>"; };
+		677B4C7C21F1835A00E98E86 /* PLVChatroomCustomModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomCustomModel.h; sourceTree = "<group>"; };
+		677B4C7D21F1835A00E98E86 /* PLVChatroomCustomModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomCustomModel.m; sourceTree = "<group>"; };
+		677B4C7F21F183C200E98E86 /* PLVChatroomCustomKouModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVChatroomCustomKouModel.h; sourceTree = "<group>"; };
+		677B4C8021F183C200E98E86 /* PLVChatroomCustomKouModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomCustomKouModel.m; sourceTree = "<group>"; };
+		677B4C8221F1BDF100E98E86 /* plv_kou1_img@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou1_img@3x.png"; sourceTree = "<group>"; };
+		677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou1_img@2x.png"; sourceTree = "<group>"; };
+		677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@2x.png"; sourceTree = "<group>"; };
+		677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@3x.png"; sourceTree = "<group>"; };
 		76BF2A194BACB52A05EA1745 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -333,10 +347,8 @@
 		220CB16C21B8C95B0034C384 /* FaceVIew */ = {
 			isa = PBXGroup;
 			children = (
-				220CB17621B8C95B0034C384 /* PLVEmoji.h */,
-				220CB17021B8C95B0034C384 /* PLVEmoji.m */,
-				220CB17221B8C95B0034C384 /* PLVEmojiModel.h */,
-				220CB16D21B8C95B0034C384 /* PLVEmojiModel.m */,
+				220CB17221B8C95B0034C384 /* PLVEmojiManager.h */,
+				220CB16D21B8C95B0034C384 /* PLVEmojiManager.m */,
 				220CB17321B8C95B0034C384 /* PLVFacialView.h */,
 				220CB16F21B8C95B0034C384 /* PLVFacialView.m */,
 				220CB17421B8C95B0034C384 /* PLVFaceView.h */,
@@ -448,7 +460,7 @@
 			children = (
 				229F762421ABA1600085F5DE /* resource */,
 				229F762021ABA1600085F5DE /* Models */,
-				229F762921ABA1600085F5DE /* Views */,
+				229F762921ABA1600085F5DE /* Cells */,
 				229F761F21ABA1600085F5DE /* PLVChatroomManager.h */,
 				229F762821ABA1600085F5DE /* PLVChatroomManager.m */,
 				2207EAF321AE32F40011B0EB /* PLVChatroomQueue.h */,
@@ -464,6 +476,10 @@
 			children = (
 				229F762121ABA1600085F5DE /* PLVChatroomModel.h */,
 				229F762221ABA1600085F5DE /* PLVChatroomModel.m */,
+				677B4C7C21F1835A00E98E86 /* PLVChatroomCustomModel.h */,
+				677B4C7D21F1835A00E98E86 /* PLVChatroomCustomModel.m */,
+				677B4C7F21F183C200E98E86 /* PLVChatroomCustomKouModel.h */,
+				677B4C8021F183C200E98E86 /* PLVChatroomCustomKouModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -476,17 +492,23 @@
 				229F762621ABA1600085F5DE /* plv_skin_flower@3x.png */,
 				22D9AB8521B66D13003DFD42 /* plv_resend@2x.png */,
 				22D9AB8421B66D13003DFD42 /* plv_resend@3x.png */,
+				677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */,
+				677B4C8221F1BDF100E98E86 /* plv_kou1_img@3x.png */,
+				677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */,
+				677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */,
 			);
 			path = resource;
 			sourceTree = "<group>";
 		};
-		229F762921ABA1600085F5DE /* Views */ = {
+		229F762921ABA1600085F5DE /* Cells */ = {
 			isa = PBXGroup;
 			children = (
 				229F762B21ABA1600085F5DE /* PLVChatroomCell.h */,
 				229F762A21ABA1600085F5DE /* PLVChatroomCell.m */,
+				22B906FB21F56F400086D05A /* PLVChatroomCustomKouCell.h */,
+				22B906FC21F56F400086D05A /* PLVChatroomCustomKouCell.m */,
 			);
-			path = Views;
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		229F764621ABA1600085F5DE /* Media */ = {
@@ -911,6 +933,7 @@
 				229F766C21ABA1600085F5DE /* plv_skin_flower@2x.png in Resources */,
 				229F768121ABA1600085F5DE /* plv_skin_player_background@2x.png in Resources */,
 				6740D66D2136A42D0076AF7D /* README.mdown in Resources */,
+				677B4C8921F1BDF300E98E86 /* plv_kou2_img@3x.png in Resources */,
 				22D9ABCE21B676FB003DFD42 /* plv_shoot_switchCamera@3x.png in Resources */,
 				22142F5C2113094200062C6E /* Assets.xcassets in Resources */,
 				67219F4B217F3B4300756A54 /* plv_btn_download@3x.png in Resources */,
@@ -918,6 +941,7 @@
 				229F768021ABA1600085F5DE /* plv_skin_player_background@3x.png in Resources */,
 				22D9ABC221B66E34003DFD42 /* cancel@2x.png in Resources */,
 				220CB19B21B8C95B0034C384 /* plv_btn_like@2x.png in Resources */,
+				677B4C8621F1BDF300E98E86 /* plv_kou1_img@3x.png in Resources */,
 				22B27D72219BC5F8003550EA /* plv_logo@3x.png in Resources */,
 				220CB1A121B8C95B0034C384 /* plv_album@2x.png in Resources */,
 				229F768E21ABA1600085F5DE /* PLVPlayerSkin.bundle in Resources */,
@@ -929,6 +953,7 @@
 				220CB19721B8C95B0034C384 /* plv_keyboard@2x.png in Resources */,
 				22D9ABC921B66E34003DFD42 /* plv_shoot_send@3x.png in Resources */,
 				220CB19D21B8C95B0034C384 /* plv_btn_like@3x.png in Resources */,
+				677B4C8821F1BDF300E98E86 /* plv_kou2_img@2x.png in Resources */,
 				229F768521ABA1600085F5DE /* plv_skin_close@3x.png in Resources */,
 				22D9ABC021B66E34003DFD42 /* back@2x.png in Resources */,
 				229F766E21ABA1600085F5DE /* plv_img_default_avatar@2x.png in Resources */,
@@ -939,6 +964,7 @@
 				220CB19E21B8C95B0034C384 /* plv_more@3x.png in Resources */,
 				22D9ABC421B66E34003DFD42 /* plv_shoot_cancel@3x.png in Resources */,
 				220CB19F21B8C95B0034C384 /* plv_shoot@2x.png in Resources */,
+				677B4C8721F1BDF300E98E86 /* plv_kou1_img@2x.png in Resources */,
 				673631EB21BF5D41006868DE /* plv_input_user_normal@3x.png in Resources */,
 				220CB19821B8C95B0034C384 /* plv_input_user_select@2x.png in Resources */,
 				673631EE21BF5D41006868DE /* plv_input_user_select@3x.png in Resources */,
@@ -1019,9 +1045,11 @@
 				22FB810C212AB55100B5CB53 /* ZJZDanMuLabel.m in Sources */,
 				2207EAF521AE32F40011B0EB /* PLVChatroomQueue.m in Sources */,
 				6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */,
+				677B4C7E21F1835A00E98E86 /* PLVChatroomCustomModel.m in Sources */,
 				22D9ABB321B66E34003DFD42 /* MyTool.m in Sources */,
 				229F768921ABA1600085F5DE /* PLVPPTVodMediaViewController.m in Sources */,
 				22CE3D0821AD4C57002B1CFB /* PLVBaseMediaViewController+PPT.m in Sources */,
+				22B906FD21F56F400086D05A /* PLVChatroomCustomKouCell.m in Sources */,
 				2269199321D1CCE9004D6F8B /* MBProgressHUD+Rotate.m in Sources */,
 				22D9ABBB21B66E34003DFD42 /* ZPhotoPreViewController.m in Sources */,
 				672D7CEF212D7B1500974886 /* FTPageController.m in Sources */,
@@ -1030,8 +1058,9 @@
 				220CB18C21B8C95B0034C384 /* PLVTextInputView.m in Sources */,
 				22D9ABB921B66E34003DFD42 /* ZPickerController.m in Sources */,
 				6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */,
-				220CB18D21B8C95B0034C384 /* PLVEmojiModel.m in Sources */,
+				220CB18D21B8C95B0034C384 /* PLVEmojiManager.m in Sources */,
 				22D9ABBC21B66E34003DFD42 /* ZPreCollectionViewCell.m in Sources */,
+				677B4C8121F183C300E98E86 /* PLVChatroomCustomKouModel.m in Sources */,
 				229F769021ABA1600085F5DE /* PLVBrightnessView.m in Sources */,
 				22D9ABBE21B66E34003DFD42 /* ZPhotoCollectionFooterView.m in Sources */,
 				220CB18F21B8C95B0034C384 /* PLVFacialView.m in Sources */,
@@ -1054,7 +1083,6 @@
 				22B4086821B76F010087DF92 /* ZNavigationController.m in Sources */,
 				22D9ABB521B66E34003DFD42 /* ZImageInfo.m in Sources */,
 				229F767021ABA1600085F5DE /* PLVChatroomCell.m in Sources */,
-				220CB19021B8C95B0034C384 /* PLVEmoji.m in Sources */,
 				22FB810B212AB55100B5CB53 /* ZJZDanMu.m in Sources */,
 				22CE3D0921AD4C57002B1CFB /* PLVBaseMediaViewController+Live.m in Sources */,
 				221AD3CF211A86C3000A423A /* PLVLoginViewController.m in Sources */,

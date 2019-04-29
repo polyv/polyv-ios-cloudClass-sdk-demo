@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -86,7 +86,7 @@
                                                     <constraint firstAttribute="width" constant="36" id="WOk-o3-Fn8"/>
                                                 </constraints>
                                             </view>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="频道号" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="h9j-C2-Cwd">
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="直播频道号" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="h9j-C2-Cwd">
                                                 <rect key="frame" x="28" y="232" width="319" height="45"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="45" id="Z98-B2-CPd"/>
@@ -99,15 +99,15 @@
                                                     <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="iYi-Qv-dd8"/>
                                                 </connections>
                                             </textField>
-                                            <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="VID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="DP2-8E-X2O">
-                                                <rect key="frame" x="28" y="232" width="319" height="45"/>
+                                            <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="回放vid" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="DP2-8E-X2O">
+                                                <rect key="frame" x="28" y="374" width="319" height="45"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="45" id="ZlU-uR-x0b"/>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="319" id="qHB-Qn-1SH"/>
                                                 </constraints>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
                                                 <connections>
                                                     <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="pbA-kA-SyG"/>
                                                 </connections>
@@ -120,15 +120,15 @@
                                                     <constraint firstAttribute="height" constant="1" id="XPi-UE-WRO"/>
                                                 </constraints>
                                             </view>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="appID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Vch-OB-1bM">
-                                                <rect key="frame" x="28" y="279" width="319" height="45"/>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="直播AppID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Vch-OB-1bM">
+                                                <rect key="frame" x="28" y="326" width="319" height="45"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="319" id="3yL-DT-y2V"/>
                                                     <constraint firstAttribute="height" constant="45" id="yiK-3Z-tbz"/>
                                                 </constraints>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
                                                 <connections>
                                                     <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="PNd-sC-51J"/>
                                                 </connections>
@@ -142,15 +142,16 @@
                                                     <constraint firstAttribute="height" constant="1" id="hq7-zq-YnL"/>
                                                 </constraints>
                                             </view>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="userID" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="OhJ-oh-eQv">
-                                                <rect key="frame" x="28" y="326" width="319" height="45"/>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="OhJ-oh-eQv">
+                                                <rect key="frame" x="28" y="279" width="319" height="45"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="319" id="1lI-QD-dNG"/>
                                                     <constraint firstAttribute="height" constant="45" id="QWI-bV-bJd"/>
                                                 </constraints>
+                                                <string key="placeholder">直播userId	</string>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
                                                 <connections>
                                                     <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="WRl-iw-x3L"/>
                                                 </connections>
@@ -164,7 +165,7 @@
                                                     <constraint firstAttribute="height" constant="1" id="Zw4-uP-4Bg"/>
                                                 </constraints>
                                             </view>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="appSecret" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="vn2-VU-4Rn">
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="直播AppSecret" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="vn2-VU-4Rn">
                                                 <rect key="frame" x="28" y="374" width="319" height="45"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="319" id="3LC-C3-GTK"/>
@@ -172,7 +173,7 @@
                                                 </constraints>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
                                                 <connections>
                                                     <action selector="textEditChangedAction:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="Yyx-Rf-xS8"/>
                                                 </connections>
@@ -186,10 +187,13 @@
                                                     <constraint firstAttribute="height" constant="1" id="nwo-xj-ra2"/>
                                                 </constraints>
                                             </view>
-                                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k5E-xI-BDw">
+                                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="k5E-xI-BDw">
                                                 <rect key="frame" x="28" y="460" width="319" height="48"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <color key="backgroundColor" red="0.12941176469999999" green="0.58823529409999997" blue="0.95294117649999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="319" id="GfD-up-Lkl"/>
+                                                    <constraint firstAttribute="height" constant="48" id="hz2-11-rhZ"/>
+                                                </constraints>
                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <state key="normal" title="登录">
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -203,7 +207,7 @@
                                                     <action selector="loginButtonClickAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="jo0-YP-Hrb"/>
                                                 </connections>
                                             </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="© 2013-2018 广州易方信息科技股份有限公司 版权所有" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ezz-dZ-a25">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="© 2013-2019 广州易方信息科技股份有限公司 版权所有" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ezz-dZ-a25">
                                                 <rect key="frame" x="36" y="625" width="303" height="17"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="17" id="IWA-o3-9Tb"/>
@@ -216,8 +220,9 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstItem="INH-H5-aZP" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="60" id="1qj-Bd-uJI"/>
-                                            <constraint firstItem="DP2-8E-X2O" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="232" id="2xf-vF-YKg"/>
+                                            <constraint firstItem="DP2-8E-X2O" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="374" id="2xf-vF-YKg"/>
                                             <constraint firstItem="JUb-K4-uR5" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="-60" id="4jV-sf-Y2M"/>
+                                            <constraint firstItem="k5E-xI-BDw" firstAttribute="top" secondItem="Ngg-NN-HcT" secondAttribute="bottom" constant="40" id="K1m-Dh-2mi"/>
                                             <constraint firstItem="DP2-8E-X2O" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="M8H-Cz-ZNG"/>
                                             <constraint firstItem="6LZ-ku-nQB" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="95" id="NmQ-cm-NOO"/>
                                             <constraint firstItem="Ngg-NN-HcT" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="RBL-KR-uK0"/>
@@ -230,14 +235,15 @@
                                             <constraint firstItem="h9j-C2-Cwd" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" priority="750" constant="232" id="cGf-N2-MRC"/>
                                             <constraint firstItem="LNC-XR-S40" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="324" id="caJ-Qz-s1P"/>
                                             <constraint firstItem="vn2-VU-4Rn" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="cig-Qu-A4L"/>
-                                            <constraint firstItem="Vch-OB-1bM" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="279" id="eJW-2H-RME"/>
+                                            <constraint firstItem="Vch-OB-1bM" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="326" id="eJW-2H-RME"/>
                                             <constraint firstItem="fMz-7b-fO6" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="60" id="fTa-my-t5w"/>
                                             <constraint firstItem="ON8-jM-RUn" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="278" id="gD7-Wc-nb5"/>
                                             <constraint firstItem="1TJ-Ay-ARX" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="gil-zd-NPP"/>
-                                            <constraint firstItem="OhJ-oh-eQv" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="326" id="grP-Sv-qoR"/>
+                                            <constraint firstItem="OhJ-oh-eQv" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="279" id="grP-Sv-qoR"/>
                                             <constraint firstItem="vn2-VU-4Rn" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="374" id="iyE-kZ-ebb"/>
                                             <constraint firstItem="OhJ-oh-eQv" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="ksW-A1-KM4"/>
                                             <constraint firstItem="Kk4-Cj-MKy" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="-60" id="lL1-m0-Bjh"/>
+                                            <constraint firstItem="k5E-xI-BDw" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="p32-wJ-jjM"/>
                                             <constraint firstItem="h9j-C2-Cwd" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="qra-BR-pIy"/>
                                             <constraint firstItem="ON8-jM-RUn" firstAttribute="leading" secondItem="h9j-C2-Cwd" secondAttribute="leading" id="s8h-bH-Gf2"/>
                                             <constraint firstItem="YfT-JH-kyq" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="sME-vm-Sbi"/>

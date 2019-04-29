@@ -84,4 +84,8 @@
     [self reOpenPlayer:nil showHud:NO];
 }
 
+- (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
+    [self setupMarquee:channel customNick:self.nickName];
+}
+
 @end

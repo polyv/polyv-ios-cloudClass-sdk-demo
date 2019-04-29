@@ -13,7 +13,7 @@
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
 #import "PLVChatroomModel.h"
-#import "PLVEmojiModel.h"
+#import "PLVEmojiManager.h"
 #import "PCCUtils.h"
 #import "MarqueeLabel.h"
 #import "PLVChatroomQueue.h"
@@ -21,6 +21,7 @@
 #import "ZPickerController.h"
 #import "PLVCameraViewController.h"
 #import "UIAlertController+UnRotate.h"
+#import "PLVChatroomManager.h"
 
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
     PLVMarqueeViewTypeMarquee     = 1,// 跑马灯公告
@@ -76,7 +77,7 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 @property (nonatomic, strong) PLVMarqueeView *marqueeView;
 @property (nonatomic, strong) PLVMarqueeView *welcomeView;
 @property (nonatomic, strong) UIButton *showLatestMessageBtn;
-@property (nonatomic, strong) PLVTextInputView *inputView;
+@property (nonatomic, strong) PLVTextInputView *chatInputView;
 @property (nonatomic, strong) PLVChatroomQueue *chatroomQueue;
 @property (nonatomic, assign) NSUInteger likeCountOfHttp;//代码setter，getter likeCountOfHttp 时要保证线程安全
 @property (nonatomic, assign) NSUInteger likeCountOfSocket;//代码setter，getter likeCountOfSocket 时要保证线程安全
@@ -85,12 +86,12 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 @property (nonatomic, assign) NSUInteger likeTiming;
 @property (nonatomic, strong) PLVSocketChatRoomObject *likeSoctetObjectBySelf;
 
+@property (nonatomic, assign) BOOL closed;
 @property (nonatomic, assign) BOOL scrollsToBottom;  // default is YES.
 @property (nonatomic, assign) BOOL showTeacherOnly;  // 只看讲师（有身份用户）数据
 @property (nonatomic, assign) BOOL moreMessageHistory;
-@property (nonatomic, assign) BOOL nickNameSetted;
-@property (nonatomic, assign) NSUInteger startIndex;
 
+@property (nonatomic, assign) NSUInteger startIndex;
 @property (nonatomic, assign) NSUInteger onlineCount;
 @property (atomic, assign) BOOL addNewModel;
 
@@ -119,6 +120,18 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+#pragma mark - Setter
+
+- (void)setSwitchInfo:(NSDictionary *)switchInfo {
+    _switchInfo = switchInfo;
+    if (self.type != PLVTextInputViewTypePrivate) {
+        //_closed = ![switchInfo[@"chat"] boolValue];
+        if ([switchInfo[@"viewerSendImgEnabled"] boolValue]) { // 图片开关
+            [self.chatInputView loadViews:self.type enableMore:YES];
+        }
+    }
+}
+
 #pragma mark - life cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -138,6 +151,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(photoBrowserDidShowImageOnScreen) name:PLVPhotoBrowserDidShowImageOnScreenNotification object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self tapChatInputView];
 }
 
 - (void)dealloc {
@@ -166,21 +185,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     return self;
 }
 
-#pragma mark - public
-- (void)clearResource {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    if (self.likeTimer) {
-        [self.likeTimer invalidate];
-        self.likeTimer = nil;
-    }
-    if (self.reloadTableTimer) {
-        [self.reloadTableTimer invalidate];
-        self.reloadTableTimer = nil;
-    }
-    [self.chatroomQueue clearTimer];
-    [self.inputView clearResource];
-    [PLVChatroomManager sharedManager].socketUser = nil;
-}
+#pragma mark - Public
 
 - (void)loadSubViews {
     CGFloat h = 50.0;
@@ -209,11 +214,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         [self refreshClickAction:refreshControl];
     }
     
-    self.inputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds)-h, CGRectGetWidth(self.view.bounds), h)];
-    self.inputView.delegate = self;
-    [self.view addSubview:self.inputView];
-    self.inputView.disableOtherButtonsInTeacherMode = !self.allowToSpeakInTeacherMode;
-    [self.inputView loadViews:self.type enableMore:NO];
+    self.chatInputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds)-h, CGRectGetWidth(self.view.bounds), h)];
+    self.chatInputView.delegate = self;
+    [self.view addSubview:self.chatInputView];
+    self.chatInputView.disableOtherButtonsInTeacherMode = !self.allowToSpeakInTeacherMode;
+    [self.chatInputView loadViews:self.type enableMore:NO];
     
     self.showLatestMessageBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.showLatestMessageBtn.layer.cornerRadius = 15.0;
@@ -233,87 +238,50 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [self.showLatestMessageBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.view);
         make.size.mas_equalTo(CGSizeMake(185, 30));
-        make.bottom.equalTo(self.inputView.mas_top).offset(-10);
+        make.bottom.equalTo(self.chatInputView.mas_top).offset(-10);
     }];
     
     self.reloadTableTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(reloadTable) userInfo:nil repeats:YES];
     [self.reloadTableTimer fire];
 }
 
-- (void)setSocketUser:(PLVSocketObject *)socketUser {
-    _socketUser = socketUser;
-    if (_type < PLVTextInputViewTypePrivate && !_nickNameSetted) {
-        // 保证在公有聊天中设置过昵称后不再修改值
-        _nickNameSetted = !socketUser.defaultUser;
-        [_inputView nickNameSetted:!socketUser.defaultUser];
+- (void)clearResource {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    if (self.likeTimer) {
+        [self.likeTimer invalidate];
+        self.likeTimer = nil;
     }
-}
-
-- (void)setNickNameSetted:(BOOL)nickNameSetted {
-    if (!_nickNameSetted && nickNameSetted) {
-        [_inputView nickNameSetted:YES];
+    if (self.reloadTableTimer) {
+        [self.reloadTableTimer invalidate];
+        self.reloadTableTimer = nil;
     }
-    _nickNameSetted = nickNameSetted;
+    [self.chatroomQueue clearTimer];
+    [self.chatInputView clearResource];
+    [PLVChatroomManager sharedManager].socketUser = nil;
 }
 
-- (void)setSwitchInfo:(NSDictionary *)switchInfo {
-    _switchInfo = switchInfo;
-    if (self.type != PLVTextInputViewTypePrivate) {
-        _closed = ![switchInfo[@"chat"] boolValue];
-        if ([switchInfo[@"viewerSendImgEnabled"] boolValue]) { // 图片开关
-            [self.inputView loadViews:self.type enableMore:YES];
-        }
-    }
+- (void)recoverChatroomStatus {
+    self.closed = NO;
 }
 
-#pragma mark - Action
-- (void)refreshClickAction:(UIRefreshControl *)refreshControl {
-    [refreshControl endRefreshing];
-    const NSUInteger length = 21;
-    if (self.moreMessageHistory) {
-        __weak typeof(self)weakSelf = self;
-        [PLVLiveVideoAPI requestChatRoomHistoryWithRoomId:self.roomId startIndex:self.startIndex endIndex:self.startIndex+length completion:^(NSArray *historyList) {
-            [weakSelf handleChatroomMessageHistory:historyList];
-            [weakSelf.tableView reloadData];
-            if (weakSelf.startIndex) {
-                [weakSelf.tableView scrollsToTop];
-            }else {
-                [weakSelf scrollsToBottom:YES];
-            }
-            if (historyList.count < length) {
-                weakSelf.moreMessageHistory = NO;
-            }else {
-                weakSelf.startIndex += length - 1;
-            }
-        } failure:^(NSError *error) {
-            [PCCUtils showChatroomMessage:@"历史记录获取失败！" addedToView:self.view];
-        }];
-    }else {
-        [PCCUtils showChatroomMessage:@"没有更多数据了！" addedToView:self.view];
-    }
-}
-
-- (void)loadMoreMessageBtnAction {
-    [self scrollsToBottom:YES];
-}
-
-#pragma mark - addNewChatroomObject
 - (void)addNewChatroomObject:(PLVSocketChatRoomObject *)object {
+    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+    if (!socketUser) {
+        return;
+    }
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_LOGIN: {
             NSString *userId = object.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserUserIdKey];
-            [self.chatroomQueue addSocketChatRoomObject:object me:[userId isEqualToString:self.socketUser.userId]];
+            [self.chatroomQueue addSocketChatRoomObject:object me:[userId isEqualToString:socketUser.userId]];
         } break;
         case PLVSocketChatRoomEventType_SET_NICK: {
             NSString *status = object.jsonDict[@"status"];
-            if ([status isEqualToString:@"success"]) {// success：广播消息；
-                if ([object.jsonDict[@"userId"] isEqualToString:self.socketUser.userId]) {
-                    self.nickNameSetted = YES;
-                    [self nickNameRenamed:object.jsonDict[@"nick"] success:YES message:object.jsonDict[@"message"]];
+            if ([status isEqualToString:@"success"]) {// success：广播消息
+                if ([object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
+                    [[PLVChatroomManager sharedManager] renameUserNick:object.jsonDict[@"nick"]];
                 }
-            }else {// error：单播消息（设置出错）
-                [self nickNameRenamed:nil success:NO message:object.jsonDict[@"message"]];
-            }
+            } //else 单播消息（出错）
+            [self showMessage:object.jsonDict[@"message"]];
         } break;
         case PLVSocketChatRoomEventType_CLOSEROOM: {
             _closed = [object.jsonDict[@"value"][@"closed"] boolValue];
@@ -326,17 +294,17 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self clearAllData];
         } break;
         case PLVSocketChatRoomEventType_ADD_SHIELD: {
-            if ([object.jsonDict[@"value"] isEqualToString:self.socketUser.clientIp]) {
-                self.socketUser.banned = YES;
+            if ([object.jsonDict[@"value"] isEqualToString:socketUser.clientIp]) {
+                socketUser.banned = YES;
             }
         } break;
         case PLVSocketChatRoomEventType_REMOVE_SHIELD: {
-            if ([object.jsonDict[@"value"] isEqualToString:self.socketUser.clientIp]) {
-                self.socketUser.banned = NO;
+            if ([object.jsonDict[@"value"] isEqualToString:socketUser.clientIp]) {
+                socketUser.banned = NO;
             }
         } break;
         case PLVSocketChatRoomEventType_KICK: {
-            if ([object.jsonDict[@"user"][@"userId"] isEqualToString:self.socketUser.userId]) {
+            if ([object.jsonDict[@"user"][@"userId"] isEqualToString:socketUser.userId]) {
                 [forbiddenUsers addObject:@(self.roomId)];
                 if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:didOpenError:)]) {
                     [self.delegate chatroom:self didOpenError:PLVChatroomErrorCodeBeKicked];
@@ -378,7 +346,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             }
         } break;
         case PLVSocketChatRoomEventType_LIKES: {
-            if (![object.jsonDict[@"userId"] isEqualToString:self.socketUser.userId]) {
+            if (![object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
                 [self handleLikeSocket:object];
             }
         } break;
@@ -393,11 +361,61 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine {
+    PLVChatroomCustomModel *customModel = [PLVChatroomManager modelWithCustomMessage:customeMessage mine:mine];
+    if (customModel) {
+        if (customModel.defined) {
+            [self addModel:customModel];
+        } else {
+            [PCCUtils showChatroomMessage:customModel.tip addedToView:self.view];
+        }
+    }
+}
+
+#pragma mark - Action
+- (void)refreshClickAction:(UIRefreshControl *)refreshControl {
+    [refreshControl endRefreshing];
+    const NSUInteger length = 21;
+    if (self.moreMessageHistory) {
+        __weak typeof(self)weakSelf = self;
+        [PLVLiveVideoAPI requestChatRoomHistoryWithRoomId:self.roomId startIndex:self.startIndex endIndex:self.startIndex+length completion:^(NSArray *historyList) {
+            [weakSelf handleChatroomMessageHistory:historyList];
+            [weakSelf.tableView reloadData];
+            if (weakSelf.startIndex) {
+                [weakSelf.tableView scrollsToTop];
+            }else {
+                [weakSelf scrollsToBottom:YES];
+            }
+            if (historyList.count < length) {
+                weakSelf.moreMessageHistory = NO;
+            }else {
+                weakSelf.startIndex += length - 1;
+            }
+        } failure:^(NSError *error) {
+            [PCCUtils showChatroomMessage:@"历史记录获取失败！" addedToView:self.view];
+        }];
+    }else {
+        [PCCUtils showChatroomMessage:@"没有更多数据了！" addedToView:self.view];
+    }
+}
+
+- (void)loadMoreMessageBtnAction {
+    [self scrollsToBottom:YES];
+}
+
+#pragma mark - Private methods
+
+- (void)tapChatInputView {
+    if (self.chatInputView) {
+        [self.chatInputView tapAction];
+    }
+}
+
 - (void)likeAnimation {
     CGRect frame = self.view.frame;
     NSArray *colors = @[UIColorFromRGB(0x9D86D2), UIColorFromRGB(0xF25268), UIColorFromRGB(0x5890FF), UIColorFromRGB(0xFCBC71)];
     
-    CGFloat inputViewY = self.inputView.frame.origin.y;
+    CGFloat inputViewY = self.chatInputView.frame.origin.y;
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"plv_like.png"]];
     imageView.frame = CGRectMake(CGRectGetWidth(frame) - 50.0, inputViewY - 44.0, 40.0, 40.0);
     imageView.backgroundColor = colors[rand()%4];
@@ -421,17 +439,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }];
 }
 
-- (void)nickNameRenamed:(NSString *)newName success:(BOOL)success message:(NSString *)message {
-    if (success) {
-        [self.socketUser renameNickname:newName];
-    }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:nickNameRenamed:success:message:)]) {
-        [self.delegate chatroom:self nickNameRenamed:newName success:success message:message];
-    }
-}
-
 - (void)addModel:(PLVChatroomModel *)model {
-    if (model.type==PLVChatroomModelTypeNotDefine || model.type==PLVChatroomModelTypeSpeakOwnCensor)
+    if (model.type == PLVChatroomModelTypeNotDefine || model.type == PLVChatroomModelTypeSpeakOwnCensor)
         return;
     
     [self.chatroomData addObject:model];
@@ -440,7 +449,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self.teacherData addObject:model];
         }
         if (model.userType == PLVChatroomUserTypeManager) {
-            if (model.speakContent) {// 可能为图片消息
+            if (model.speakContent) { // 可能为图片消息
                 [self showMarqueeWithMessage:model.speakContent]; // 跑马灯公告
             }
         }
@@ -461,18 +470,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 - (void)removeModelWithSocketObject:(PLVSocketChatRoomObject *)object {
     NSString *removeMsgId = object.jsonDict[@"id"];
-    for (int i=0; i<self.chatroomData.count; i++) {
-        PLVChatroomModel *model = self.chatroomData[i];
+    for (PLVChatroomModel *model in self.chatroomData) {
         if (model.msgId && [removeMsgId isEqualToString:model.msgId]) {
             if (model.isTeacher) {
                 [self.teacherData removeObject:model];
             }
             [self.chatroomData removeObject:model];
-            if (self.showTeacherOnly) {
-                [self.tableView reloadData];
-            }else {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:i inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
-            }
+            self.addNewModel = YES;
             break;
         }
     }
@@ -481,10 +485,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 - (void)clearAllData {
     [self.chatroomData removeAllObjects];
     [self.teacherData removeAllObjects];
-    [self.tableView reloadData];
+    self.addNewModel = YES;
 }
 
-#pragma mark - Private methods
 - (BOOL)emitChatroomMessageWithObject:(PLVSocketChatRoomObject *)object {
     // 关闭房间、禁言只对聊天室发言有效
     if (self.type < PLVTextInputViewTypePrivate && object.eventType==PLVSocketChatRoomEventType_SPEAK) {
@@ -492,7 +495,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [PCCUtils showChatroomMessage:[NSString stringWithFormat:@"消息发送失败！%ld", (long)PLVChatroomErrorCodeRoomClose] addedToView:self.view];
             return NO;
         }
-        if (self.type < PLVTextInputViewTypePrivate && self.socketUser.isBanned) { // only log.
+        if (self.type < PLVTextInputViewTypePrivate && [PLVChatroomManager sharedManager].socketUser.isBanned) { // only log.
             NSLog(@"消息发送失败！%ld", (long)PLVChatroomErrorCodeBanned);
             return YES;
         }
@@ -517,24 +520,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 - (void)handleChatroomMessageHistory:(NSArray *)messageArr {
     if (messageArr && messageArr.count) {
         for (NSDictionary *messageDict in messageArr) {
-            PLVSocketChatRoomObject *chatroomObject;
-            NSString *msgSource = messageDict[@"msgSource"];
-            if (msgSource) {
-                if ([msgSource isEqualToString:@"chatImg"]) { // 图片
-                    NSDictionary *imageDict = @{@"EVENT" : @"CHAT_IMG", @"values" : @[messageDict[@"content"]], @"user" : messageDict[@"user"]};
-                    chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:imageDict];
-                } // redpaper（红包）、get_redpaper（领红包）
-            } else {
-                NSString *uid = [NSString stringWithFormat:@"%@",messageDict[@"user"][@"uid"]];
-                if ([uid isEqualToString:@"1"] || [uid isEqualToString:@"1"]) {
-                    // uid = 1，打赏消息；uid = 2，自定义消息
-                }else { // speak message
-                    NSDictionary *speakDict = @{@"EVENT" : @"SPEAK", @"values" : @[messageDict[@"content"]], @"user" : messageDict[@"user"]};
-                    chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:speakDict];
-                }
-            }
-            if (chatroomObject) {
-                PLVChatroomModel *model = [PLVChatroomModel modelWithObject:chatroomObject];
+            PLVChatroomModel *model = [PLVChatroomManager modelWithHistoryMessageDict:messageDict];
+            if (model) {
                 [self.chatroomData insertObject:model atIndex:0];
                 if (self.type < PLVTextInputViewTypePrivate && model.isTeacher) {
                     [self.teacherData insertObject:model atIndex:0];
@@ -544,11 +531,15 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+- (void)showMessage:(NSString *)message {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:showMessage:)]) {
+        [self.delegate chatroom:self showMessage:message];
+    }
+}
+
 #pragma mark Notifications
 - (void)photoBrowserDidShowImageOnScreen {
-    if (self.inputView) {
-        [self.inputView tapAction];
-    }
+    [self tapChatInputView];
 }
 
 #pragma mark - Interaction
@@ -565,7 +556,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     if (@available(iOS 8.2, *)) {
         font = [UIFont systemFontOfSize:14.0 weight:UIFontWeightMedium];
     }
-    NSMutableAttributedString *attributedStr = [[PLVEmojiModelManager sharedManager] convertTextEmotionToAttachment:message font:font];
+    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:message font:font];
     
     [self.marqueeView.marqueeLabe setAttributedText:attributedStr];
     [self.marqueeView.marqueeLabe restartLabel];
@@ -620,28 +611,38 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.type < PLVTextInputViewTypePrivate && self.showTeacherOnly) {
-        PLVChatroomModel *model = self.teacherData[indexPath.row];
-        return [model cellFromModelWithTableView:tableView];
-    } else {
-        PLVChatroomModel *model = self.chatroomData[indexPath.row];
-        PLVChatroomCell *cell = [model cellFromModelWithTableView:tableView];
-        if ([cell isKindOfClass:[PLVChatroomImageSendCell class]]) {
-            PLVChatroomImageSendCell *sendCell = (PLVChatroomImageSendCell *)cell;
-            sendCell.delegate = self;
+        if (indexPath.row < self.teacherData.count) {
+            PLVChatroomModel *model = self.teacherData[indexPath.row];
+            return [model cellFromModelWithTableView:tableView];
         }
-        return cell;
+    } else {
+        if (indexPath.row < self.chatroomData.count) {
+            PLVChatroomModel *model = self.chatroomData[indexPath.row];
+            PLVChatroomCell *cell = [model cellFromModelWithTableView:tableView];
+            if ([cell isKindOfClass:[PLVChatroomImageSendCell class]]) {
+                PLVChatroomImageSendCell *sendCell = (PLVChatroomImageSendCell *)cell;
+                sendCell.delegate = self;
+            }
+            return cell;
+        }
     }
+    return [[UITableViewCell alloc] init];
 }
 
 #pragma mark - UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.type < PLVTextInputViewTypePrivate && self.showTeacherOnly) {
-        PLVChatroomModel *model = self.teacherData[indexPath.row];
-        return model.cellHeight;
+        if (indexPath.row < self.teacherData.count) {
+            PLVChatroomModel *model = self.teacherData[indexPath.row];
+            return model.cellHeight;
+        }
     } else {
-        PLVChatroomModel *model = self.chatroomData[indexPath.row];
-        return model.cellHeight;
+        if (indexPath.row < self.chatroomData.count) {
+            PLVChatroomModel *model = self.chatroomData[indexPath.row];
+            return model.cellHeight;
+        }
     }
+    return 0.0;
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -689,23 +690,24 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 #pragma mark - likeTimer poll
 - (void)pollHandleLikeCount {//5秒轮询一次
     self.likeTiming++;
+    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
     @synchronized (self) {
-        if (self.socketUser && self.likeCountOfSocket > 0) {//5秒发送一次点砸 Socket（本时间段内的点赞总数）
+        if (socketUser && self.likeCountOfSocket > 0) {//5秒发送一次点砸 Socket（本时间段内的点赞总数）
             if (self.likeCountOfSocket > 5) {
                 self.likeCountOfSocket = 5;
             }
             self.likeCountOfHttp += self.likeCountOfSocket;
-            PLVSocketChatRoomObject *likeSocketObject = [PLVSocketChatRoomObject chatRoomObjectForLikesEventTypeWithRoomId:self.socketUser.roomId userId:self.socketUser.userId nickName:self.socketUser.nickName sessionId:[self currentChannelSessionId] likeCount:self.likeCountOfSocket];
+            PLVSocketChatRoomObject *likeSocketObject = [PLVSocketChatRoomObject chatRoomObjectForLikesEventTypeWithRoomId:socketUser.roomId userId:socketUser.userId nickName:socketUser.nickName sessionId:[self currentChannelSessionId] likeCount:self.likeCountOfSocket];
             [self emitChatroomMessageWithObject:likeSocketObject];
             self.likeCountOfSocket = 0;
         }
-        if (self.socketUser && self.likeCountOfHttp > 0 && self.likeTiming % 6 == 0) {//30秒发送一次点赞 http 统计（本时间段内的点赞总数）
+        if (socketUser && self.likeCountOfHttp > 0 && self.likeTiming % 6 == 0) {//30秒发送一次点赞 http 统计（本时间段内的点赞总数）
             if (self.likeCountOfHttp > 30) {
                 self.likeCountOfHttp = 30;
             }
             NSUInteger currentLikeCountOfHttp = self.likeCountOfHttp;
             __weak typeof(self) weakSelf = self;
-            [PLVLiveVideoAPI likeWithChannelId:self.roomId viewerId:self.socketUser.userId times:currentLikeCountOfHttp completion:^{
+            [PLVLiveVideoAPI likeWithChannelId:self.roomId viewerId:socketUser.userId times:currentLikeCountOfHttp completion:^{
                 @synchronized (weakSelf) {
                     weakSelf.likeCountOfHttp -= currentLikeCountOfHttp;
                 }
@@ -716,15 +718,33 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+// 处理点赞事件
 - (void)handleLikeSocket:(PLVSocketChatRoomObject *)object {
-    if (self.type == PLVTextInputViewTypeNormalPublic) {
-        [self likeAnimation];
+    switch (self.type) {
+        case PLVTextInputViewTypeNormalPublic: // 普通公聊
+            [self likeAnimation];
+            break;
+        case PLVTextInputViewTypeCloudClassPublic: { // 云课堂公聊
+            PLVChatroomModel *model = [PLVChatroomModel modelWithObject:object flower:YES];
+            [self addModel:model];
+        } break;
+        default:
+            break;
     }
-    PLVChatroomModel *model = [PLVChatroomModel modelWithObject:object flower:self.type != PLVTextInputViewTypeNormalPublic];
-    [self addModel:model];
 }
 
-#pragma mark - PLVTextInputViewDelegate
+#pragma mark - <PLVTextInputViewDelegate>
+
+- (BOOL)textInputViewShouldBeginEditing:(PLVTextInputView *)inputView {
+    BOOL beginEditing = ![PLVChatroomManager sharedManager].defaultNick;
+    if (beginEditing) {
+        [self scrollsToBottom:YES];
+    } else {
+        [self showNicknameAlert];
+    }
+    return beginEditing;
+}
+
 - (void)textInputView:(PLVTextInputView *)inputView followKeyboardAnimation:(BOOL)flag {
     if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:followKeyboardAnimation:)]) {
         [self.delegate chatroom:self followKeyboardAnimation:flag];
@@ -733,18 +753,19 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 - (void)textInputView:(PLVTextInputView *)inputView didSendText:(NSString *)text {
     NSString *newText = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    if (!self.socketUser || !newText.length) {
+    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+    if (!socketUser || !newText.length) {
         return;
     }
     // TODO:发言时间间隔3s
     PLVChatroomModel *model;
     if (self.type < PLVTextInputViewTypePrivate) {
-        PLVSocketChatRoomObject *mySpeak = [PLVSocketChatRoomObject chatRoomObjectForSpeakEventTypeWithRoomId:self.socketUser.roomId content:text];
+        PLVSocketChatRoomObject *mySpeak = [PLVSocketChatRoomObject chatroomForSpeakWithContent:text loginUser:[PLVChatroomManager sharedManager].socketUser];
         BOOL success = [self emitChatroomMessageWithObject:mySpeak];
         if (success)
             model = [PLVChatroomModel modelWithObject:mySpeak];
     } else {
-        PLVSocketChatRoomObject *question = [PLVSocketChatRoomObject chatRoomObjectForStudentQuestionEventTypeWithLoginObject:self.socketUser content:text];
+        PLVSocketChatRoomObject *question = [PLVSocketChatRoomObject chatRoomObjectForStudentQuestionEventTypeWithLoginObject:socketUser content:text];
         BOOL success = [self emitChatroomMessageWithObject:question];
         if (success)
             model = [PLVChatroomModel modelWithObject:question];
@@ -758,8 +779,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     @synchronized (self) {
         self.likeCountOfSocket++;
     }
-    if (self.likeSoctetObjectBySelf == nil && self.socketUser != nil) {
-        self.likeSoctetObjectBySelf = [PLVSocketChatRoomObject socketObjectWithJsonDict:@{PLVSocketIOChatRoom_LIKES_nick : self.socketUser.nickName}];
+    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+    if (self.likeSoctetObjectBySelf == nil && socketUser != nil) {
+        self.likeSoctetObjectBySelf = [PLVSocketChatRoomObject socketObjectWithJsonDict:@{PLVSocketIOChatRoom_LIKES_nick : socketUser.nickName}];
         self.likeSoctetObjectBySelf.localMessage = YES;
     }
     if (self.likeSoctetObjectBySelf != nil) {
@@ -772,14 +794,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     self.showTeacherOnly = on;
     [self.tableView reloadData];
     [self scrollsToBottom:YES];
-}
-
-- (void)textInputView:(PLVTextInputView *)inputView nickNameSetted:(BOOL)nickNameSetted {
-    if (nickNameSetted) {
-        [self scrollsToBottom:YES];
-    } else {
-        [self showNicknameAlert];
-    }
 }
 
 - (void)openAlbum:(PLVTextInputView *)inputView {
@@ -799,7 +813,19 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
 }
 
-#pragma mark - PLVChatroomQueueDeleage
+#pragma mark Emit Custom Message
+
+- (void)emitCustomEvent:(NSString *)event emitMode:(int)emitMode data:(NSDictionary *)data tip:(NSString *)tip {
+    // 生成本地自定义消息数据
+    NSDictionary * customMessage = @{@"EVENT":event, @"version":@(1), @"data":data};
+    [self addCustomMessage:customMessage mine:YES];
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:emitCustomEvent:emitMode:data:tip:)]) {
+        [self.delegate chatroom:self emitCustomEvent:event emitMode:emitMode data:data tip:tip];
+    }
+}
+
+#pragma mark - <PLVChatroomQueueDeleage>
 - (void)pop:(PLVChatroomQueue *)queue welcomeMessage:(NSMutableAttributedString *)welcomeMessage {
     if (!self.welcomeView) {
         self.welcomeView = [[PLVMarqueeView alloc] init];
@@ -851,14 +877,14 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
-#pragma mark - ZPickerControllerDelegate
+#pragma mark - <ZPickerControllerDelegate>
 - (void)pickerController:(ZPickerController*)pVC uploadImage:(UIImage *)uploadImage {
     [self uploadImage:uploadImage];
 }
 
 - (void)dismissPickerController:(ZPickerController*)pVC {
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    [self.inputView tapAction];
+    [self tapChatInputView];
     __weak typeof(self) weakSelf = self;
     [self dismissViewControllerAnimated:YES completion:^{
         [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
@@ -867,14 +893,14 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }];
 }
 
-#pragma mark - PLVCameraViewControllerDelegate
+#pragma mark - <PLVCameraViewControllerDelegate>
 - (void)cameraViewController:(PLVCameraViewController *)cameraVC uploadImage:(UIImage *)uploadImage {
     [self uploadImage:uploadImage];
 }
 
 - (void)dismissCameraViewController:(PLVCameraViewController*)cameraVC {
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    [self.inputView tapAction];
+    [self tapChatInputView];
     __weak typeof(self) weakSelf = self;
     [self dismissViewControllerAnimated:YES completion:^{
         [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
@@ -948,7 +974,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
-#pragma mark - PLVChatroomImageSendCellDelegate
+#pragma mark - <PLVChatroomImageSendCellDelegate>
 - (void)refreshUpload:(PLVChatroomImageSendCell *)sendCell {
     NSString *imageName = [NSString stringWithFormat:@"%@.jpeg", sendCell.imgId];
     [self uploadImage:sendCell.image imageId:sendCell.imgId imageName:imageName];

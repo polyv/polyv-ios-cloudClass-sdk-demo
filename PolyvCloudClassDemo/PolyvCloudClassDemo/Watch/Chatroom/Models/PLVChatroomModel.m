@@ -8,11 +8,11 @@
 
 #import "PLVChatroomModel.h"
 #import "PCCUtils.h"
+#import "PLVChatroomManager.h"
 
 @interface PLVChatroomModel ()
 
 @property (nonatomic, assign) BOOL teacher;
-@property (nonatomic, assign) BOOL localMessageModel;
 @property (nonatomic, strong) NSString *msgId;
 @property (nonatomic, assign) CGFloat cellHeight;
 @property (nonatomic, assign) PLVChatroomModelType type;
@@ -117,7 +117,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                 if (status) {  // 单播消息
                     if ([status isEqualToString:@"censor"]) { // 聊天室审核
                     }else if ([status isEqualToString:@"error"]) { // 严禁词
-                        model.type = PLVChatroomModelTypeSystem;
+                        //model.type = PLVChatroomModelTypeSystem;
+                        model.type = PLVChatroomModelTypeNotDefine; // 严禁词不提示用户
                         model.content = object.jsonDict[@"message"];
                     }
                 }else if (user) { // 用户发言信息
@@ -179,7 +180,7 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
         } break;
         case PLVSocketChatRoomEventType_LIKES: {
             model.type = PLVChatroomModelTypeFlower;
-            NSString *nickName = object.jsonDict[PLVSocketIOChatRoom_LIKES_nick];
+            NSString *nickName = [NSString stringWithFormat:@"%@",object.jsonDict[@"nick"]];
             model.content = [NSString stringWithFormat:@"%@ 赠送了 鲜花",nickName];
         } break;
         default:
@@ -195,11 +196,11 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
     model.localMessageModel = object.localMessage;
     if (flower) {
         model.type = PLVChatroomModelTypeFlower;
-        NSString *nickName = object.jsonDict[PLVSocketIOChatRoom_LIKES_nick];
+        NSString *nickName = [NSString stringWithFormat:@"%@",object.jsonDict[@"nick"]];
         model.content = [NSString stringWithFormat:@"%@ 赠送了 鲜花", nickName];
     } else {
         model.type = PLVChatroomModelTypeLike;
-        NSString *nickName = object.jsonDict[PLVSocketIOChatRoom_LIKES_nick];
+        NSString *nickName = [NSString stringWithFormat:@"%@",object.jsonDict[@"nick"]];
         model.content = [NSString stringWithFormat:@"%@ 觉得主持人讲得很棒", nickName];
     }
     return model;
@@ -318,7 +319,7 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
  */
 - (void)handleUserInfomationWithUserInfo:(NSDictionary *)userInfo {
     self.userId = [NSString stringWithFormat:@"%@",userInfo[@"userId"]];
-    self.nickName = userInfo[PLVSocketIOChatRoomUserNickKey];
+    self.nickName = [NSString stringWithFormat:@"%@",userInfo[@"nick"]];
     NSString *userType = userInfo[PLVSocketIOChatRoomUserUserTypeKey];
     if ([userType isEqualToString:@"teacher"]) {
         self.userType = PLVChatroomUserTypeTeacher;
@@ -349,8 +350,6 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
     // 处理"//"类型开头的地址和 HTTP 协议地址为 HTTPS
     if ([avatar hasPrefix:@"//"]) {
         self.avatar = [@"https:" stringByAppendingString:avatar];
-    }else if ([avatar hasPrefix:@"http:"]) {
-        self.avatar = [avatar stringByReplacingOccurrencesOfString:@"http:" withString:@"https:"];
     }else {
         self.avatar = avatar;
     }

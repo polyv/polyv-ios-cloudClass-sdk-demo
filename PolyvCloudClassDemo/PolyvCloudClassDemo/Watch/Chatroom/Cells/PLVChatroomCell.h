@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Masonry/Masonry.h>
 #import "PLVPhotoBrowser.h"
 
 /// cell 类型
@@ -33,11 +34,23 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 /// cell高度
 @property (nonatomic, readonly) CGFloat height;
 
+/// 自己的消息
+@property (nonatomic, assign) BOOL mine;
+
+/// 模型数据
+@property (nonatomic, strong) NSDictionary *modelDict;
+
+/// 获取类的 indentifier
++ (NSString *)cellIndetifier;
+
 /// 初始化
 - (instancetype)initWithReuseIdentifier:(NSString *)indentifier;
 
 /// 根据content计算cell高度
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content;
+
+/// 根据modelDict计算cell高度
++ (CGFloat)calculateCellHeightWithModelDict:(NSDictionary *)modelDict mine:(BOOL)mine;
 
 @end
 

@@ -7,7 +7,7 @@
 //
 
 #import "PLVNormalVodMediaViewController.h"
-#import <PolyvCloudClassSDK/PLVVodPlayerController.h>
+#import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 #import "PLVBaseMediaViewController+Vod.h"
 
 @interface PLVNormalVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPlayerControllerDelegate>
@@ -20,6 +20,8 @@
 
 @synthesize player;
 @synthesize vodId;
+@synthesize channelId;
+@synthesize userId;
 
 #pragma mark - life cycle
 - (void)viewDidLoad {
@@ -29,6 +31,16 @@
     self.skinView.controllView.hidden = YES;
     
     self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.mainView delegate:self];
+    
+    PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
+    if (liveConfig.channelId && liveConfig.userId) {
+        __weak typeof(self)weakSelf = self;
+        [PLVLivePlayerController loadLiveVideoChannelWithUserId:liveConfig.userId channelId:liveConfig.channelId.integerValue completion:^(PLVLiveVideoChannel *channel) {
+            [weakSelf setupMarquee:channel customNick:self.nickName];
+        } failure:^(NSError *error) {
+            NSLog(@"直播频道信息加载失败：%@",error);
+        }];
+    }
 }
 
 #pragma mark - PLVBaseMediaViewController
