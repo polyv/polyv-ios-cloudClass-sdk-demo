@@ -23,6 +23,7 @@
 @property (nonatomic, assign) BOOL skinShowed;//播放器皮肤是否已显示
 @property (nonatomic, assign) BOOL skinAnimationing;//播放器皮肤显示隐藏动画的开关
 @property (nonatomic, assign) BOOL zoomAnimationing;//横竖屏切换动画的开关
+@property (nonatomic, assign) CGRect baseRect;
 
 @property (nonatomic, strong) PLVVideoMarquee *videoMarquee; // 视频跑马灯
 
@@ -38,6 +39,7 @@
     self.originFrame = CGRectZero;
     self.curOrientation = UIDeviceOrientationPortrait;
     self.view.autoresizingMask = UIViewAutoresizingNone;
+    self.baseRect = [UIScreen mainScreen].bounds;
     
     self.mainView = [[UIView alloc] initWithFrame:self.view.bounds];
     self.mainView.backgroundColor = BlueBackgroundColor;
@@ -140,7 +142,7 @@
         BOOL fullscreen = NO;
         BOOL flip = NO;
         if (UIDeviceOrientationIsLandscape(orientation)) {
-            rect = [UIScreen mainScreen].bounds;
+            rect = self.baseRect;
             angle = (orientation == UIDeviceOrientationLandscapeRight ? -M_PI_2 : M_PI_2);
             fullscreen = YES;
             if (UIDeviceOrientationIsLandscape(self.curOrientation)) {//水平翻转时，只改变view.transform，不改变view.frame
@@ -151,7 +153,17 @@
         self.zoomAnimationing = YES;
         
         __weak typeof(self) weakSelf = self;
-        [[UIApplication sharedApplication] setStatusBarOrientation:(UIInterfaceOrientation)(orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown || orientation == UIDeviceOrientationUnknown ? UIDeviceOrientationPortrait : orientation) animated:YES];
+        UIInterfaceOrientation deviceOrientation;
+        if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationPortraitUpsideDown || orientation == UIDeviceOrientationFaceDown) {
+            deviceOrientation = UIInterfaceOrientationPortrait;
+        } else if (orientation == UIDeviceOrientationLandscapeLeft) {
+            deviceOrientation = UIInterfaceOrientationLandscapeRight;
+        } else if (orientation == UIDeviceOrientationLandscapeRight) {
+            deviceOrientation = UIInterfaceOrientationLandscapeLeft;
+        } else {
+            deviceOrientation = UIInterfaceOrientationUnknown;
+        }
+        [[UIApplication sharedApplication] setStatusBarOrientation:deviceOrientation animated:YES];
         [UIView animateWithDuration:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             weakSelf.skinView.fullscreen = fullscreen;
             CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(angle);

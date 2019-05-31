@@ -19,6 +19,8 @@
 
 @property (nonatomic, strong) PLVBaseMediaViewController<PLVVodMediaProtocol> *mediaVC;
 
+@property (nonatomic, strong) NSTimer *pollingTimer;
+
 @end
 
 @implementation PLVVodViewController
@@ -53,6 +55,18 @@
         CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
         [(PLVPPTVodMediaViewController *)self.mediaVC loadSecondaryView:CGRectMake(self.view.frame.size.width - w, h, w, (int)(w * PPTPlayerViewScale))];
     }
+    
+    //[self playerPolling];
+}
+
+- (void)playerPolling {
+    if (@available(iOS 10.0, *)) {
+        self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            NSLog(@"观看时长：%ld，停留时长：%ld",
+                  self.mediaVC.player.watchDuration,
+                  self.mediaVC.player.stayDuration);
+        }];
+    }
 }
 
 #pragma mark - view controls
@@ -75,6 +89,10 @@
 #pragma mark - PLVBaseMediaViewControllerDelegate
 - (void)quit:(PLVBaseMediaViewController *)mediaVC error:(NSError *)error {
     [self.mediaVC clearResource];
+    if (self.pollingTimer) {
+        [self.pollingTimer invalidate];
+        self.pollingTimer = nil;
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

@@ -989,7 +989,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
 				"${BUILT_PRODUCTS_DIR}/MBProgressHUD/MBProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework",
@@ -1010,7 +1010,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BF1994BA0FC7C1A048CCF17C /* [CP] Check Pods Manifest.lock */ = {

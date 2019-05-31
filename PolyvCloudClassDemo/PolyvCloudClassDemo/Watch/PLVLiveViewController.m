@@ -36,6 +36,8 @@
 @property (nonatomic, strong) PLVChatroomController *privateChatroomController;
 @property (nonatomic, assign) BOOL idleTimerDisabled;
 
+@property (nonatomic, strong) NSTimer *pollingTimer;
+
 @end
 
 @implementation PLVLiveViewController
@@ -45,7 +47,6 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
-    [self switchKeyboardMethod];
     self.idleTimerDisabled = [UIApplication sharedApplication].idleTimerDisabled;
     [UIApplication sharedApplication].idleTimerDisabled = YES;
     
@@ -62,29 +63,23 @@
             [weakSelf exitCurrentControllerWithAlert:nil message:@"您未被授权观看本直播"];
         });
     }
+    
+    //[self playerPolling];
 }
 
 - (void)dealloc {
     NSLog(@"%s", __FUNCTION__);
     [UIApplication sharedApplication].idleTimerDisabled = self.idleTimerDisabled;
-    Method fromMethod = class_getInstanceMethod(objc_getClass("UIInputWindowController"), @selector(supportedInterfaceOrientations));
-    Method toMethod = class_getInstanceMethod([self class], @selector(app_supportedAllInterfaceOrientations));
-    method_exchangeImplementations(fromMethod, toMethod);
 }
 
-#pragma mark - runtime switch keyboard supportedInterfaceOrientations
-- (void)switchKeyboardMethod {//必须，runtime置换UIInputWindowController的supportedInterfaceOrientations方法，防止横屏时，键盘接收到弹出事件崩溃
-    Method fromMethod = class_getInstanceMethod(objc_getClass("UIInputWindowController"), @selector(supportedInterfaceOrientations));
-    Method toMethod = class_getInstanceMethod([self class], @selector(app_supportedPortraitInterfaceOrientations));
-    method_exchangeImplementations(fromMethod, toMethod);
-}
-
-- (UIInterfaceOrientationMask)app_supportedPortraitInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
-}
-
-- (UIInterfaceOrientationMask)app_supportedAllInterfaceOrientations {
-    return UIInterfaceOrientationMaskAll;
+- (void)playerPolling {
+    if (@available(iOS 10.0, *)) {
+        self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            NSLog(@"观看时长：%ld，停留时长：%ld",
+                  self.mediaVC.player.watchDuration,
+                  self.mediaVC.player.stayDuration);
+        }];
+    }
 }
 
 #pragma mark - init
@@ -241,6 +236,13 @@
     [self.publicChatroomController clearResource];
     [self.privateChatroomController clearResource];
     [self clearSocketIO];
+    if (self.triviaCardVC) {
+        [self.triviaCardVC.view removeFromSuperview];
+    }
+    if (self.pollingTimer) {
+        [self.pollingTimer invalidate];
+        self.pollingTimer = nil;
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -491,10 +493,7 @@
     NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     [data addEntriesFromDictionary:@{@"channelId" : [NSString stringWithFormat:@"%lu", (unsigned long)self.socketIO.roomId]}];
     [data addEntriesFromDictionary:dict];
-    __weak typeof(self) weakSelf = self;
-    [PLVLiveVideoAPI postLotteryWithData:data completion:^{
-        [weakSelf.triviaCardVC removeLotteryInfo:dict[@"lotteryId"]];
-    } failure:^(NSError *error) {
+    [PLVLiveVideoAPI postLotteryWithData:data completion:nil failure:^(NSError *error) {
         NSLog(@"抽奖信息提交失败: %@", error.description);
     }];
 }

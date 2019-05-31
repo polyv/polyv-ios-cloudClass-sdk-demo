@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// delegate
 @property (nonatomic, weak) id<PLVChatroomDelegate> delegate;
 
-/// 各类开关信息
+/// 直播间开关信息
 @property (nonatomic, strong) NSDictionary *switchInfo;
 
 /// 只看讲师模式下是否允许发言、点赞、送花等操作，默认 YES（公聊模式属性）

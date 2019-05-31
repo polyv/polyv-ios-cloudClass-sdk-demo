@@ -276,8 +276,8 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             self.zoomScreenBtn.hidden = YES;
             codeRateMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
             if (self.codeRateBtn.hidden) {
-                danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 50.0);
-                danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
+                danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 60.0);
+                danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 20.0);
             } else {
                 danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 104.0);
                 danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);

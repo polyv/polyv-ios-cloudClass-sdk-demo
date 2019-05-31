@@ -95,6 +95,8 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 @property (nonatomic, assign) NSUInteger onlineCount;
 @property (atomic, assign) BOOL addNewModel;
 
+@property (nonatomic, assign) BOOL enableWelcome; // 欢迎语开关
+
 @end
 
 static NSMutableSet *forbiddenUsers;
@@ -126,6 +128,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     _switchInfo = switchInfo;
     if (self.type != PLVTextInputViewTypePrivate) {
         //_closed = ![switchInfo[@"chat"] boolValue];
+        self.enableWelcome = [switchInfo[@"welcome"] boolValue]; // 欢迎语开关
         if ([switchInfo[@"viewerSendImgEnabled"] boolValue]) { // 图片开关
             [self.chatInputView loadViews:self.type enableMore:YES];
         }
@@ -175,6 +178,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.type = type;
         self.roomId = roomId;
         self.view.frame = frame;
+        self.enableWelcome = YES;
         self.scrollsToBottom = YES;
         self.moreMessageHistory = YES;
         self.allowToSpeakInTeacherMode = YES;
@@ -827,6 +831,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 #pragma mark - <PLVChatroomQueueDeleage>
 - (void)pop:(PLVChatroomQueue *)queue welcomeMessage:(NSMutableAttributedString *)welcomeMessage {
+    if (!self.enableWelcome) {
+        return;
+    }
     if (!self.welcomeView) {
         self.welcomeView = [[PLVMarqueeView alloc] init];
         [self changeWelcomeViewFrame];
