@@ -203,7 +203,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     } else {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.userIDTF.text, self.appIDTF.text, self.vIdTF.text] forKey:NSUserDefaultKey_VodLoginInfo];
         
-        [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
+        [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
             [PLVLiveVideoAPI getVodType:self.vIdTF.text completion:^(BOOL vodType) {
                 [hud hideAnimated:YES];
                 [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType];

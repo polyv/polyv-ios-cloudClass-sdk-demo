@@ -14,7 +14,7 @@
 
 #pragma mark - public
 /// 横竖屏旋转动画
-- (void)dealDeviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform;
+- (void)dealDeviceOrientationDidChangeSubAnimation;
 
 /// 切换主副屏的操作
 - (void)dealSwitchAction:(BOOL)manualControl;

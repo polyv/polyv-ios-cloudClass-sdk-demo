@@ -11,6 +11,7 @@
 #import <Masonry/Masonry.h>
 #import <PolyvFoundationSDK/PLVDateUtil.h>
 #import "PLVBrightnessView.h"
+#import "PCCUtils.h"
 
 #define BlueColor [UIColor colorWithRed:33.0 / 255.0 green:150.0 / 255.0 blue:243.0 / 255.0 alpha:1.0]
 
@@ -23,15 +24,19 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 @interface PLVPlayerSkinView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIView *controllView;
+@property (nonatomic, strong) UIImageView *topBgImgV;
+@property (nonatomic, strong) UIImageView *bottomBgImgV;
 @property (nonatomic, strong) UIButton *backBtn;
+@property (nonatomic, strong) UIButton *moreBtn;
 @property (nonatomic, strong) UIButton *mainBtn;
+@property (nonatomic, strong) UIButton *refreshBtn;
 @property (nonatomic, strong) UIButton *linkMicBtn;
 @property (nonatomic, strong) UIButton *switchScreenBtn;
 @property (nonatomic, strong) UIButton *zoomScreenBtn;
-@property (nonatomic, strong) UIButton *codeRateBtn;
-@property (nonatomic, strong) UILabel *danmuLabel;
-@property (nonatomic, strong) UISwitch *danmuSwitch;
-@property (nonatomic, strong) UIButton *speedBtn;
+@property (nonatomic, strong) UIButton *danmuBtn;
+@property (nonatomic, assign) NSInteger openDanmuByUser;
+@property (nonatomic, strong) UIButton * showInputBtn;
+
 @property (nonatomic, strong) UILabel *currentPlayTimeLabel;
 @property (nonatomic, strong) UILabel *blankLabel;
 @property (nonatomic, strong) UILabel *durationLabel;
@@ -56,36 +61,13 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 
 #pragma mark - IBAction
-- (IBAction)speedBtnAction:(id)sender {
-    [self addPopView:NO];
-    
-    NSArray *speedItems = @[@"1.0X", @"1.25X", @"1.5X", @"2.0X"];
-    for (NSString *speedValue in speedItems) {
-        UIButton *btn = [self addButton:nil selectedImgName:nil title:speedValue fontSize:18.0 action:@selector(changeSpeeedBtnAction:) inView:self.popView];
-        [btn setTitleColor:BlueColor forState:UIControlStateSelected];
-        if ([speedValue isEqualToString:self.speedBtn.currentTitle]) {
-            btn.selected = YES;
-        }
-    }
-    [self remakePopViewConstraints];
-}
 
-- (IBAction)codeRateBtnAction:(id)sender {
-    [self addPopView:NO];
-    
-    for (NSString *codeRateValue in self.codeRateItems) {
-        UIButton *btn = [self addButton:nil selectedImgName:nil title:codeRateValue fontSize:18.0 action:@selector(changeCodeRateBtnAction:) inView:self.popView];
-        [btn setTitleColor:BlueColor forState:UIControlStateSelected];
-        if ([codeRateValue isEqualToString:self.codeRateBtn.currentTitle]) {
-            btn.selected = YES;
-        }
-    }
-    [self remakePopViewConstraints];
-}
-
-- (IBAction)switchDanmuAction:(id)sender {
+- (IBAction)danmuBtnAction:(id)sender {
+    self.danmuBtn.selected = !self.danmuBtn.selected;
+    [self showDanmuInputBtn:(self.danmuBtn.selected && ([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft || [UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight))]; // 竖屏时无弹幕输入框
+    self.openDanmuByUser = self.danmuBtn.selected ? 1 : -1;
     if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinView:switchDanmu:)]) {
-        [self.delegate playerSkinView:self switchDanmu:self.danmuSwitch.on];
+        [self.delegate playerSkinView:self switchDanmu:self.danmuBtn.selected];
     }
 }
 
@@ -108,7 +90,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 - (IBAction)backBtnAction:(id)sender {
     if (self.fullscreen) {
-        [self setOrientation:UIDeviceOrientationPortrait];
+        [PCCUtils changeDeviceOrientation:UIDeviceOrientationPortrait];
     } else {
         if (self.delegate && [self.delegate respondsToSelector:@selector(quit:)]) {
             [self.delegate quit:self];
@@ -116,22 +98,28 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }
 }
 
+- (IBAction)moreBtnAction:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(more:)]) {
+        [self.delegate more:self];
+    }
+}
+
 - (IBAction)mainBtnAction:(id)sender {
-    if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(refresh:)]) {
-            [self.delegate refresh:self];
+    self.mainBtn.selected = !self.mainBtn.selected;
+    if (self.mainBtn.selected) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(play:)]) {
+            [self.delegate play:self];
         }
     } else {
-        self.mainBtn.selected = !self.mainBtn.selected;
-        if (self.mainBtn.selected) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(play:)]) {
-                [self.delegate play:self];
-            }
-        } else {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(pause:)]) {
-                [self.delegate pause:self];
-            }
+        if (self.delegate && [self.delegate respondsToSelector:@selector(pause:)]) {
+            [self.delegate pause:self];
         }
+    }
+}
+
+- (IBAction)refreshBtnAction:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(refresh:)]) {
+        [self.delegate refresh:self];
     }
 }
 
@@ -148,33 +136,18 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 }
 
 - (IBAction)zoomScreenBtnAction:(id)sender {
-    [self setOrientation:UIDeviceOrientationLandscapeLeft];
-}
-
-- (IBAction)changeSpeeedBtnAction:(UIButton *)sender {
-    [self selectItem:sender];
-    if (![self.speedBtn.currentTitle isEqualToString:sender.currentTitle]) {
-        [self.speedBtn setTitle:sender.currentTitle forState:UIControlStateNormal];
-        if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinView:speed:)]) {
-            CGFloat speed = [[sender.currentTitle substringToIndex:sender.currentTitle.length - 2] floatValue];
-            [self.delegate playerSkinView:self speed:speed];
-        }
-    }
-}
-
-- (IBAction)changeCodeRateBtnAction:(UIButton *)sender {
-    [self selectItem:sender];
-    if (![self.codeRateBtn.currentTitle isEqualToString:sender.currentTitle]) {
-        [self.codeRateBtn setTitle:sender.currentTitle forState:UIControlStateNormal];
-        if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinView:codeRate:)]) {
-            [self.delegate playerSkinView:self codeRate:self.codeRateBtn.currentTitle];
-        }
-    }
+    [PCCUtils changeDeviceOrientation:UIDeviceOrientationLandscapeLeft];
 }
 
 - (IBAction)switchCameraBtnAction:(id)sender {
     if (self.delegate && [self.delegate respondsToSelector:@selector(switchCamera:)]) {
         [self.delegate switchCamera:self];
+    }
+}
+
+- (IBAction)showInputBtnAction:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(showInput:)]) {
+        [self.delegate showInput:self];
     }
 }
 
@@ -188,38 +161,46 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     pan.delegate = self;
     [self.superview addGestureRecognizer:pan];
     
+    //顶部底部背景
+    self.topBgImgV = [[UIImageView alloc]init];
+    self.topBgImgV.image = [self playerSkinImage:@"plv_skin_topbg"];
+    self.topBgImgV.userInteractionEnabled = NO;
+    [self addSubview:self.topBgImgV];
+    
     self.controllView = [[UIView alloc] initWithFrame:self.bounds];
     self.controllView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.controllView];
     
+    self.bottomBgImgV = [[UIImageView alloc]init];
+    self.bottomBgImgV.image = [self playerSkinImage:@"plv_skin_bottombg"];
+    self.bottomBgImgV.userInteractionEnabled = NO;
+    [self.controllView addSubview:self.bottomBgImgV];
+    
     //直播，点播都共有的按钮
+    self.mainBtn = [self addButton:@"plv_skin_play" selectedImgName:@"plv_skin_pause" title:nil fontSize:17.0 action:@selector(mainBtnAction:) inView:self.controllView];
     self.backBtn = [self addButton:@"plv_skin_back" selectedImgName:nil title:nil fontSize:17.0 action:@selector(backBtnAction:) inView:self];
+    self.moreBtn = [self addButton:@"plv_skin_more" selectedImgName:nil title:nil fontSize:17.0 action:@selector(moreBtnAction:) inView:self.controllView];
     self.switchScreenBtn = [self addButton:@"plv_skin_switchscreen" title:nil action:@selector(switchScreenBtnAction:)];
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeNormalVod) {
         self.switchScreenBtn.hidden = YES;
     }
     self.zoomScreenBtn = [self addButton:@"plv_skin_fullscreen" title:nil action:@selector(zoomScreenBtnAction:)];
-    self.codeRateBtn = [self addButton:nil title:@"流畅" action:@selector(codeRateBtnAction:)];
     
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
-        self.mainBtn = [self addButton:@"plv_skin_refresh" title:nil action:@selector(mainBtnAction:)];
+        self.refreshBtn = [self addButton:@"plv_skin_refresh" title:nil action:@selector(refreshBtnAction:)];
         self.switchCameraBtn = [self addButton:nil title:nil action:@selector(switchCameraBtnAction:)];
         [self.switchCameraBtn setImage:[UIImage imageNamed:@"plv_skin_switchCamera"] forState:UIControlStateNormal];
         self.switchCameraBtn.hidden = YES;
         self.linkMicBtn = [self addButton:@"plv_skin_hangup" selectedImgName:nil title:nil fontSize:17.0 action:@selector(linkMicBtnAction:) inView:self.controllView];
         self.linkMicBtn.hidden = YES;
         
-        self.danmuLabel = [self addLabel:@"弹幕" textAlignment:NSTextAlignmentCenter];
-        self.danmuSwitch = [[UISwitch alloc] init];
-        self.danmuSwitch.on = YES;
-        self.danmuSwitch.transform = CGAffineTransformMakeScale(0.7, 0.7);
-        self.danmuSwitch.tintColor = BlueColor;
-        self.danmuSwitch.onTintColor = self.danmuSwitch.tintColor;
-        [self.danmuSwitch addTarget:self action:@selector(switchDanmuAction:) forControlEvents:UIControlEventValueChanged];
-        [self.controllView addSubview:self.danmuSwitch];
+        self.danmuBtn = [self addButton:@"plv_skin_danmu_close" selectedImgName:@"plv_skin_danmu_open" title:nil fontSize:17.0 action:@selector(danmuBtnAction:) inView:self.controllView];
+        self.danmuBtn.hidden = YES;
+        
+        self.showInputBtn = [self addShowInputBtnTitle:@"发个弹幕呗~" fontSize:12 action:@selector(showInputBtnAction:) inView:self.controllView];
+        self.showInputBtn.hidden = YES;
+        self.showInputBtn.userInteractionEnabled = NO;
     } else {
-        self.mainBtn = [self addButton:@"plv_skin_play" selectedImgName:@"plv_skin_pause" title:nil fontSize:17.0 action:@selector(mainBtnAction:) inView:self.controllView];
-        self.speedBtn = [self addButton:nil title:@"1.0X" action:@selector(speedBtnAction:)];
         self.currentPlayTimeLabel = [self addLabel:@"00:00" textAlignment:NSTextAlignmentRight];
         self.blankLabel = [self addLabel:@"/" textAlignment:NSTextAlignmentCenter];
         self.durationLabel = [self addLabel:@"00:00" textAlignment:NSTextAlignmentLeft];
@@ -246,20 +227,23 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 }
 
 - (void)layout {
-    UIEdgeInsets backMargin = UIEdgeInsetsMake(20.0, 10.0, -1.0, -1.0);
-    if (@available(iOS 11.0, *)) {
-        backMargin = UIEdgeInsetsMake(0.0, 10.0, -1.0, -1.0);
-    }
-    UIEdgeInsets mainMargin = UIEdgeInsetsMake(-1.0, 10.0, 0.0, -1.0);
-    UIEdgeInsets switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 64.0, 10.0);
-    UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
+    float lrPadding = 8.0; // 左右间距
+    float btnPadding = 44.0 + lrPadding;
+
+    UIEdgeInsets topBgImgVMargin = UIEdgeInsetsMake(self.fullscreen ? 0.0 : -44.0, 0.0, -1.0, 0.0);
+    UIEdgeInsets bottomBgImgVMargin = UIEdgeInsetsMake(-1.0, 0.0, self.fullscreen ? -20.0 : 0.0, 0.0);
+
+    UIEdgeInsets backMargin = UIEdgeInsetsMake(0.0, lrPadding, -1.0, -1.0);
+    UIEdgeInsets moreMargin = UIEdgeInsetsMake(0.0, -1.0, -1.0, lrPadding);
+    UIEdgeInsets mainMargin = UIEdgeInsetsMake(-1.0, lrPadding, 0.0, -1.0);
+    UIEdgeInsets refreshMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 1, 0.0, -1.0); // 从左开始数第二
+
+    UIEdgeInsets danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2); // 从右开始倒数第三
+    UIEdgeInsets switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1); // 从右开始倒数第二
+    UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding);
     self.zoomScreenBtn.hidden = NO;
-    UIEdgeInsets codeRateMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);
-    if (self.codeRateItems == nil || self.codeRateItems.count == 0) {
-        self.codeRateBtn.hidden = YES;
-    } else {
-        self.codeRateBtn.hidden = NO;
-    }
+    
+    UIEdgeInsets showDanmuMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 2 + 35.0, 6.0, lrPadding + btnPadding * 2 + 35.0);
     
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
         UIEdgeInsets switchCameraMargin = UIEdgeInsetsMake(-1.0, -1.0, 128.0, 10.0);
@@ -269,63 +253,49 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             linkMicMargin = UIEdgeInsetsMake(-1.0, -1.0, 128.0, 10.0);
         }
         
-        UIEdgeInsets danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 158.0);
-        UIEdgeInsets danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 118.0);
         if (self.fullscreen) {
-            backMargin = UIEdgeInsetsMake(20.0, 10.0, -1.0, -1.0);
+            backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
+            moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            codeRateMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
-            if (self.codeRateBtn.hidden) {
-                danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 60.0);
-                danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 20.0);
-            } else {
-                danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 104.0);
-                danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);
-            }
+            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
+            danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
         } else {
-            if (self.codeRateBtn.hidden) {
-                danmuLabelMargin = UIEdgeInsetsMake(-1.0, -1.0, 2.0, 104.0);
-                danmuSwitchMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);
-            }
+            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2);
         }
         
         [self remakeConstraints:self.switchCameraBtn margin:switchCameraMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
         [self remakeConstraints:self.linkMicBtn margin:linkMicMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-        [self remakeConstraints:self.danmuLabel margin:danmuLabelMargin size:CGSizeMake(40.0, 40.0) baseView:self.controllView];
-        [self remakeConstraints:self.danmuSwitch margin:danmuSwitchMargin size:CGSizeMake(40.0, 40.0) baseView:self.controllView];
     } else {
-        UIEdgeInsets speedMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 118.0);
         UIEdgeInsets sliderBackgroundMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, 0.0);
         UIEdgeInsets progressMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, -1.0);
         UIEdgeInsets sliderMargin = UIEdgeInsetsMake(-1.0, 0.0, 31.0, 0.0);
         
         if (self.fullscreen) {
-            backMargin = UIEdgeInsetsMake(20.0, 10.0, -1.0, -1.0);
+            backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
+            moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            codeRateMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
-            if (self.codeRateBtn.hidden) {
-                speedMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 10.0);
-            } else {
-                speedMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);
-            }
+            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
         } else {
-            if (self.codeRateBtn.hidden) {
-                speedMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, 64.0);
-            }
+            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
         }
         
-        [self remakeConstraints:self.speedBtn margin:speedMargin size:CGSizeMake(50.0, 44.0) baseView:self.controllView];
         [self remakeConstraints:self.sliderBackgroundView margin:sliderBackgroundMargin size:CGSizeMake(-1.0, 2.0) baseView:self.controllView];
         [self remakeConstraints:self.progressBar margin:progressMargin size:CGSizeMake(0.0, 2.0) baseView:self.controllView];
         [self remakeConstraints:self.slider margin:sliderMargin size:CGSizeMake(-1.0, 30.0) baseView:self.controllView];
         [self timelabelSizeToFit];
     }
     
+    [self remakeConstraints:self.topBgImgV margin:topBgImgVMargin size:CGSizeMake(-1.0, self.fullscreen ? 84.0 : 128.0) baseView:self];
+    [self remakeConstraints:self.bottomBgImgV margin:bottomBgImgVMargin size:CGSizeMake(-1.0, self.fullscreen ? 84.0 : 64.0) baseView:self.controllView];
     [self remakeConstraints:self.backBtn margin:backMargin size:CGSizeMake(44.0, 44.0) baseView:self];
+    [self remakeConstraints:self.moreBtn margin:moreMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.mainBtn margin:mainMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
+    [self remakeConstraints:self.refreshBtn margin:refreshMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
+    [self remakeConstraints:self.danmuBtn margin:danmuMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.switchScreenBtn margin:switchScreenMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.zoomScreenBtn margin:zoomScreenMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.codeRateBtn margin:codeRateMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
+    [self remakeConstraints:self.showInputBtn margin:showDanmuMargin size:CGSizeMake(-1.0, 32.0) baseView:self.controllView];
     
     if (self.popView != nil && !self.popView.hidden) {
         [self remakePopViewConstraints];
@@ -335,9 +305,9 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 - (void)modifySwitchScreenBtnState:(BOOL)secondaryViewClosed pptOnSecondaryView:(BOOL)pptOnSecondaryView {
     if (secondaryViewClosed) {
         if (pptOnSecondaryView) {
-            [self.switchScreenBtn setImage:nil forState:UIControlStateNormal];
+            [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_ppt"] forState:UIControlStateNormal];
             [self.switchScreenBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            [self.switchScreenBtn setTitle:@"PPT" forState:UIControlStateNormal];
+            [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
         } else {
             [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_camera"] forState:UIControlStateNormal];
             [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
@@ -346,10 +316,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
         [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_switchscreen"] forState:UIControlStateNormal];
         [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
     }
-}
-
-- (void)switchCodeRate:(NSString *)codeRate {
-    [self.codeRateBtn setTitle:codeRate forState:UIControlStateNormal];
 }
 
 - (void)linkMicStatus:(BOOL)select {
@@ -371,6 +337,22 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [messageLabel removeFromSuperview];
     });
+}
+
+- (void)showDanmuBtn:(BOOL)show{
+    self.danmuBtn.hidden = !show;
+    self.danmuBtn.userInteractionEnabled = !self.danmuBtn.hidden;
+}
+
+- (void)showDanmuInputBtn:(BOOL)show{
+    self.showInputBtn.hidden = !show;
+    self.showInputBtn.userInteractionEnabled = !self.showInputBtn.hidden;
+}
+
+- (void)linkMicStart:(BOOL)start{
+    self.mainBtn.hidden = start;
+    self.refreshBtn.hidden = start;
+    self.moreBtn.hidden = start;
 }
 
 #pragma mark - 点播独有方法
@@ -541,18 +523,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     return result;
 }
 
-- (void)setOrientation:(UIDeviceOrientation)orientation {
-    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
-        SEL selector = NSSelectorFromString(@"setOrientation:");
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
-        [invocation setSelector:selector];
-        [invocation setTarget:[UIDevice currentDevice]];
-        int val = orientation;
-        [invocation setArgument:&val atIndex:2];
-        [invocation invoke];
-    }
-}
-
 - (void)selectItem:(UIButton *)sender {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hiddenPopView) object:nil];
     sender.selected = YES;
@@ -614,6 +584,22 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     return [self addButton:normalImgName selectedImgName:nil title:title fontSize:17.0 action:action inView:self.controllView];
 }
 
+- (UIButton *)addShowInputBtnTitle:(NSString *)title fontSize:(CGFloat)fontSize action:(SEL)action inView:(UIView *)view {
+    UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn setTitle:title forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:0.8] forState:UIControlStateNormal];
+    btn.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Semibold" size:fontSize];
+    [btn setBackgroundColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:0.3]];
+
+    btn.layer.masksToBounds = YES;
+    btn.layer.cornerRadius = 17.0f;
+    
+    [btn addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    [view addSubview:btn];
+    
+    return btn;
+}
+
 - (UILabel *)addLabel:(NSString *)text fontSize:(CGFloat)fontSize textAlignment:(NSTextAlignment)textAlignment inView:(UIView *)view {
     UILabel *label = [[UILabel alloc] init];
     label.backgroundColor = [UIColor clearColor];
@@ -660,36 +646,20 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }
 }
 
-//UIEdgeInsets margin的top, left, bottom, right都为正值，负值代表不计算该边距的约束
+//UIEdgeInsets margin的top, left, bottom, right都为正值，-1.0代表不计算该边距的约束, <-10.0计算该边距的负边距约束
 - (void)remakeConstraints:(UIView *)view margin:(UIEdgeInsets)margin size:(CGSize)size baseView:(UIView *)baseView {
     [view mas_remakeConstraints:^(MASConstraintMaker *make) {
-        if (margin.top >= 0.0) {
-            if (@available(iOS 11.0, *)) {
-                make.top.equalTo(baseView.mas_safeAreaLayoutGuideTop).offset(margin.top);
-            } else {
-                make.top.equalTo(baseView.mas_top).offset(margin.top);
-            }
+        if (margin.top >= 0.0 || margin.top < -10.0) {
+            make.top.equalTo(baseView.mas_top).offset(margin.top);
         }
         if (margin.left >= 0.0) {
-            if (@available(iOS 11.0, *)) {
-                make.left.equalTo(baseView.mas_safeAreaLayoutGuideLeft).offset(margin.left);
-            } else {
-                make.left.equalTo(baseView.mas_left).offset(margin.left);
-            }
+            make.left.equalTo(baseView.mas_left).offset(margin.left);
         }
-        if (margin.bottom >= 0.0) {
-            if (@available(iOS 11.0, *)) {
-                make.bottom.equalTo(baseView.mas_safeAreaLayoutGuideBottom).offset(-margin.bottom);
-            } else {
-                make.bottom.equalTo(baseView.mas_bottom).offset(-margin.bottom);
-            }
+        if (margin.bottom >= 0.0 || margin.bottom < -10.0) {
+            make.bottom.equalTo(baseView.mas_bottom).offset(-margin.bottom);
         }
         if (margin.right >= 0.0) {
-            if (@available(iOS 11.0, *)) {
-                make.right.equalTo(baseView.mas_safeAreaLayoutGuideRight).offset(-margin.right);
-            } else {
-                make.right.equalTo(baseView.mas_right).offset(-margin.right);
-            }
+            make.right.equalTo(baseView.mas_right).offset(-margin.right);
         }
         if (size.width > 0.0) {
             make.width.mas_equalTo(size.width);

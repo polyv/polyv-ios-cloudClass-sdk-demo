@@ -64,7 +64,7 @@
         });
     }
     
-    //[self playerPolling];
+//    [self playerPolling];
 }
 
 - (void)dealloc {
@@ -75,15 +75,12 @@
 - (void)playerPolling {
     if (@available(iOS 10.0, *)) {
         self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSLog(@"观看时长：%ld，停留时长：%ld",
-                  self.mediaVC.player.watchDuration,
-                  self.mediaVC.player.stayDuration);
+            NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
         }];
     }
 }
 
 #pragma mark - init
-
 - (void)initData {
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     self.channelId = liveConfig.channelId.integerValue;
@@ -128,12 +125,8 @@
     self.mediaVC.userId = liveConfig.userId; //必须，不能为空
     self.mediaVC.nickName = loginUser.nickName;
     self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
+    self.mediaVC.originFrame = self.mediaVC.view.frame;
     [self.view addSubview:self.mediaVC.view];
-    
-    self.triviaCardVC = [[PLVTriviaCardViewController alloc] init];
-    self.triviaCardVC.delegate = self;
-    self.triviaCardVC.view.frame = [UIApplication sharedApplication].delegate.window.bounds;
-    [[UIApplication sharedApplication].delegate.window addSubview:self.triviaCardVC.view];
     
     self.linkMicVC = [[PLVLinkMicController alloc] init];
     self.linkMicVC.delegate = self;
@@ -146,13 +139,33 @@
     }
     self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
     self.linkMicVC.linkMicBtn = self.mediaVC.skinView.linkMicBtn;
-    [self.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.view];
+    [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
     
     self.linkMicVC.login = loginUser;
     self.mediaVC.linkMicVC = self.linkMicVC;
     if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
         [(PLVPPTLiveMediaViewController *)self.mediaVC loadSecondaryView:originSecondaryFrame];
     }
+    
+    // 若需要 [加载静态离线页面]，请解开2处注释代码
+    // 1_[加载静态离线页面]
+    //  NSString *basePath = [NSString stringWithFormat:@"%@/dist", [[NSBundle mainBundle] bundlePath]];
+    //  NSURL *baseURL = [NSURL fileURLWithPath:basePath isDirectory:YES];
+    //  NSString *htmlPath = [NSString stringWithFormat:@"%@/index.html", basePath];
+    //  NSError * htmlError;
+    //  NSString *htmlString = [NSString stringWithContentsOfFile:htmlPath encoding:NSUTF8StringEncoding error:&htmlError];
+    //  if (htmlError) { NSLog(@"[加载静态离线页面] 错误 Error - %@",htmlError); }
+    
+    self.triviaCardVC = [[PLVTriviaCardViewController alloc] init];
+    self.triviaCardVC.delegate = self;
+    
+    // 2_[加载静态离线页面]
+    // self.triviaCardVC.localHtml = htmlString;
+    // self.triviaCardVC.baseURL = baseURL;
+    
+    self.triviaCardVC.view.frame = self.view.bounds;
+    self.triviaCardVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:self.triviaCardVC.view];
 }
 
 - (void)setupPublicChatroom:(CGFloat)top {
@@ -162,8 +175,8 @@
     PLVTextInputViewType type = self.liveType == PLVLiveViewControllerTypeLive ? PLVTextInputViewTypeNormalPublic : PLVTextInputViewTypeCloudClassPublic;
     self.publicChatroomController = [PLVChatroomController chatroomWithType:type roomId:self.channelId frame:chatroomFrame];
     self.publicChatroomController.delegate = self;
-    //self.publicChatroomController.allowToSpeakInTeacherMode = NO;
-    [self.publicChatroomController loadSubViews];
+//    self.publicChatroomController.allowToSpeakInTeacherMode = NO;
+    [self.publicChatroomController loadSubViews:self.view];
     
     self.pageController = [[FTPageController alloc] initWithTitles:@[@"聊天"] controllers:@[self.publicChatroomController]];
     self.pageController.view.backgroundColor = [UIColor colorWithWhite:236/255.0 alpha:1];
@@ -175,14 +188,14 @@
 - (void)addPrivateChatroom {
     self.privateChatroomController = [PLVChatroomController chatroomWithType:PLVTextInputViewTypePrivate roomId:self.channelId frame:self.publicChatroomController.view.frame];
     self.privateChatroomController.delegate = self;
-    [self.privateChatroomController loadSubViews];
+    [self.privateChatroomController loadSubViews:self.view];
     
     [self.pageController addPageWithTitle:@"私聊" controller:self.privateChatroomController];
 }
 
 #pragma mark - view controls
-- (BOOL)shouldAutorotate {//设备方向旋转，横竖屏切换，但UIViewController不需要旋转，在播放器的父类里自己实现旋转的动画效果
-    return NO;
+- (BOOL)shouldAutorotate {
+    return self.mediaVC != nil && self.mediaVC.canAutorotate && ![PLVLiveVideoConfig sharedInstance].unableRotate && ![PLVLiveVideoConfig sharedInstance].triviaCardUnableRotate;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -236,9 +249,6 @@
     [self.publicChatroomController clearResource];
     [self.privateChatroomController clearResource];
     [self clearSocketIO];
-    if (self.triviaCardVC) {
-        [self.triviaCardVC.view removeFromSuperview];
-    }
     if (self.pollingTimer) {
         [self.pollingTimer invalidate];
         self.pollingTimer = nil;
@@ -313,6 +323,14 @@
 }
 
 #pragma mark Interactive message
+- (void)socketIO:(PLVSocketIO *)socketIO didReceiveBulletinMessage:(NSString *)json result:(int)result {
+    if (result == 0) {
+        [self.triviaCardVC openBulletin:json];
+    }else if(result == 1){
+        [self.triviaCardVC removeBulletin];
+    }
+}
+
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveQuestionMessage:(NSString *)json result:(int)result {
     __weak typeof(self) weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -334,23 +352,21 @@
     }
 }
 
-/* TODO:问卷
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveQuestionnaireMessage:(NSString *)json result:(int)result {
     if (result == 0) {
         [self.triviaCardVC openQuestionnaireContent:json]; // 打开问卷
     } else if (result == 1) {
         [self.triviaCardVC stopQuestionNaire:json];    // 关闭问卷
     }
-}*/
+}
 
-/* TODO:签到
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveSignInMessage:(NSString *)json result:(int)result {
     if (result == 0) {
         [self.triviaCardVC startSign:json];
     } else if (result == 1) {
         [self.triviaCardVC stopSign:json];
     }
-}*/
+}
 
 #pragma mark Custom message
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveCustomMessage:(NSDictionary *)customMessage {
@@ -398,29 +414,24 @@
 }
 
 - (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag {
-    CGRect rect = self.view.frame;
     if (!self.mediaVC.skinView.fullscreen) {
-        rect.origin.y = flag ? -100.0 : 0.0;//在 PLVTextInputView.m 键盘控件里的 followKeyboardAnimation 方法需要使用 100.0 这个值，两边要一致
         if (flag) {
-            rect.size.height = [UIScreen mainScreen].bounds.size.height + 100.0;
+            CGFloat safeAreaY = 20.0;
+            if (@available(iOS 11.0, *)) {
+                safeAreaY = self.view.safeAreaLayoutGuide.layoutFrame.origin.y;
+            }
+            CGRect linkMicRect = self.linkMicVC.view.frame;
+            linkMicRect = CGRectMake(0.0, safeAreaY, linkMicRect.size.width, linkMicRect.size.height);
+            self.linkMicVC.view.frame = linkMicRect;
+            [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
         } else {
-            rect.size.height = [UIScreen mainScreen].bounds.size.height;
+            self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
+            [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
         }
-    } else {
-        rect.origin.y = 0.0;
-    }
-    self.view.frame = rect;
-    if (flag) {
-        CGRect linkMicRect = self.linkMicVC.view.frame;
-        linkMicRect = CGRectMake(0.0, self.mediaVC.view.frame.origin.y + self.mediaVC.view.frame.size.height - linkMicRect.size.height, linkMicRect.size.width, linkMicRect.size.height);
-        self.linkMicVC.view.frame = linkMicRect;
-        [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
-    } else {
-        self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-        [self.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.view];
-    }
-    if ([self.mediaVC isKindOfClass:PLVPPTLiveMediaViewController.class]) {
-        [(PLVPPTLiveMediaViewController *)self.mediaVC secondaryViewFollowKeyboardAnimation:flag];
+        
+        if ([self.mediaVC isKindOfClass:PLVPPTLiveMediaViewController.class]) {
+            [(PLVPPTLiveMediaViewController *)self.mediaVC secondaryViewFollowKeyboardAnimation:flag];
+        }
     }
 }
 
@@ -445,8 +456,13 @@
     [PCCUtils showChatroomMessage:message addedToView:self.pageController.view];
 }
 
-#pragma mark - PLVBaseMediaViewControllerDelegate
+- (void)readBulletin:(PLVChatroomController *)chatroom{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.33 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.triviaCardVC openLastBulletin];
+    });
+}
 
+#pragma mark - PLVBaseMediaViewControllerDelegate
 - (void)quit:(PLVBaseMediaViewController *)mediaVC error:(NSError *)error {
     if (error) {
         if (error.code == PLVBaseMediaErrorCodeMarqueeFailed) {
@@ -457,16 +473,18 @@
     }
 }
 
-- (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC rotationTransform:(CGAffineTransform)rotationTransform {
+- (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC {
     [self setNeedsStatusBarAppearanceUpdate];//横竖屏切换前，更新Status Bar的状态
     
-    BOOL fullscreen = self.mediaVC.skinView.fullscreen;
-    [self.triviaCardVC layout:fullscreen rotationTransform:rotationTransform];
-    
-    if (fullscreen) {
+    [self.triviaCardVC layout:self.mediaVC.skinView.fullscreen];
+    if (self.mediaVC.skinView.fullscreen) {
         [self.publicChatroomController tapChatInputView];
         [self.privateChatroomController tapChatInputView];
     }
+}
+
+- (void)sendText:(PLVBaseMediaViewController *)mediaVC text:(NSString *)text{
+    [self.publicChatroomController sendTextMessage:text];
 }
 
 #pragma mark - PLVTriviaCardViewControllerDelegate

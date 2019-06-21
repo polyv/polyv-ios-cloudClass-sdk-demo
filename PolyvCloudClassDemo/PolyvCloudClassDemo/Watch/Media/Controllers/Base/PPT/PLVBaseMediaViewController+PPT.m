@@ -16,18 +16,25 @@
 @implementation PLVBaseMediaViewController (PPT)
 
 #pragma mark - public
-- (void)dealDeviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
+- (void)dealDeviceOrientationDidChangeSubAnimation {
     UIView *displayView = self.pptOnSecondaryView ? self.mainView : self.secondaryView;
     [self.player setFrame:displayView.bounds];
     
-    self.secondaryView.fullscreen = self.skinView.fullscreen;
-    self.secondaryView.transform = rotationTransform;
     CGRect secondaryRect = self.originSecondaryFrame;
+    self.secondaryView.fullscreen = self.skinView.fullscreen;
     if (self.secondaryView.fullscreen) {
-        if (self.curOrientation == UIDeviceOrientationLandscapeRight) {
-            secondaryRect = CGRectMake(0.0, self.mainView.frame.origin.x, self.originSecondaryFrame.size.height, self.originSecondaryFrame.size.width);
+        if (@available(iOS 11.0, *)) {
+            CGRect safeFrame = self.view.superview.safeAreaLayoutGuide.layoutFrame;
+            // 快速旋转时，safeAreaLayoutGuide 如果出现横竖屏错乱的情况，手动调整
+            if (safeFrame.origin.y > 0.0) {
+                safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
+            }
+            if (safeFrame.size.width < safeFrame.size.height) {
+                safeFrame.size = CGSizeMake(safeFrame.size.height, safeFrame.size.width);
+            }
+            secondaryRect.origin = CGPointMake(safeFrame.origin.x + safeFrame.size.width - secondaryRect.size.width, 0.0);
         } else {
-            secondaryRect = CGRectMake(self.mainView.frame.origin.y + self.mainView.frame.size.height - self.originSecondaryFrame.size.height, self.mainView.frame.origin.x + self.mainView.frame.size.width - self.originSecondaryFrame.size.width, self.originSecondaryFrame.size.height, self.originSecondaryFrame.size.width);
+            secondaryRect.origin = CGPointMake(self.view.bounds.size.width - secondaryRect.size.width, 0.0);
         }
     }
     self.secondaryView.frame = secondaryRect;
@@ -75,7 +82,7 @@
     self.pptVC = [[PLVPPTViewController alloc] init];
     self.pptVC.delegate = self;
     self.pptVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    //[self.pptVC.backgroundImgView setContentMode:UIViewContentModeScaleAspectFit];
+//    [self.pptVC.backgroundImgView setContentMode:UIViewContentModeScaleAspectFit];
     UIView *displayView = self.pptOnSecondaryView ? self.secondaryView : self.mainView;
     self.pptVC.view.frame = displayView.bounds;
     [displayView insertSubview:self.pptVC.view atIndex:0];
@@ -114,6 +121,10 @@
 - (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
+
+    if ([playerController isKindOfClass:PLVLivePlayerController.class]) {
+        [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
+    }
     
     self.pptVC.pptPlayable = YES;
     if (self.pptOnSecondaryView && !self.player.playingAD && !self.pptFlag) {//自动切换主屏为PPT，副屏为视频
@@ -132,14 +143,16 @@
         return;
     }
     if (self.pptOnSecondaryView) {
-        self.mainView.backgroundColor = playerController.playable ? [UIColor blackColor] : BlueBackgroundColor;
+        self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : GrayBackgroundColor;
     } else {
-        self.secondaryView.backgroundColor = playerController.playable ? [UIColor blackColor] : [UIColor whiteColor];
+        self.secondaryView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : [UIColor whiteColor];
     }
-}
-
-- (BOOL)onSafeArea:(PLVPlayerController *)playerController {
-    return self.pptOnSecondaryView && !self.skinView.fullscreen;
+    
+    if ([playerController isKindOfClass:PLVLivePlayerController.class]) {
+        BOOL showAudioModeBtn = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
+        [self.moreView showAudioModeBtn:showAudioModeBtn];
+        [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
+    }
 }
 
 - (BOOL)cameraClosed {

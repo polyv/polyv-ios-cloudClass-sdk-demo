@@ -9,6 +9,7 @@
 #import <PolyvCloudClassSDK/PLVLiveVideoChannel.h>
 #import <PolyvCloudClassSDK/PLVLinkMicController.h>
 #import "ZJZDanMu.h"
+#import "PLVPlayerInputView.h"
 
 /// 直播播放器基类协议（功能：1.弹幕；2.连麦窗口的交互）
 @protocol PLVLiveMediaProtocol <NSObject>
@@ -23,6 +24,8 @@
 @property (nonatomic, strong) PLVLinkMicController *linkMicVC;
 /// 弹幕控件
 @property (nonatomic, strong) ZJZDanMu *danmuLayer;
+/// 发送弹幕弹窗
+@property (nonatomic, strong) PLVPlayerInputView *danmuInputView;
 /// 正在加载channelJSON
 @property (nonatomic, assign) BOOL reOpening;
 

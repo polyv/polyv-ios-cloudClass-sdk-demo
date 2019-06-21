@@ -44,7 +44,6 @@
         
         [self setupUI];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
         [[UIScreen mainScreen] addObserver:self forKeyPath:@"brightness" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
@@ -120,14 +119,11 @@
         self.addedInSubview = YES;
         UIWindow *window = [UIApplication sharedApplication].delegate.window;
         [window addSubview:self];
-        __weak typeof(self) weakSelf = self;
         [self mas_remakeConstraints:^(MASConstraintMaker *make) {
             UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
             CGFloat x = 0.0;
             CGFloat y = 0.0;
-            CGFloat angle = 0.0;
             if (UIDeviceOrientationIsLandscape(orientation)) {
-                angle = (orientation == UIDeviceOrientationLandscapeRight ? -M_PI_2 : M_PI_2);
                 x = 1.0;
                 y = 1.0;
             } else {
@@ -137,7 +133,6 @@
             make.centerY.equalTo(window.mas_centerY).mas_offset(y);
             make.width.mas_equalTo(BrightnessViewWidth);
             make.height.mas_equalTo(BrightnessViewHeight);
-            weakSelf.transform = CGAffineTransformMakeRotation(angle);
         }];
     }
     
@@ -155,19 +150,6 @@
             imgView.hidden = YES;
         }
     }
-}
-
-#pragma mark - orientation
-- (void)deviceOrientationDidChange {
-    UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-    CGFloat angle = 0.0;
-    if (UIDeviceOrientationIsLandscape(orientation)) {
-        angle = (orientation == UIDeviceOrientationLandscapeRight ? -M_PI_2 : M_PI_2);
-    }
-    __weak typeof(self) weakSelf = self;
-    [UIView animateWithDuration:[[UIApplication sharedApplication] statusBarOrientationAnimationDuration] delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        weakSelf.transform = CGAffineTransformMakeRotation(angle);
-    } completion:nil];
 }
 
 @end

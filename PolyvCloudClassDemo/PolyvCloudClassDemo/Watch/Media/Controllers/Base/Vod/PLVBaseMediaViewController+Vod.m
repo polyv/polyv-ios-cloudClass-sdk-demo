@@ -8,20 +8,21 @@
 
 #import "PLVBaseMediaViewController+Vod.h"
 
-@interface PLVBaseMediaViewController () <PLVPlayerSkinViewDelegate>
+@interface PLVBaseMediaViewController () <PLVPlayerSkinViewDelegate, PLVPlayerSkinMoreViewDelegate>
 
 @end
 
 @implementation PLVBaseMediaViewController (Vod)
 
 #pragma mark - PLVPlayerSkinViewDelegate
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView speed:(CGFloat)speed {
-    [(PLVVodPlayerController *)self.player speedRate:speed];
-}
-
 - (void)seek:(PLVPlayerSkinView *)skinView {
     NSTimeInterval curTime = [self.skinView getCurrentTime];
     [(PLVVodPlayerController *)self.player seek:curTime];
+}
+
+#pragma mark - PLVPlayerSkinMoreViewDelegate
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView speed:(CGFloat)speed{
+    [(PLVVodPlayerController *)self.player speedRate:speed];
 }
 
 #pragma mark - PLVVodPlayerControllerDelegate

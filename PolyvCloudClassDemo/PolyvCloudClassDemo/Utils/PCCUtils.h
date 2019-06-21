@@ -40,7 +40,10 @@
 /// UIAlertViewController弹窗
 + (void)presentAlertViewController:(NSString *)title message:(NSString *)message inViewController:(UIViewController *)vc;
 
-//强制把设备UIDevice的方向设置为竖屏（在弹出，弹入相册，照相机，或退出直播时需要手动调用）
+/// 改变设备的方向，用于横竖屏切换
++ (void)changeDeviceOrientation:(UIDeviceOrientation)orientation;
+
+/// 强制把设备UIDevice的方向设置为竖屏（在弹出，弹入相册，照相机，或退出直播时需要手动调用）
 + (void)deviceOnInterfaceOrientationMaskPortrait;
 
 @end

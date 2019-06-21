@@ -7,10 +7,10 @@
 //
 
 #import "PLVBaseMediaViewController+Live.h"
+#import <MBProgressHUD/MBProgressHUD.h>
 #import "PLVLiveMediaProtocol.h"
-#import "MBProgressHUD+Rotate.h"
 
-@interface PLVBaseMediaViewController () <PLVLiveMediaProtocol, PLVPlayerSkinViewDelegate>
+@interface PLVBaseMediaViewController () <PLVLiveMediaProtocol, PLVPlayerSkinViewDelegate, PLVPlayerSkinMoreViewDelegate, PLVPlayerInputViewDelegate, PLVPlayerSkinAudioModeViewDelegate>
 
 @end
 
@@ -23,7 +23,6 @@
         MBProgressHUD *hud = nil;
         if (showHud) {
             hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
-            [hud addDeviceOrientationDidChangeNotification];
             [hud.label setText:@"加载JSON..."];
         }
         
@@ -48,6 +47,7 @@
 - (void)danmu:(NSMutableAttributedString *)message {
     [self addDanmuLayer];
     [self.danmuLayer insertScrollDML:message];
+    [self addDanmuInputView];
 }
 
 - (void)addDanmuLayer {
@@ -56,9 +56,21 @@
         if (@available(iOS 11.0, *)) {
             danmuRect = self.mainView.safeAreaLayoutGuide.layoutFrame;
         }
+        if (CGRectEqualToRect(danmuRect, CGRectZero)) { return; }
         self.danmuLayer = [[ZJZDanMu alloc] initWithFrame:danmuRect];
         self.danmuLayer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.danmuLayer.hidden = YES;
+        self.danmuLayer.userInteractionEnabled = NO;
         [self.view insertSubview:self.danmuLayer belowSubview:self.skinView];
+    }
+}
+
+- (void)addDanmuInputView {
+    if (self.danmuInputView == nil) {
+        if (self.view.superview == nil) { return; }
+        self.danmuInputView = [[PLVPlayerInputView alloc]initWithFrame:self.view.superview.bounds];
+        self.danmuInputView.delegate = self;
+        [self.view.superview addSubview:self.danmuInputView];
     }
 }
 
@@ -66,9 +78,25 @@
     return [((PLVLivePlayerController *)self.player) currentChannelSessionId];
 }
 
+- (void)addAudioModeView {
+    if ([self.player isKindOfClass:PLVLivePlayerController.class] && ((PLVLivePlayerController *)self.player).audioModeDisplayView == nil) {
+        PLVPlayerSkinAudioModeView * audioModeV = [[PLVPlayerSkinAudioModeView alloc]init];
+        audioModeV.delegate = self;
+        ((PLVLivePlayerController *)self.player).audioModeDisplayView = audioModeV;
+    }
+}
+
 #pragma mark - PLVPlayerSkinViewDelegate
+- (void)play:(PLVPlayerSkinView *)skinView {
+    [self reOpenPlayer:nil showHud:NO];
+}
+
+- (void)pause:(PLVPlayerSkinView *)skinView {
+    [(PLVLivePlayerController *)self.player pause];
+}
+
 - (void)refresh:(PLVPlayerSkinView *)skinView {
-    [self reOpenPlayer:nil showHud:YES];
+    [self reOpenPlayer:nil showHud:NO];
 }
 
 - (void)linkMic:(PLVPlayerSkinView *)skinView {
@@ -85,10 +113,44 @@
 - (void)playerSkinView:(PLVPlayerSkinView *)skinView switchDanmu:(BOOL)switchDanmu {
     [self addDanmuLayer];
     self.danmuLayer.hidden = !switchDanmu;
+    [self addDanmuInputView];
 }
 
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView codeRate:(NSString *)codeRate {
-    [self reOpenPlayer:codeRate showHud:NO];
+- (void)showInput:(PLVPlayerSkinView *)skinView{
+    [self skinHiddenAnimaion];
+    [self.danmuInputView show];
+    [self.view.superview bringSubviewToFront:self.danmuInputView];
+}
+
+#pragma mark - PLVPlayerSkinMoreViewDelegate
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView codeRate:(NSString *)codeRate{
+    [self reOpenPlayer:codeRate showHud:YES];
+}
+
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView switchAudioMode:(BOOL)switchAudioMode{
+    if (switchAudioMode) {
+        [self addAudioModeView];
+        [(PLVLivePlayerController *)self.player switchAudioMode:YES];
+    }else{
+        [(PLVLivePlayerController *)self.player switchAudioMode:NO];
+    }
+}
+
+#pragma mark - PLVPlayerInputViewDelegate
+- (void)playerInputView:(PLVPlayerInputView *)inputView didSendText:(NSString *)text{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(sendText:text:)]) {
+        [self.delegate sendText:self text:text];
+    }
+}
+
+#pragma mark - PLVLivePlayerControllerDelegate
+- (void)livePlayerController:(PLVLivePlayerController *)livePlayer playing:(BOOL)playing{
+    [self.skinView modifyMainBtnState:playing];
+}
+
+#pragma mark - PLVPlayerSkinAudioModeViewDelegate
+- (void)playVideoAudioModeView:(PLVPlayerSkinAudioModeView *)audioModeView{
+    [(PLVLivePlayerController *)self.player switchAudioMode:NO];
 }
 
 @end

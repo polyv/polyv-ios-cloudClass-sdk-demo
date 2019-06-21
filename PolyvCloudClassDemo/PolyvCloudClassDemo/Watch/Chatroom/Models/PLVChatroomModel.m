@@ -227,6 +227,12 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             [(PLVChatroomSpeakOtherCell *)cell setSpeakContent:self.speakContent];
             [(PLVChatroomSpeakOtherCell *)cell setActorTextColor:self.actorTextColor];
             [(PLVChatroomSpeakOtherCell *)cell setActorBackgroundColor:self.actorBackgroundColor];
+            // 使用特殊字体颜色区分官方人员和学生
+            BOOL useSpecialColor = (self.userType == PLVChatroomUserTypeTeacher) || (self.userType == PLVChatroomUserTypeAssistant) || (self.userType == PLVChatroomUserTypeManager);
+            UIColor * specialColor = UIColorFromRGB(0x0092fa); // 若需自定义‘官方人员’字色，修改此处色值
+            UIColor * normalColor = UIColorFromRGB(0x546E7A); // 若需自定义‘学生’字色，修改此处色值
+            UIColor * speckContentColor = useSpecialColor ? specialColor : normalColor;
+            [(PLVChatroomSpeakOtherCell *)cell setSpeakContentColor:speckContentColor];
         } break;
         case PLVChatroomModelTypeImageSend: {
             if (!cell) {

@@ -117,17 +117,22 @@ static PCCUtils *chatroomHud = nil;
     [vc presentViewController:alertController animated:YES completion:nil];
 }
 
-#pragma mark - UIDevice UIInterfaceOrientationMaskPortrait
-+ (void)deviceOnInterfaceOrientationMaskPortrait {
+#pragma mark - UIDevice changeDeviceOrientation
++ (void)changeDeviceOrientation:(UIDeviceOrientation)orientation {
     if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
         SEL selector = NSSelectorFromString(@"setOrientation:");
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
         [invocation setSelector:selector];
         [invocation setTarget:[UIDevice currentDevice]];
-        int val = UIDeviceOrientationPortrait;//强制把设备UIDevice的方向设置为竖屏
+        int val = orientation;
         [invocation setArgument:&val atIndex:2];//从2开始，因为0 1 两个参数已经被selector和target占用
         [invocation invoke];
     }
+}
+
+#pragma mark - UIDevice UIInterfaceOrientationMaskPortrait
++ (void)deviceOnInterfaceOrientationMaskPortrait {
+    [self changeDeviceOrientation:UIDeviceOrientationPortrait];
 }
 
 @end

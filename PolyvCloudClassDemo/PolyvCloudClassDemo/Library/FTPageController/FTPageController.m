@@ -38,8 +38,8 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
         self.titles = [[NSMutableArray alloc] initWithArray:titles];
         self.controllers = [[NSMutableArray alloc] initWithArray:controllers];
         
-        [self setupPageController];
         [self setupTitles];
+        [self setupPageController];
     }
     return self;
 }

@@ -10,7 +10,7 @@
 #import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 #import "PLVBaseMediaViewController+Vod.h"
 
-@interface PLVNormalVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPlayerControllerDelegate>
+@interface PLVNormalVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPlayerControllerDelegate, PLVPlayerSkinMoreViewDelegate>
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
@@ -44,7 +44,7 @@
 }
 
 #pragma mark - PLVBaseMediaViewController
-- (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
+- (void)deviceOrientationDidChangeSubAnimation {
     UIView *displayView = self.mainView;
     [self.player setFrame:displayView.bounds];
 }
@@ -58,7 +58,8 @@
     [(PLVVodPlayerController *)self.player pause];
 }
 
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView codeRate:(NSString *)codeRate {
+#pragma mark - PLVPlayerSkinMoreViewDelegate
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView codeRate:(NSString *)codeRate{
     [(PLVVodPlayerController *)self.player switchCodeRate:codeRate];
 }
 
@@ -67,21 +68,13 @@
     self.skinView.controllView.hidden = YES;
 }
 
-- (void)playerController:(PLVPlayerController *)playerController showMessage:(NSString *)message {
-    [self.skinView showMessage:message];
-}
-
 - (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
 }
 
 - (void)changePlayerScreenBackgroundColor:(PLVPlayerController *)playerController {
-    self.mainView.backgroundColor = playerController.playable ? [UIColor blackColor] : BlueBackgroundColor;
-}
-
-- (BOOL)onSafeArea:(PLVPlayerController *)playerController {
-    return !self.skinView.fullscreen;
+    self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : BlueBackgroundColor;
 }
 
 @end

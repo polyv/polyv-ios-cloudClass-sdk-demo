@@ -11,7 +11,7 @@
 #import "PLVBaseMediaViewController+Vod.h"
 #import "PLVBaseMediaViewController+PPT.h"
 
-@interface PLVPPTVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPPTViewControllerDelegate>
+@interface PLVPPTVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPPTViewControllerDelegate, PLVPlayerSkinMoreViewDelegate>
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
@@ -48,8 +48,8 @@
 }
 
 #pragma mark - PLVBaseMediaViewController
-- (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
-    [self dealDeviceOrientationDidChangeSubAnimation:rotationTransform];
+- (void)deviceOrientationDidChangeSubAnimation {
+    [self dealDeviceOrientationDidChangeSubAnimation];
 }
 
 - (void)loadPlayer {
@@ -72,7 +72,8 @@
     [self.pptVC pptPause:[self.skinView getCurrentTime] * 1000.0];
 }
 
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView codeRate:(NSString *)codeRate {
+#pragma mark - PLVPlayerSkinMoreViewDelegate
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView codeRate:(NSString *)codeRate{
     [(PLVVodPlayerController *)self.player switchCodeRate:codeRate];
 }
 

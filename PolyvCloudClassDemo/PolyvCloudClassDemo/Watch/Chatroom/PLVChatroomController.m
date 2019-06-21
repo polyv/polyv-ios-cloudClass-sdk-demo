@@ -20,7 +20,6 @@
 #import "ZNavigationController.h"
 #import "ZPickerController.h"
 #import "PLVCameraViewController.h"
-#import "UIAlertController+UnRotate.h"
 #import "PLVChatroomManager.h"
 
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
@@ -191,7 +190,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 #pragma mark - Public
 
-- (void)loadSubViews {
+- (void)loadSubViews:(UIView *)tapSuperView {
     CGFloat h = 50.0;
     if (@available(iOS 11.0, *)) {
         CGRect rect = [UIApplication sharedApplication].delegate.window.bounds;
@@ -220,6 +219,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     
     self.chatInputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds)-h, CGRectGetWidth(self.view.bounds), h)];
     self.chatInputView.delegate = self;
+    self.chatInputView.tapSuperView = tapSuperView;
     [self.view addSubview:self.chatInputView];
     self.chatInputView.disableOtherButtonsInTeacherMode = !self.allowToSpeakInTeacherMode;
     [self.chatInputView loadViews:self.type enableMore:NO];
@@ -374,6 +374,10 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [PCCUtils showChatroomMessage:customModel.tip addedToView:self.view];
         }
     }
+}
+
+- (void)sendTextMessage:(NSString *)text{
+    [self textInputView:nil didSendText:text];
 }
 
 #pragma mark - Action
@@ -576,14 +580,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)showNicknameAlert {
-    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
     UIAlertController *alertCtrl = [UIAlertController alertControllerWithTitle:nil message:@"请输入聊天昵称" preferredStyle:UIAlertControllerStyleAlert];
     [alertCtrl addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = @"简单易记的名称有助于让大家认识你哦";
     }];
-    [alertCtrl addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
-    }]];
+    [alertCtrl addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     __weak typeof(self)weakSelf = self;
     __weak UIAlertController *alertCtrlRef = alertCtrl;
     [alertCtrl addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -599,7 +600,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } else {
             [PCCUtils showChatroomMessage:@"设置昵称不能为空！" addedToView:weakSelf.view];
         }
-        [PLVLiveVideoConfig sharedInstance].unableRotate = NO;
     }]];
     [self presentViewController:alertCtrl animated:YES completion:nil];
 }
@@ -738,7 +738,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 #pragma mark - <PLVTextInputViewDelegate>
-
 - (BOOL)textInputViewShouldBeginEditing:(PLVTextInputView *)inputView {
     BOOL beginEditing = ![PLVChatroomManager sharedManager].defaultNick;
     if (beginEditing) {
@@ -785,7 +784,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
     if (self.likeSoctetObjectBySelf == nil && socketUser != nil) {
-        self.likeSoctetObjectBySelf = [PLVSocketChatRoomObject socketObjectWithJsonDict:@{PLVSocketIOChatRoom_LIKES_nick : socketUser.nickName}];
+        self.likeSoctetObjectBySelf = [PLVSocketChatRoomObject socketObjectWithJsonDict:@{PLVSocketIOChatRoom_LIKES_nick : socketUser.nickName,@"sessionId":[self currentChannelSessionId]}];
         self.likeSoctetObjectBySelf.localMessage = YES;
     }
     if (self.likeSoctetObjectBySelf != nil) {
@@ -817,8 +816,16 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
 }
 
-#pragma mark Emit Custom Message
+- (void)readBulletin:(PLVTextInputView *)inputView{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(readBulletin:)]) {
+        [self.delegate readBulletin:self];
+    }
+    if (self.chatInputView) {
+        [self.chatInputView tapAction];
+    }
+}
 
+#pragma mark Emit Custom Message
 - (void)emitCustomEvent:(NSString *)event emitMode:(int)emitMode data:(NSDictionary *)data tip:(NSString *)tip {
     // 生成本地自定义消息数据
     NSDictionary * customMessage = @{@"EVENT":event, @"version":@(1), @"data":data};

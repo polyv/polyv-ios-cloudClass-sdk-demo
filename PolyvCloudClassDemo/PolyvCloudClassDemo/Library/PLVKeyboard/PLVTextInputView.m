@@ -136,29 +136,13 @@
 @property (nonatomic, assign) CGRect faceOriginRect;
 @property (nonatomic, strong) PLVKeyboardMoreView *moreView;
 @property (nonatomic, assign) CGRect moreOriginRect;
-@property (nonatomic, strong) UITapGestureRecognizer *tap;
+@property (nonatomic, strong) UIView *tapView;
+@property (nonatomic, weak) UIView *originSuperView;
+@property (nonatomic, assign) CGFloat originY;
 
 @end
 
 @implementation PLVTextInputView
-
-- (PLVFaceView *)faceView {
-    if (!_faceView) {
-        _faceView = [[PLVFaceView alloc] initWithFrame:self.faceOriginRect];
-        _faceView.delegate = self;
-        [self.superview addSubview:_faceView];
-    }
-    return _faceView;
-}
-
-- (PLVKeyboardMoreView *)moreView {
-    if (!_moreView) {
-        _moreView = [[PLVKeyboardMoreView alloc] initWithFrame:self.moreOriginRect];
-        _moreView.delegate = self;
-        [self.superview addSubview:_moreView];
-    }
-    return _moreView;
-}
 
 #pragma mark - life cycle
 - (void)dealloc {
@@ -168,8 +152,12 @@
 #pragma mark - public
 - (void)loadViews:(PLVTextInputViewType)type enableMore:(BOOL)enableMore {
     if (self.textView == nil) {
+        self.originSuperView = self.superview;
+        self.originY = self.frame.origin.y;
         self.backgroundColor = [UIColor colorWithRed:245.0 / 255.0 green:245.0 / 255.0 blue:247.0 / 255.0 alpha:1.0];
-        self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
+        self.tapView = [[UIView alloc] initWithFrame:self.tapSuperView.bounds];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
+        [self.tapView addGestureRecognizer:tap];
         
         CGRect rect = CGRectMake(48.0, 6.5, self.bounds.size.width - 96.0, 37.0);
         if (type == PLVTextInputViewTypePrivate) {
@@ -179,7 +167,7 @@
         self.textView.delegate = self;
         self.textView.backgroundColor = [UIColor whiteColor];
         self.textView.returnKeyType = UIReturnKeySend;
-        self.textView.scrollEnabled = NO;
+        self.textView.scrollEnabled = YES;
         self.textView.showsHorizontalScrollIndicator = NO;
         UIEdgeInsets oldTextContainerInset = self.textView.textContainerInset;
         oldTextContainerInset.right = 24.0;
@@ -230,8 +218,12 @@
             faceHeight += 55.0;
             moreHeight += 55.0;
         }
-        self.faceOriginRect = CGRectMake(0.0, self.frame.origin.y + self.frame.size.height, self.bounds.size.width, faceHeight);
-        self.moreOriginRect = CGRectMake(0.0, self.frame.origin.y + self.frame.size.height, self.bounds.size.width, moreHeight);
+        self.faceOriginRect = CGRectMake(0.0, self.tapSuperView.frame.origin.y + self.tapSuperView.frame.size.height, self.bounds.size.width, faceHeight);
+        self.faceView = [[PLVFaceView alloc] initWithFrame:self.faceOriginRect];
+        self.faceView.delegate = self;
+        self.moreOriginRect = CGRectMake(0.0, self.tapSuperView.frame.origin.y + self.tapSuperView.frame.size.height, self.bounds.size.width, moreHeight);
+        self.moreView = [[PLVKeyboardMoreView alloc] initWithFrame:self.moreOriginRect];
+        self.moreView.delegate = self;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -247,11 +239,11 @@
 - (void)tapAction {
     if (self.inputState != PLVTextInputViewStateNormal) {
         self.inputState = PLVTextInputViewStateNormal;
-        [self.superview removeGestureRecognizer:self.tap];
+        [self.tapView removeFromSuperview];
         self.textView.inputView = nil;
         self.emojiBtn.selected = NO;
         self.moreBtn.selected = NO;
-        [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
+        [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3)} flag:NO];
         [self endEditing:YES];
     }
 }
@@ -287,13 +279,12 @@
         self.moreBtn.selected = NO;
         if(self.emojiBtn.selected) {
             self.inputState = PLVTextInputViewStateEmoji;
-            [self.superview addGestureRecognizer:self.tap];
             self.textView.inputView = [[UIView alloc] initWithFrame:CGRectZero];
             [self.textView reloadInputViews];
             if (self.textView.isFirstResponder) {
                 [self.textView resignFirstResponder];
             }
-            [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
+            [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3)} flag:NO];
             [self.textView becomeFirstResponder];
         } else {
             self.inputState = PLVTextInputViewStateSystem;
@@ -315,7 +306,6 @@
 - (void)moreAction:(UIButton *)sender {
     if ([self textInputViewShouldBeginEditing]) {
         self.inputState = PLVTextInputViewStateMore;
-        [self.superview addGestureRecognizer:self.tap];
         self.moreBtn.selected = YES;
         [self.textView resignFirstResponder];
         if (self.textView.isFirstResponder && !self.emojiBtn.selected) {
@@ -323,7 +313,7 @@
         } else {
             self.emojiBtn.selected = NO;
             self.textView.inputView = nil;
-            [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3), UIKeyboardAnimationCurveUserInfoKey : @(UIViewAnimationOptionCurveEaseInOut)} flag:NO];
+            [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3)} flag:NO];
         }
         [self placeholderTextView];
     }
@@ -363,51 +353,65 @@
     }];
 }
 
-- (void)followKeyboardAnimation:(BOOL)flag {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textInputView:followKeyboardAnimation:)]) {
-        [self.delegate textInputView:self followKeyboardAnimation:flag];
-    }
-}
-
 - (void)followKeyboardAnimation:(NSDictionary *)userInfo flag:(BOOL)flag {
     __weak typeof(self) weakSelf = self;
-    NSTimeInterval duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    duration = duration < 0.3 ? 0.3 : duration;
-    [UIView animateWithDuration:duration delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        [weakSelf followKeyboardAnimation:flag ? flag : (weakSelf.emojiBtn.selected || weakSelf.moreBtn.selected)];
-        
-        CGRect rect = weakSelf.frame;
-        CGRect faceRect = weakSelf.faceView.frame;
-        CGRect moreRect = weakSelf.moreView.frame;
-        if (flag) {
-            CGRect keyBoardFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
-            CGRect covertRect = [[UIApplication sharedApplication].delegate.window convertRect:keyBoardFrame toView:weakSelf.superview];
-            rect.origin.y = covertRect.origin.y - rect.size.height + weakSelf.bottomHeight;
-            faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
-            moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
-        } else {
-            if (weakSelf.emojiBtn.selected) {
-                [weakSelf.superview addSubview:weakSelf.faceView];
-                faceRect.origin.y = weakSelf.faceOriginRect.origin.y - faceRect.size.height + 100.0;
-                moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
-                rect.origin.y = faceRect.origin.y - rect.size.height + weakSelf.bottomHeight;
-            } else if (weakSelf.moreBtn.selected) {
-                [weakSelf.superview addSubview:weakSelf.moreView];
-                faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
-                moreRect.origin.y = weakSelf.moreOriginRect.origin.y - moreRect.size.height + 100.0;
-                rect.origin.y = moreRect.origin.y - rect.size.height + weakSelf.bottomHeight;
-            } else {
-                faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
-                moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
-                rect.origin.y = faceRect.origin.y - rect.size.height;
-            }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSTimeInterval duration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] - 0.001;
+        duration = duration < 0.3 ? 0.3 : duration;
+        BOOL up = flag ? flag : (weakSelf.emojiBtn.selected || weakSelf.moreBtn.selected);
+        if (up && weakSelf.superview == weakSelf.originSuperView) {
+            [weakSelf.tapSuperView addSubview:weakSelf.tapView];
+            CGRect baseRect = weakSelf.frame;
+            baseRect = [weakSelf.originSuperView convertRect:baseRect toView:weakSelf.tapSuperView];
+            weakSelf.frame = baseRect;
+            [weakSelf.tapSuperView addSubview:weakSelf];
         }
         
-        weakSelf.frame = rect;
-        weakSelf.faceView.frame = faceRect;
-        weakSelf.moreView.frame = moreRect;
-        [weakSelf layoutIfNeeded];
-    } completion:nil];
+        [UIView animateWithDuration:duration delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(textInputView:followKeyboardAnimation:)]) {
+                [weakSelf.delegate textInputView:weakSelf followKeyboardAnimation:up];
+            }
+            
+            CGRect rect = weakSelf.frame;
+            if (flag) {
+                CGRect keyBoardFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+                CGRect covertRect = [[UIApplication sharedApplication].delegate.window convertRect:keyBoardFrame toView:weakSelf.tapSuperView];
+                rect.origin.y = covertRect.origin.y - rect.size.height + weakSelf.bottomHeight;
+            } else {
+                [weakSelf.tapSuperView addSubview:weakSelf.faceView];
+                [weakSelf.tapSuperView addSubview:weakSelf.moreView];
+                CGRect faceRect = weakSelf.faceView.frame;
+                CGRect moreRect = weakSelf.moreView.frame;
+                if (weakSelf.emojiBtn.selected) {
+                    faceRect.origin.y = weakSelf.faceOriginRect.origin.y - faceRect.size.height;
+                    moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
+                    rect.origin.y = faceRect.origin.y - rect.size.height + weakSelf.bottomHeight;
+                } else if (weakSelf.moreBtn.selected) {
+                    faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
+                    moreRect.origin.y = weakSelf.moreOriginRect.origin.y - moreRect.size.height;
+                    rect.origin.y = moreRect.origin.y - rect.size.height + weakSelf.bottomHeight;
+                } else {
+                    faceRect.origin.y = weakSelf.faceOriginRect.origin.y;
+                    moreRect.origin.y = weakSelf.moreOriginRect.origin.y;
+                    rect.origin.y = weakSelf.tapSuperView.frame.origin.y + weakSelf.tapSuperView.frame.size.height - rect.size.height;
+                }
+                weakSelf.faceView.frame = faceRect;
+                weakSelf.moreView.frame = moreRect;
+            }
+            
+            weakSelf.frame = rect;
+            [weakSelf layoutIfNeeded];
+        } completion:^(BOOL finished) {
+            if (!up) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    CGRect baseRect = weakSelf.frame;
+                    baseRect.origin.y = weakSelf.originY;
+                    weakSelf.frame = baseRect;
+                    [weakSelf.originSuperView addSubview:weakSelf];
+                });
+            }
+        }];
+    });
 }
 
 - (void)checkSendBtnEnable:(BOOL)enable {
@@ -445,7 +449,6 @@
     self.inputState = PLVTextInputViewStateSystem;
     //TODO：中文键盘或第三方键盘第一次弹出时会收到两至三次弹出事件通知，现无法区分这种情况，会导致动画效果不连续流畅，暂无解决方案
     if (self.textView.isFirstResponder && !self.emojiBtn.selected && !self.moreBtn.selected) {
-        [self.superview addGestureRecognizer:self.tap];
         [self followKeyboardAnimation:notification.userInfo flag:YES];
     }
 }
@@ -501,7 +504,7 @@
 - (void)textViewDidChange:(UITextView *)textView {
     [self checkSendBtnEnable:self.textView.attributedText.length > 0];
     CGFloat height = ceilf([self.textView sizeThatFits:self.textView.frame.size].height);
-    if (self.lastTextViewHeight != height) {
+    if (height <= 90.0 && self.lastTextViewHeight != height) {
         self.lastTextViewHeight = height;
         __weak typeof(self) weakSelf = self;
         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -560,4 +563,11 @@
         [self.delegate shoot:self];
     }
 }
+
+- (void)readBulletin:(PLVKeyboardMoreView *)moreView{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(readBulletin:)]) {
+        [self.delegate readBulletin:self];
+    }
+}
+
 @end

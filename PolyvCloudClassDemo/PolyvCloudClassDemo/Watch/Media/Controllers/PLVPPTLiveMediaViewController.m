@@ -23,6 +23,7 @@
 @synthesize userId;
 @synthesize linkMicVC;
 @synthesize danmuLayer;
+@synthesize danmuInputView;
 @synthesize reOpening;
 @synthesize player;
 @synthesize pptVC;
@@ -69,8 +70,12 @@
 
 - (void)secondaryViewFollowKeyboardAnimation:(BOOL)flag {
     if (flag) {
+        CGFloat safeAreaY = 20.0;
+        if (@available(iOS 11.0, *)) {
+            safeAreaY = self.view.superview.safeAreaLayoutGuide.layoutFrame.origin.y;
+        }
         CGRect secondaryRect = self.secondaryView.frame;
-        secondaryRect = CGRectMake(self.view.frame.size.width - secondaryRect.size.width, self.view.frame.origin.y + self.view.frame.size.height - secondaryRect.size.height, secondaryRect.size.width, secondaryRect.size.height);
+        secondaryRect = CGRectMake(self.view.frame.size.width - secondaryRect.size.width, safeAreaY, secondaryRect.size.width, secondaryRect.size.height);
         self.secondaryView.frame = secondaryRect;
     } else {
         self.secondaryView.frame = self.originSecondaryFrame;
@@ -82,8 +87,8 @@
 }
 
 #pragma mark - PLVBaseMediaViewController
-- (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
-    [self dealDeviceOrientationDidChangeSubAnimation:rotationTransform];
+- (void)deviceOrientationDidChangeSubAnimation {
+    [self dealDeviceOrientationDidChangeSubAnimation];
     
     if (self.skinView.fullscreen) {
         [self.view insertSubview:self.linkMicVC.view belowSubview:self.skinView];
@@ -94,9 +99,10 @@
             rect.size.width -= rect.origin.x * 2.0;
         }
         self.linkMicVC.view.frame = rect;
+        self.danmuInputView.frame = self.view.bounds;
     } else {
         self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-        [self.view.superview insertSubview:self.linkMicVC.view belowSubview:self.view];
+        [self.view.superview insertSubview:self.linkMicVC.view aboveSubview:self.view];
     }
 }
 
@@ -153,6 +159,9 @@
     }
     ((PLVLivePlayerController*)self.player).linkMic = YES;
     [self.player clearAllPlayer];
+    
+    [self.moreView showAudioModeBtn:NO];
+    [self.skinView linkMicStart:YES];
 }
 
 - (void)cancelLinkMic {
@@ -165,6 +174,10 @@
     self.secondaryView.alpha = 1.0;
     ((PLVLivePlayerController*)self.player).linkMic = NO;
     [self reOpenPlayer:nil showHud:NO];
+    
+    BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
+    [self.moreView showAudioModeBtn:showAudioModeSwitch];
+    [self.skinView linkMicStart:NO];
 }
 
 #pragma mark - PLVLivePlayerControllerDelegate
@@ -184,6 +197,7 @@
 }
 
 - (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
+    self.enableDanmuModule = !channel.closeDanmuEnable;
     [self setupMarquee:channel customNick:self.nickName];
 }
 

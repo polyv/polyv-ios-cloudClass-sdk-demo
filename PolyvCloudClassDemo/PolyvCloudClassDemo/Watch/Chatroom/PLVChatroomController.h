@@ -47,6 +47,9 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 回调HUD消息
 - (void)chatroom:(PLVChatroomController *)chatroom showMessage:(NSString *)message;
 
+/// 查看公告
+- (void)readBulletin:(PLVChatroomController *)chatroom;
+
 @end
 
 @interface PLVChatroomController : UIViewController
@@ -103,7 +106,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /**
  加载子视图
  */
-- (void)loadSubViews;
+- (void)loadSubViews:(UIView *)tapSuperView;
 
 /**
  准备退出时，必须清空定时器资源
@@ -129,6 +132,13 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
  @param mine 自己消息类型
  */
 - (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine;
+
+/**
+ 发送一条自己文字评论
+ 
+ @param text 自己文本消息
+ */
+- (void)sendTextMessage:(NSString *)text;
 
 #pragma mark - chatInputView
 

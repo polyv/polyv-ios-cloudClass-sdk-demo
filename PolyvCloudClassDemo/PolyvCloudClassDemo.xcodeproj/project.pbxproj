@@ -33,8 +33,6 @@
 		22142F622113094200062C6E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22142F612113094200062C6E /* main.m */; };
 		221AD3CF211A86C3000A423A /* PLVLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221AD3CB211A86C3000A423A /* PLVLoginViewController.m */; };
 		221AD3D0211A86C3000A423A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 221AD3CC211A86C3000A423A /* Main.storyboard */; };
-		2269199321D1CCE9004D6F8B /* MBProgressHUD+Rotate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2269199121D1CCE9004D6F8B /* MBProgressHUD+Rotate.m */; };
-		2293618821CCC64E00722B05 /* UIAlertController+UnRotate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293618721CCC64E00722B05 /* UIAlertController+UnRotate.m */; };
 		229F766921ABA1600085F5DE /* PLVLiveViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F761C21ABA1600085F5DE /* PLVLiveViewController.m */; };
 		229F766A21ABA1600085F5DE /* PLVChatroomController.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F761E21ABA1600085F5DE /* PLVChatroomController.m */; };
 		229F766B21ABA1600085F5DE /* PLVChatroomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F762221ABA1600085F5DE /* PLVChatroomModel.m */; };
@@ -105,6 +103,12 @@
 		22D9ABD121B676FB003DFD42 /* plv_shoot_close@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22D9ABCD21B676FB003DFD42 /* plv_shoot_close@3x.png */; };
 		22FB810B212AB55100B5CB53 /* ZJZDanMu.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FB80E9212AB55100B5CB53 /* ZJZDanMu.m */; };
 		22FB810C212AB55100B5CB53 /* ZJZDanMuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FB80EB212AB55100B5CB53 /* ZJZDanMuLabel.m */; };
+		298A8E4722B1430D00706456 /* plv_notice@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4522B1430D00706456 /* plv_notice@3x.png */; };
+		298A8E4822B1430D00706456 /* plv_notice@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4622B1430D00706456 /* plv_notice@2x.png */; };
+		632516CA22AE101E008636C6 /* PLVPlayerInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 632516C822AE101D008636C6 /* PLVPlayerInputView.m */; };
+		63589FF122BC79A9007D4151 /* dist in Resources */ = {isa = PBXBuildFile; fileRef = 63589FF022BC79A9007D4151 /* dist */; };
+		639EC8B822AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */; };
+		63E8C8D122A64B2B00CF5129 /* PLVPlayerSkinMoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */; };
 		67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67219F48217F3B4300756A54 /* plv_btn_download@2x.png */; };
 		67219F4B217F3B4300756A54 /* plv_btn_download@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67219F49217F3B4300756A54 /* plv_btn_download@3x.png */; };
 		672D7CEF212D7B1500974886 /* FTPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D7CEA212D7B1500974886 /* FTPageController.m */; };
@@ -171,10 +175,6 @@
 		221AD3CB211A86C3000A423A /* PLVLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVLoginViewController.m; sourceTree = "<group>"; };
 		221AD3CD211A86C3000A423A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		221AD3CE211A86C3000A423A /* PLVLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVLoginViewController.h; sourceTree = "<group>"; };
-		2269199121D1CCE9004D6F8B /* MBProgressHUD+Rotate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MBProgressHUD+Rotate.m"; sourceTree = "<group>"; };
-		2269199221D1CCE9004D6F8B /* MBProgressHUD+Rotate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MBProgressHUD+Rotate.h"; sourceTree = "<group>"; };
-		2293618621CCC64E00722B05 /* UIAlertController+UnRotate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIAlertController+UnRotate.h"; sourceTree = "<group>"; };
-		2293618721CCC64E00722B05 /* UIAlertController+UnRotate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIAlertController+UnRotate.m"; sourceTree = "<group>"; };
 		229F761B21ABA1600085F5DE /* PLVVodViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVVodViewController.h; sourceTree = "<group>"; };
 		229F761C21ABA1600085F5DE /* PLVLiveViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVLiveViewController.m; sourceTree = "<group>"; };
 		229F761E21ABA1600085F5DE /* PLVChatroomController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomController.m; sourceTree = "<group>"; };
@@ -282,6 +282,15 @@
 		22FB80EA212AB55100B5CB53 /* ZJZDanMuLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMuLabel.h; sourceTree = "<group>"; };
 		22FB80EB212AB55100B5CB53 /* ZJZDanMuLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZJZDanMuLabel.m; sourceTree = "<group>"; };
 		22FB80EC212AB55100B5CB53 /* ZJZDanMu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMu.h; sourceTree = "<group>"; };
+		298A8E4522B1430D00706456 /* plv_notice@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@3x.png"; sourceTree = "<group>"; };
+		298A8E4622B1430D00706456 /* plv_notice@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@2x.png"; sourceTree = "<group>"; };
+		632516C822AE101D008636C6 /* PLVPlayerInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerInputView.m; sourceTree = "<group>"; };
+		632516C922AE101D008636C6 /* PLVPlayerInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVPlayerInputView.h; sourceTree = "<group>"; };
+		63589FF022BC79A9007D4151 /* dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = dist; sourceTree = "<group>"; };
+		639EC8B622AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinAudioModeView.h; sourceTree = "<group>"; };
+		639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinAudioModeView.m; sourceTree = "<group>"; };
+		63E8C8CF22A64B2B00CF5129 /* PLVPlayerSkinMoreView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinMoreView.h; sourceTree = "<group>"; };
+		63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinMoreView.m; sourceTree = "<group>"; };
 		67219F48217F3B4300756A54 /* plv_btn_download@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@2x.png"; sourceTree = "<group>"; };
 		67219F49217F3B4300756A54 /* plv_btn_download@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@3x.png"; sourceTree = "<group>"; };
 		672D7CE9212D7B1500974886 /* FTPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTPageController.h; sourceTree = "<group>"; };
@@ -372,6 +381,8 @@
 		220CB17921B8C95B0034C384 /* skin */ = {
 			isa = PBXGroup;
 			children = (
+				298A8E4622B1430D00706456 /* plv_notice@2x.png */,
+				298A8E4522B1430D00706456 /* plv_notice@3x.png */,
 				673631EF21BF5FF2006868DE /* plv_emoji_off@2x.png */,
 				673631F021BF5FF2006868DE /* plv_emoji_off@3x.png */,
 				673631F221BF5FF3006868DE /* plv_emoji_on@2x.png */,
@@ -445,6 +456,7 @@
 		229F761A21ABA1600085F5DE /* Watch */ = {
 			isa = PBXGroup;
 			children = (
+				63589FF022BC79A9007D4151 /* dist */,
 				229F761D21ABA1600085F5DE /* Chatroom */,
 				229F764621ABA1600085F5DE /* Media */,
 				229F764521ABA1600085F5DE /* PLVLiveViewController.h */,
@@ -574,6 +586,12 @@
 				229F766821ABA1600085F5DE /* PLVMediaSecondaryView.m */,
 				229F766621ABA1600085F5DE /* PLVPlayerSkinView.h */,
 				229F766321ABA1600085F5DE /* PLVPlayerSkinView.m */,
+				63E8C8CF22A64B2B00CF5129 /* PLVPlayerSkinMoreView.h */,
+				63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */,
+				632516C922AE101D008636C6 /* PLVPlayerInputView.h */,
+				632516C822AE101D008636C6 /* PLVPlayerInputView.m */,
+				639EC8B622AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.h */,
+				639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -766,7 +784,6 @@
 		6740D64421364A440076AF7D /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				6749417C21D0D2F400EEF5BB /* Category */,
 				6740D64621364C010076AF7D /* PCCUtils.h */,
 				6740D64521364C010076AF7D /* PCCUtils.m */,
 			);
@@ -798,17 +815,6 @@
 				6740D66B2136A42D0076AF7D /* MarqueeLabel.h */,
 			);
 			path = ObjC;
-			sourceTree = "<group>";
-		};
-		6749417C21D0D2F400EEF5BB /* Category */ = {
-			isa = PBXGroup;
-			children = (
-				2293618621CCC64E00722B05 /* UIAlertController+UnRotate.h */,
-				2293618721CCC64E00722B05 /* UIAlertController+UnRotate.m */,
-				2269199221D1CCE9004D6F8B /* MBProgressHUD+Rotate.h */,
-				2269199121D1CCE9004D6F8B /* MBProgressHUD+Rotate.m */,
-			);
-			path = Category;
 			sourceTree = "<group>";
 		};
 		6761E9ED2180169E0026E8A6 /* PLVPhotoBrowser */ = {
@@ -940,6 +946,7 @@
 				220CB1A221B8C95B0034C384 /* Emotion.bundle in Resources */,
 				229F768021ABA1600085F5DE /* plv_skin_player_background@3x.png in Resources */,
 				22D9ABC221B66E34003DFD42 /* cancel@2x.png in Resources */,
+				298A8E4722B1430D00706456 /* plv_notice@3x.png in Resources */,
 				220CB19B21B8C95B0034C384 /* plv_btn_like@2x.png in Resources */,
 				677B4C8621F1BDF300E98E86 /* plv_kou1_img@3x.png in Resources */,
 				22B27D72219BC5F8003550EA /* plv_logo@3x.png in Resources */,
@@ -969,7 +976,9 @@
 				220CB19821B8C95B0034C384 /* plv_input_user_select@2x.png in Resources */,
 				673631EE21BF5D41006868DE /* plv_input_user_select@3x.png in Resources */,
 				22B27D71219BC5F8003550EA /* plv_clear@3x.png in Resources */,
+				298A8E4822B1430D00706456 /* plv_notice@2x.png in Resources */,
 				67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */,
+				63589FF122BC79A9007D4151 /* dist in Resources */,
 				229F766D21ABA1600085F5DE /* plv_skin_flower@3x.png in Resources */,
 				672D7CF1212D7B1500974886 /* FTTitleViewCell.xib in Resources */,
 				22D9ABC621B66E34003DFD42 /* plv_btn_shoot@2x.png in Resources */,
@@ -1050,7 +1059,6 @@
 				229F768921ABA1600085F5DE /* PLVPPTVodMediaViewController.m in Sources */,
 				22CE3D0821AD4C57002B1CFB /* PLVBaseMediaViewController+PPT.m in Sources */,
 				22B906FD21F56F400086D05A /* PLVChatroomCustomKouCell.m in Sources */,
-				2269199321D1CCE9004D6F8B /* MBProgressHUD+Rotate.m in Sources */,
 				22D9ABBB21B66E34003DFD42 /* ZPhotoPreViewController.m in Sources */,
 				672D7CEF212D7B1500974886 /* FTPageController.m in Sources */,
 				22D9ABBA21B66E34003DFD42 /* ZAlbumsViewController.m in Sources */,
@@ -1062,6 +1070,7 @@
 				22D9ABBC21B66E34003DFD42 /* ZPreCollectionViewCell.m in Sources */,
 				677B4C8121F183C300E98E86 /* PLVChatroomCustomKouModel.m in Sources */,
 				229F769021ABA1600085F5DE /* PLVBrightnessView.m in Sources */,
+				639EC8B822AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m in Sources */,
 				22D9ABBE21B66E34003DFD42 /* ZPhotoCollectionFooterView.m in Sources */,
 				220CB18F21B8C95B0034C384 /* PLVFacialView.m in Sources */,
 				229F768F21ABA1600085F5DE /* PLVPlayerSkinView.m in Sources */,
@@ -1084,9 +1093,10 @@
 				22D9ABB521B66E34003DFD42 /* ZImageInfo.m in Sources */,
 				229F767021ABA1600085F5DE /* PLVChatroomCell.m in Sources */,
 				22FB810B212AB55100B5CB53 /* ZJZDanMu.m in Sources */,
+				632516CA22AE101E008636C6 /* PLVPlayerInputView.m in Sources */,
 				22CE3D0921AD4C57002B1CFB /* PLVBaseMediaViewController+Live.m in Sources */,
 				221AD3CF211A86C3000A423A /* PLVLoginViewController.m in Sources */,
-				2293618821CCC64E00722B05 /* UIAlertController+UnRotate.m in Sources */,
+				63E8C8D122A64B2B00CF5129 /* PLVPlayerSkinMoreView.m in Sources */,
 				229F766A21ABA1600085F5DE /* PLVChatroomController.m in Sources */,
 				229F766B21ABA1600085F5DE /* PLVChatroomModel.m in Sources */,
 				220CB18E21B8C95B0034C384 /* PLVFaceView.m in Sources */,

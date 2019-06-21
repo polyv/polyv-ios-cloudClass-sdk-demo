@@ -22,6 +22,7 @@
 @synthesize userId;
 @synthesize linkMicVC;
 @synthesize danmuLayer;
+@synthesize danmuInputView;
 @synthesize reOpening;
 @synthesize player;
 
@@ -35,20 +36,34 @@
 }
 
 #pragma mark - PLVBaseMediaViewController
-- (void)deviceOrientationDidChangeSubAnimation:(CGAffineTransform)rotationTransform {
+- (void)deviceOrientationDidChangeSubAnimation {
     UIView *displayView = self.mainView;
     [self.player setFrame:displayView.bounds];
+    
+    if (self.skinView.fullscreen) {
+        self.danmuInputView.frame = self.view.bounds;
+        self.linkMicVC.view.alpha = 0;
+    }else{
+        self.linkMicVC.view.alpha = 1;
+    }
 }
 
 #pragma mark - PLVLiveMediaProtocol
 - (void)linkMicSuccess {
     [((PLVLivePlayerController*)self.player) mute];
+    
+    [self.moreView showAudioModeBtn:NO];
+    [self.skinView linkMicStart:YES];
 }
 
 - (void)cancelLinkMic {
     self.skinView.switchCameraBtn.hidden = YES;
     [((PLVLivePlayerController*)self.player) cancelMute];
     [self reOpenPlayer:nil showHud:NO];
+    
+    BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
+    [self.moreView showAudioModeBtn:showAudioModeSwitch];
+    [self.skinView linkMicStart:NO];
 }
 
 #pragma mark - PLVPlayerControllerDelegate
@@ -56,21 +71,18 @@
     self.skinView.controllView.hidden = YES;
 }
 
-- (void)playerController:(PLVPlayerController *)playerController showMessage:(NSString *)message {
-    [self.skinView showMessage:message];
-}
-
 - (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
+    [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
 }
 
 - (void)changePlayerScreenBackgroundColor:(PLVPlayerController *)playerController {
-    self.mainView.backgroundColor = playerController.playable ? [UIColor blackColor] : BlueBackgroundColor;
-}
-
-- (BOOL)onSafeArea:(PLVPlayerController *)playerController {
-    return !self.skinView.fullscreen;
+    self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : GrayBackgroundColor;
+    
+    BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
+    [self.moreView showAudioModeBtn:showAudioModeSwitch];
+    [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
 }
 
 #pragma mark - PLVLivePlayerControllerDelegate
@@ -85,6 +97,7 @@
 }
 
 - (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
+    self.enableDanmuModule = !channel.closeDanmuEnable;
     [self setupMarquee:channel customNick:self.nickName];
 }
 

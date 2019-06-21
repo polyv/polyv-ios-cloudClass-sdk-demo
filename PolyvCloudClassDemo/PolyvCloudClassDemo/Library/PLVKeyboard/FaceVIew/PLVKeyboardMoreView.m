@@ -78,7 +78,7 @@
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView*)collectionView {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)collectionView:(UICollectionView*)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -97,6 +97,10 @@
         [cell.moreBtn setImage:[UIImage imageNamed:@"plv_shoot.png"] forState:UIControlStateNormal];
         [cell.moreBtn setTitle:@"拍摄" forState:UIControlStateNormal];
         [cell.moreBtn addTarget:self action:@selector(shoot:) forControlEvents:UIControlEventTouchUpInside];
+    }else if (index == 2) {
+        [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
+        [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
+        [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     [cell changeTitleStyle];
@@ -116,6 +120,12 @@
     }
 }
 
+- (IBAction)readBulletin:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(readBulletin:)]) {
+        [self.delegate readBulletin:self];
+    }
+}
+
 #pragma mark - UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
     CGSize size = CGSizeMake(0.0, self.collectionView.bounds.size.height);
@@ -127,7 +137,7 @@
 
 - (CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
     CGSize size = CGSizeMake(0.0, self.collectionView.bounds.size.height);
-    if (section == 1) {
+    if (section == 2) {
         size = CGSizeMake(self.flowLayout.sectionInset.right, self.collectionView.bounds.size.height);
     }
     return size;

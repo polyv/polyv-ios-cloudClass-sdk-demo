@@ -258,6 +258,13 @@
     self.height = newSize.height + 33; //10+18+5
 }
 
+- (void)setSpeakContentColor:(UIColor *)speakContentColor{
+    _speakContentColor = speakContentColor;
+    if (speakContentColor) {
+        _messageLB.textColor = speakContentColor;
+    }
+}
+
 - (void)setActorTextColor:(UIColor *)actorTextColor {
     _actorTextColor = actorTextColor;
     if (actorTextColor) {

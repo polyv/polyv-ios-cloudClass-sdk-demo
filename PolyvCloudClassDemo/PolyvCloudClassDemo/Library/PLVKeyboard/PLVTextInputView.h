@@ -37,6 +37,8 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewState) {
 
 @property (nonatomic, weak) id<PLVTextInputViewDelegate> delegate;
 
+@property (nonatomic, weak) UIView *tapSuperView;
+
 /// 键盘状态
 @property (nonatomic, assign) PLVTextInputViewState inputState;
 
@@ -74,5 +76,6 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewState) {
 - (void)textInputView:(PLVTextInputView *)inputView onlyTeacher:(BOOL)on;
 - (void)openAlbum:(PLVTextInputView *)inputView;
 - (void)shoot:(PLVTextInputView *)inputView;
+- (void)readBulletin:(PLVTextInputView *)inputView;
 
 @end

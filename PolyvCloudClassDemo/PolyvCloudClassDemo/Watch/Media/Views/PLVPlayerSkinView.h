@@ -29,8 +29,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 @property (nonatomic, weak) id<PLVPlayerSkinViewDelegate> delegate;
 /// 皮肤类型
 @property (nonatomic, assign) PLVPlayerSkinViewType type;
-/// 码率列表
-@property (nonatomic, strong) NSMutableArray<NSString *> *codeRateItems;
 /// 是否全屏
 @property (nonatomic, assign) BOOL fullscreen;
 /// 回放视频时长
@@ -39,6 +37,10 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 @property (nonatomic, strong, readonly) UIView *controllView;
 /// 连麦按钮
 @property (nonatomic, strong, readonly) UIButton *linkMicBtn;
+/// 弹幕按钮
+@property (nonatomic, strong, readonly) UIButton *danmuBtn;
+/// 用户是否点击按钮开启弹幕 0未决定 1开启 -1关闭
+@property (nonatomic, assign, readonly) NSInteger openDanmuByUser;
 /// 只有自己的连麦窗口切换到主屏, 才显示切换前后置摄像头的按钮
 @property (nonatomic, strong) UIButton *switchCameraBtn;
 
@@ -52,14 +54,20 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 /// 更新切换主副窗口的按钮状态
 - (void)modifySwitchScreenBtnState:(BOOL)secondaryViewClosed pptOnSecondaryView:(BOOL)pptOnSecondaryView;
 
-/// 切换码率
-- (void)switchCodeRate:(NSString *)codeRate;
-
 /// 更新连麦按钮状态
 - (void)linkMicStatus:(BOOL)select;
 
 /// 显示播放器的回调信息
 - (void)showMessage:(NSString *)message;
+
+/// 显示/隐藏弹幕按钮
+- (void)showDanmuBtn:(BOOL)show;
+
+/// 显示/隐藏弹幕输入按钮
+- (void)showDanmuInputBtn:(BOOL)show;
+
+/// 连麦开始/结束，适配当前连麦状态
+- (void)linkMicStart:(BOOL)start;
 
 #pragma mark - 点播独有方法
 /// 更新点播的进度条
@@ -93,12 +101,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 ///退出
 - (void)quit:(PLVPlayerSkinView *)skinView;
 
-/// 速率
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView speed:(CGFloat)speed;
-
-/// 码率
-- (void)playerSkinView:(PLVPlayerSkinView *)skinView codeRate:(NSString *)codeRate;
-
 /// 连麦
 - (void)linkMic:(PLVPlayerSkinView *)skinView;
 
@@ -110,5 +112,11 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 
 /// 主副屏幕切换
 - (void)switchScreenOnManualControl:(PLVPlayerSkinView *)skinView;
+
+/// 更多
+- (void)more:(PLVPlayerSkinView *)skinView;
+
+/// 发弹幕
+- (void)showInput:(PLVPlayerSkinView *)skinView;
 
 @end

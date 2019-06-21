@@ -50,28 +50,28 @@
     
     CGFloat h = self.view.bounds.size.width * (self.vodType == PLVVodViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale) + [UIApplication sharedApplication].statusBarFrame.size.height;
     self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
+    self.mediaVC.originFrame = self.mediaVC.view.frame;
     [self.view addSubview:self.mediaVC.view];
     if (self.vodType == PLVVodViewControllerTypeCloudClass) {
         CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
         [(PLVPPTVodMediaViewController *)self.mediaVC loadSecondaryView:CGRectMake(self.view.frame.size.width - w, h, w, (int)(w * PPTPlayerViewScale))];
     }
+    self.mediaVC.player.pauseInBackground = YES; // 默认回后台暂停
     
-    //[self playerPolling];
+//    [self playerPolling];
 }
 
 - (void)playerPolling {
     if (@available(iOS 10.0, *)) {
         self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSLog(@"观看时长：%ld，停留时长：%ld",
-                  self.mediaVC.player.watchDuration,
-                  self.mediaVC.player.stayDuration);
+            NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
         }];
     }
 }
 
 #pragma mark - view controls
-- (BOOL)shouldAutorotate {//设备方向旋转，横竖屏切换，但UIViewController不需要旋转，在播放器的父类里自己实现旋转的动画效果
-    return NO;
+- (BOOL)shouldAutorotate {
+    return self.mediaVC != nil && self.mediaVC.canAutorotate;
 }
 
 - (BOOL)prefersStatusBarHidden {

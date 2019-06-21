@@ -73,6 +73,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 @property (nonatomic, strong) NSString *nickName;
 /// 发言者的发言内容
 @property (nonatomic, strong) NSString *speakContent;
+/// 发言者的发言内容字体颜色
+@property (nonatomic, strong) UIColor *speakContentColor;
 /// 头衔字体颜色
 @property (nonatomic, strong) UIColor *actorTextColor;
 /// 头衔背景颜色
