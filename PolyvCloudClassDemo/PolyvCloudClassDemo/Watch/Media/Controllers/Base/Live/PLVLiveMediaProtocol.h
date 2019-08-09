@@ -28,6 +28,16 @@
 @property (nonatomic, strong) PLVPlayerInputView *danmuInputView;
 /// 正在加载channelJSON
 @property (nonatomic, assign) BOOL reOpening;
+/// 倒计时器的父View
+@property (nonatomic, strong) UIView *countdownTimeView;
+/// 倒计时器
+@property (nonatomic, strong) UILabel *countdownTimeLabel;
+/// 倒计时相关定时器
+@property (nonatomic, strong) NSTimer *countdownTimer;
+/// 倒计时间
+@property (nonatomic, strong) NSDate *startTime;
+/// 当前流状态
+@property (nonatomic, assign) PLVLiveStreamState curStreamState;
 
 @optional
 /// 显示一条弹幕，该 message 由外层的键盘输入回调 或 Sockect IM 传递进来
@@ -45,5 +55,11 @@
  @return 返回值有可能为 nil，调用层需要做判断
  */
 - (NSString *)currentChannelSessionId;
+
+/// 有外层返回的startTime时间决定是否需要加载倒计时器，显示在播放器顶部
+- (void)loadCountdownTimeLabel:(NSDate *)startTime;
+
+/// 清空倒计时的定时器
+- (void)clearCountdownTimer;
 
 @end

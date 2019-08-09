@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 
 /// 回放类型
 typedef NS_ENUM(NSInteger, PLVVodViewControllerType) {
@@ -21,5 +22,7 @@ typedef NS_ENUM(NSInteger, PLVVodViewControllerType) {
 
 /// 回放类型（1：普通直播；2：云课堂）
 @property (nonatomic, assign) PLVVodViewControllerType vodType;
+/// 聊天室相关的Tab信息
+@property (nonatomic, strong) PLVLiveVideoChannelMenuInfo *channelMenuInfo;
 
 @end

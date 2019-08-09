@@ -12,8 +12,8 @@
 
 @property (nonatomic, assign) BOOL clicked;
 
-@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (strong, nonatomic) UILabel *titleLabel;
 
-@property (weak, nonatomic) IBOutlet UIView *indicatorView;
+@property (strong, nonatomic) UIView *indicatorView;
 
 @end

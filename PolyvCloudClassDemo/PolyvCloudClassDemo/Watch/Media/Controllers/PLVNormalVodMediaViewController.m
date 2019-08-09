@@ -30,8 +30,6 @@
     [self loadSkinView:PLVPlayerSkinViewTypeNormalVod];
     self.skinView.controllView.hidden = YES;
     
-    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.mainView delegate:self];
-    
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     if (liveConfig.channelId && liveConfig.userId) {
         __weak typeof(self)weakSelf = self;
@@ -41,6 +39,8 @@
             NSLog(@"直播频道信息加载失败：%@",error);
         }];
     }
+    
+    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.mainView delegate:self];
 }
 
 #pragma mark - PLVBaseMediaViewController
@@ -64,11 +64,11 @@
 }
 
 #pragma mark - PLVPlayerControllerDelegate
-- (void)adPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)playerController:(PLVPlayerController *)playerController subPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = YES;
 }
 
-- (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
 }

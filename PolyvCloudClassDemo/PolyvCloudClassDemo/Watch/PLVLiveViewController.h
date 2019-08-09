@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 
 /// 直播类型
 typedef NS_ENUM(NSInteger, PLVLiveViewControllerType) {
@@ -23,6 +24,8 @@ typedef NS_ENUM(NSInteger, PLVLiveViewControllerType) {
 @property (nonatomic, assign) PLVLiveViewControllerType liveType;
 /// 在登录时，根据网络请求返回当前频道是否正在直播（直播中：云课堂主屏为PPT，副屏为视频流；未直播，主屏优先播放暖场广告）
 @property (nonatomic, assign) BOOL playAD;
+/// 聊天室相关的Tab信息
+@property (nonatomic, strong) PLVLiveVideoChannelMenuInfo *channelMenuInfo;
 
 /// 聊天室自定义用户昵称，不设置时默认生成
 @property (nonatomic, strong) NSString *nickName;

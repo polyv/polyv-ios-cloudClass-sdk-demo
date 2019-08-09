@@ -108,7 +108,7 @@
 }
 
 #pragma mark - PLVPlayerControllerDelegate
-- (void)adPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)playerController:(PLVPlayerController *)playerController subPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = YES;
     if (!self.pptOnSecondaryView) {//主屏切换为暖场，副屏为PPT
         [self switchAction:NO];
@@ -118,11 +118,11 @@
     }
 }
 
-- (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
 
-    if ([playerController isKindOfClass:PLVLivePlayerController.class]) {
+    if ([self.player isKindOfClass:PLVLivePlayerController.class]) {
         [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
     }
     

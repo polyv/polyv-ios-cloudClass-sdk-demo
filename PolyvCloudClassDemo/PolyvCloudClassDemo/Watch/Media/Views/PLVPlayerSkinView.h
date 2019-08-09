@@ -35,6 +35,8 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewType) {
 @property (nonatomic, assign) NSTimeInterval duration;
 /// 控制控件的父View
 @property (nonatomic, strong, readonly) UIView *controllView;
+/// 顶部的渐变背景
+@property (nonatomic, strong) UIImageView *topBgImgV;
 /// 连麦按钮
 @property (nonatomic, strong, readonly) UIButton *linkMicBtn;
 /// 弹幕按钮

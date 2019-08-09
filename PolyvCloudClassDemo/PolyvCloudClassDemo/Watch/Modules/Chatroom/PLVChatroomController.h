@@ -50,6 +50,9 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 查看公告
 - (void)readBulletin:(PLVChatroomController *)chatroom;
 
+/// 当前userId已在别处登录，确认后自动退出直播间
+- (void)reLogin:(PLVChatroomController *)chatroom;
+
 @end
 
 @interface PLVChatroomController : UIViewController
@@ -140,8 +143,10 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
  */
 - (void)sendTextMessage:(NSString *)text;
 
-#pragma mark - chatInputView
-
+/// 取消键盘的输入
 - (void)tapChatInputView;
+
+/// 在连麦时需要调整聊天室的窗口大小
+- (void)changeChatroomFrame:(CGRect)rect;
 
 @end

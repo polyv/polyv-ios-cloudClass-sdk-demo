@@ -11,7 +11,7 @@
 #import "PLVBaseMediaViewController+Vod.h"
 #import "PLVBaseMediaViewController+PPT.h"
 
-@interface PLVPPTVodMediaViewController () <PLVPlayerSkinViewDelegate, PLVPPTViewControllerDelegate, PLVPlayerSkinMoreViewDelegate>
+@interface PLVPPTVodMediaViewController () <PLVPlayerControllerDelegate, PLVPlayerSkinViewDelegate, PLVPPTViewControllerDelegate, PLVPlayerSkinMoreViewDelegate>
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
@@ -59,6 +59,11 @@
 
 - (void)switchAction:(BOOL)manualControl {
     [self dealSwitchAction:manualControl];
+}
+
+#pragma mark - PLVPlayerControllerDelegate
+- (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
+    [self mainPlaybackIsPreparedToPlay:notification];
 }
 
 #pragma mark - PLVPlayerSkinViewDelegate

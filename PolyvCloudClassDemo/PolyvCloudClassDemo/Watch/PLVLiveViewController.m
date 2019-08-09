@@ -8,7 +8,6 @@
 
 #import "PLVLiveViewController.h"
 #import "objc/runtime.h"
-#import <PolyvCloudClassSDK/PolyvCloudClassSDK.h>
 #import <PolyvBusinessSDK/PolyvBusinessSDK.h>
 #import "PLVNormalLiveMediaViewController.h"
 #import "PLVPPTLiveMediaViewController.h"
@@ -17,11 +16,10 @@
 #import "PLVChatroomController.h"
 #import "PCCUtils.h"
 #import "PLVEmojiManager.h"
+#import "PLVLiveInfoViewController.h"
 
 #define PPTPlayerViewScale (3.0 / 4.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
-#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
-#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 
 @interface PLVLiveViewController () <PLVBaseMediaViewControllerDelegate, PLVTriviaCardViewControllerDelegate,  PLVLinkMicControllerDelegate, PLVSocketIODelegate, PLVChatroomDelegate>
 
@@ -32,9 +30,13 @@
 @property (nonatomic, strong) PLVTriviaCardViewController *triviaCardVC;//答题卡控件
 @property (nonatomic, strong) PLVLinkMicController *linkMicVC;//连麦控件
 @property (nonatomic, strong) FTPageController *pageController;
-@property (nonatomic, strong) PLVChatroomController *publicChatroomController;
-@property (nonatomic, strong) PLVChatroomController *privateChatroomController;
+@property (nonatomic, strong) PLVLiveInfoViewController *liveInfoViewController;
+@property (nonatomic, strong) PLVChatroomController *publicChatroomViewController;
+@property (nonatomic, strong) PLVChatroomController *privateChatroomViewController;
+@property (nonatomic, assign) CGRect chatroomFrame;
 @property (nonatomic, assign) BOOL idleTimerDisabled;
+@property (nonatomic, assign) CGFloat mediaViewControllerHeight;
+@property (nonatomic, assign) CGSize fullSize;
 
 @property (nonatomic, strong) NSTimer *pollingTimer;
 
@@ -43,9 +45,15 @@
 @implementation PLVLiveViewController
 
 #pragma mark - life cycle
+- (void)dealloc {
+    NSLog(@"%s", __FUNCTION__);
+    [UIApplication sharedApplication].idleTimerDisabled = self.idleTimerDisabled;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
+    self.fullSize = self.view.frame.size;
     
     self.idleTimerDisabled = [UIApplication sharedApplication].idleTimerDisabled;
     [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -54,9 +62,8 @@
     
     BOOL watchPermission = [PLVChatroomController havePermissionToWatchLive:self.channelId];
     if (watchPermission) {
-        [self setupUI];
+        [self addMediaViewController];
         [self loadChannelMenuInfos];
-        [self loadChatroomInfos];
     } else {
         __weak typeof(self) weakSelf = self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -67,15 +74,10 @@
 //    [self playerPolling];
 }
 
-- (void)dealloc {
-    NSLog(@"%s", __FUNCTION__);
-    [UIApplication sharedApplication].idleTimerDisabled = self.idleTimerDisabled;
-}
-
 - (void)playerPolling {
     if (@available(iOS 10.0, *)) {
         self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
+            NSLog(@"观看时长：%ld，停留时长：%ld", (long)self.mediaVC.player.watchDuration, (long)self.mediaVC.player.stayDuration);
         }];
     }
 }
@@ -96,27 +98,17 @@
     [PLVChatroomManager sharedManager].loginUser = loginUser;
 }
 
-- (void)setupUI {
-    CGFloat mediaViewControllerHeight = self.view.bounds.size.width * (self.liveType == PLVLiveViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale);
-    mediaViewControllerHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
+- (void)addMediaViewController {
+    self.mediaViewControllerHeight = self.view.bounds.size.width * (self.liveType == PLVLiveViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale);
+    self.mediaViewControllerHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
     
-    [self setupPublicChatroom:mediaViewControllerHeight];
-    [self addMediaViewController:mediaViewControllerHeight];
-}
-
-- (void)addMediaViewController:(CGFloat)h {
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].loginUser;
-    CGRect originSecondaryFrame = CGRectZero;
     
     if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
         self.mediaVC = [[PLVPPTLiveMediaViewController alloc] init];
-        CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
-        originSecondaryFrame = CGRectMake(self.view.frame.size.width - w, h + 44.0, w, (int)(w * PPTPlayerViewScale));
     } else {
         self.mediaVC = [[PLVNormalLiveMediaViewController alloc] init];
-        CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
-        originSecondaryFrame = CGRectMake(self.view.frame.size.width - w, h + 44.0, w, (int)(w * NormalPlayerViewScale));
     }
     
     self.mediaVC.delegate = self;
@@ -124,78 +116,141 @@
     self.mediaVC.channelId = liveConfig.channelId; //必须，不能为空
     self.mediaVC.userId = liveConfig.userId; //必须，不能为空
     self.mediaVC.nickName = loginUser.nickName;
-    self.mediaVC.view.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, h);
-    self.mediaVC.originFrame = self.mediaVC.view.frame;
+    self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
+    self.mediaVC.view.frame = self.mediaVC.originFrame;
     [self.view addSubview:self.mediaVC.view];
+    
+    CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
+    CGFloat h = (int)(w * PPTPlayerViewScale);
+    if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
+        [(PLVPPTLiveMediaViewController *)self.mediaVC loadSecondaryView:CGRectMake(self.view.frame.size.width - w, self.mediaViewControllerHeight + PageControllerTopBarHeight, w, h)];
+    }
     
     self.linkMicVC = [[PLVLinkMicController alloc] init];
     self.linkMicVC.delegate = self;
+    self.linkMicVC.login = [PLVChatroomManager sharedManager].loginUser;
+    self.linkMicVC.linkMicBtn = self.mediaVC.skinView.linkMicBtn;
+    self.mediaVC.linkMicVC = self.linkMicVC;
+    
     if (self.liveType == PLVLiveViewControllerTypeLive) {
-        self.linkMicVC.linkMicType = PLVLinkMicTypeLive;//开启视频连麦时，普通直播的连麦窗口是音频模式
-        self.linkMicVC.originSecondaryFrame = CGRectMake(0.0, originSecondaryFrame.origin.y, 60.0, 60.0);
+        self.linkMicVC.linkMicType = PLVLinkMicTypeNormalLive;//开启视频连麦时，普通直播的连麦窗口是音频模式(旧版推流端)，或者视频模式（新版推流端，对齐云课堂的连麦方式）
     } else {
         self.linkMicVC.linkMicType = PLVLinkMicTypeCloudClass;//开启视频连麦时，云课堂的是视频模式
-        self.linkMicVC.originSecondaryFrame = originSecondaryFrame;
     }
-    self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-    self.linkMicVC.linkMicBtn = self.mediaVC.skinView.linkMicBtn;
+    self.linkMicVC.baseY = self.mediaViewControllerHeight;
+    self.linkMicVC.baseOffY = PageControllerTopBarHeight;
+    self.linkMicVC.baseSize = CGSizeMake(w, h);
+    self.linkMicVC.originSize = self.linkMicVC.baseSize;
+    self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.baseY, self.view.bounds.size.width, h);
     [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
-    
-    self.linkMicVC.login = loginUser;
-    self.mediaVC.linkMicVC = self.linkMicVC;
-    if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
-        [(PLVPPTLiveMediaViewController *)self.mediaVC loadSecondaryView:originSecondaryFrame];
-    }
     
     // 若需要 [加载静态离线页面]，请解开2处注释代码
     // 1_[加载静态离线页面]
-    //  NSString *basePath = [NSString stringWithFormat:@"%@/dist", [[NSBundle mainBundle] bundlePath]];
-    //  NSURL *baseURL = [NSURL fileURLWithPath:basePath isDirectory:YES];
-    //  NSString *htmlPath = [NSString stringWithFormat:@"%@/index.html", basePath];
-    //  NSError * htmlError;
-    //  NSString *htmlString = [NSString stringWithContentsOfFile:htmlPath encoding:NSUTF8StringEncoding error:&htmlError];
-    //  if (htmlError) { NSLog(@"[加载静态离线页面] 错误 Error - %@",htmlError); }
+//  NSString *basePath = [NSString stringWithFormat:@"%@/dist", [[NSBundle mainBundle] bundlePath]];
+//  NSURL *baseURL = [NSURL fileURLWithPath:basePath isDirectory:YES];
+//  NSString *htmlPath = [NSString stringWithFormat:@"%@/index.html", basePath];
+//  NSError * htmlError;
+//  NSString *htmlString = [NSString stringWithContentsOfFile:htmlPath encoding:NSUTF8StringEncoding error:&htmlError];
+//  if (htmlError) { NSLog(@"[加载静态离线页面] 错误 Error - %@",htmlError); }
     
     self.triviaCardVC = [[PLVTriviaCardViewController alloc] init];
     self.triviaCardVC.delegate = self;
     
     // 2_[加载静态离线页面]
-    // self.triviaCardVC.localHtml = htmlString;
-    // self.triviaCardVC.baseURL = baseURL;
+// self.triviaCardVC.localHtml = htmlString;
+// self.triviaCardVC.baseURL = baseURL;
     
     self.triviaCardVC.view.frame = self.view.bounds;
     self.triviaCardVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.triviaCardVC.view];
 }
 
-- (void)setupPublicChatroom:(CGFloat)top {
-    CGRect pageCtrlFrame = CGRectMake(0, top, SCREEN_WIDTH, SCREEN_HEIGHT - top);
-    CGRect chatroomFrame = CGRectMake(0, 0, CGRectGetWidth(pageCtrlFrame), CGRectGetHeight(pageCtrlFrame)-PageControllerTopBarHeight);
+#pragma mark - setup chatroom
+- (void)setupChatroomItem {
+    CGRect pageCtrlFrame = CGRectMake(0, self.mediaViewControllerHeight, self.fullSize.width, self.fullSize.height - self.mediaViewControllerHeight);
+    self.chatroomFrame = CGRectMake(0, 0, CGRectGetWidth(pageCtrlFrame), CGRectGetHeight(pageCtrlFrame) - PageControllerTopBarHeight);
     
-    PLVTextInputViewType type = self.liveType == PLVLiveViewControllerTypeLive ? PLVTextInputViewTypeNormalPublic : PLVTextInputViewTypeCloudClassPublic;
-    self.publicChatroomController = [PLVChatroomController chatroomWithType:type roomId:self.channelId frame:chatroomFrame];
-    self.publicChatroomController.delegate = self;
-//    self.publicChatroomController.allowToSpeakInTeacherMode = NO;
-    [self.publicChatroomController loadSubViews:self.view];
+    NSMutableArray *titles = [NSMutableArray new];
+    NSMutableArray *controllers = [NSMutableArray new];
     
-    self.pageController = [[FTPageController alloc] initWithTitles:@[@"聊天"] controllers:@[self.publicChatroomController]];
-    self.pageController.view.backgroundColor = [UIColor colorWithWhite:236/255.0 alpha:1];
-    self.pageController.view.frame = pageCtrlFrame;
-    [self.view addSubview:self.pageController.view];
-    [self addChildViewController:self.pageController];
+    for (PLVLiveVideoChannelMenu *menu in self.channelMenuInfo.channelMenus) {
+        if ([menu.menuType isEqualToString:@"desc"]) {
+            NSString *descTitle = menu.name.length == 0 ? @"直播介绍" : menu.name;
+            [self setupLiveInfoViewController:self.channelMenuInfo:menu];
+            if (descTitle && self.liveInfoViewController) {
+                [titles addObject:descTitle];
+                [controllers addObject:self.liveInfoViewController];
+            }
+        } else if ([menu.menuType isEqualToString:@"chat"]) {
+            NSString *chatTitle = menu.name.length == 0 ? @"互动聊天" : menu.name;
+            [self setupPublicChatroomViewController];
+            
+            if (chatTitle && self.publicChatroomViewController) {
+                [titles addObject:chatTitle];
+                [controllers addObject:self.publicChatroomViewController];
+            }
+        } else if ([menu.menuType isEqualToString:@"quiz"]) {
+            NSString *quizTitle = menu.name.length == 0 ? @"提问" : menu.name;
+            [self setupPrivateChatroomViewController:menu];
+            
+            if (quizTitle && self.privateChatroomViewController) {
+                [titles addObject:quizTitle];
+                [controllers addObject:self.privateChatroomViewController];
+            }
+        }
+    }
+    
+    if (titles.count>0 && controllers.count>0 && titles.count==controllers.count) {
+        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers];
+        self.pageController.view.backgroundColor = [UIColor colorWithWhite:236 / 255.0 alpha:1];
+        self.pageController.view.frame = pageCtrlFrame;
+        [self.view insertSubview:self.pageController.view belowSubview:self.mediaVC.view];  // 需要添加在播放器下面，使得播放器全屏的时候能盖住聊天室
+        [self addChildViewController:self.pageController];
+    }
 }
 
-- (void)addPrivateChatroom {
-    self.privateChatroomController = [PLVChatroomController chatroomWithType:PLVTextInputViewTypePrivate roomId:self.channelId frame:self.publicChatroomController.view.frame];
-    self.privateChatroomController.delegate = self;
-    [self.privateChatroomController loadSubViews:self.view];
+- (void)setupPublicChatroomViewController {
+    PLVTextInputViewType type = self.liveType == PLVLiveViewControllerTypeLive ? PLVTextInputViewTypeNormalPublic : PLVTextInputViewTypeCloudClassPublic;
+    self.publicChatroomViewController = [PLVChatroomController chatroomWithType:type roomId:self.channelId frame:self.chatroomFrame];
+    self.publicChatroomViewController.delegate = self;
+//    self.publicChatroomController.allowToSpeakInTeacherMode = NO;
+    [self.publicChatroomViewController loadSubViews:self.view];
     
-    [self.pageController addPageWithTitle:@"私聊" controller:self.privateChatroomController];
+    [self loadChatroomInfos];
+}
+
+- (void)setupPrivateChatroomViewController:(PLVLiveVideoChannelMenu *)quizMenu {
+    self.privateChatroomViewController = [PLVChatroomController chatroomWithType:PLVTextInputViewTypePrivate roomId:self.channelId frame:self.chatroomFrame];
+    self.privateChatroomViewController.delegate = self;
+    [self.privateChatroomViewController loadSubViews:self.view];
+}
+
+- (void)setupLiveInfoViewController:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo :(PLVLiveVideoChannelMenu *)descMenu {
+    self.liveInfoViewController = [[PLVLiveInfoViewController alloc] init];
+    self.liveInfoViewController.channelMenuInfo = channelMenuInfo;
+    self.liveInfoViewController.menu = descMenu;
+    self.liveInfoViewController.view.frame = self.chatroomFrame;
+    
+    /// 倒计时，如果不需要这个功能，可以先注释掉以下代码
+    if (channelMenuInfo.startTime.length > 0 && ![@"live" isEqualToString:channelMenuInfo.watchStatus]) {
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"yyyy/MM/dd HH:mm:ss"];
+        NSDate *startTime = [formatter dateFromString:channelMenuInfo.startTime];
+        if ([startTime timeIntervalSinceNow] > 0.0) {
+            [self.mediaVC loadCountdownTimeLabel:startTime];
+        }
+    }
 }
 
 #pragma mark - view controls
 - (BOOL)shouldAutorotate {
     return self.mediaVC != nil && self.mediaVC.canAutorotate && ![PLVLiveVideoConfig sharedInstance].unableRotate && ![PLVLiveVideoConfig sharedInstance].triviaCardUnableRotate;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    // 设备为iPhone时，不处理竖屏的UpsideDown方向
+    BOOL iPhone = [@"iPhone" isEqualToString:[UIDevice currentDevice].model];
+    return iPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -212,17 +267,17 @@
 
 #pragma mark - network request
 - (void)loadChannelMenuInfos {
-    __weak typeof(self)weakSelf = self;
-    [PLVLiveVideoAPI getChannelMenuInfos:self.channelId completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
-        for (PLVLiveVideoChannelMenu *menu in channelMenuInfo.channelMenus) {
-            if ([menu.menuType isEqualToString:@"quiz"]) {
-                [weakSelf addPrivateChatroom];
-                break;
-            }
-        }
-    } failure:^(NSError *error) {
-        NSLog(@"频道菜单获取失败！%@",error);
-    }];
+    if (self.channelMenuInfo) {
+        [self setupChatroomItem];
+    } else {
+        __weak typeof(self) weakSelf = self;
+        [PLVLiveVideoAPI getChannelMenuInfos:self.channelId completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
+            weakSelf.channelMenuInfo = channelMenuInfo;
+            [weakSelf setupChatroomItem];
+        } failure:^(NSError *error) {
+            NSLog(@"频道菜单获取失败！%@",error);
+        }];
+    }
 }
 
 - (void)loadChatroomInfos {
@@ -235,7 +290,7 @@
         } failure:^(NSError *error) {
             [PCCUtils showHUDWithTitle:@"聊天室Token获取失败！" detail:error.localizedDescription view:weakSelf.view];
         }];
-        [weakSelf.publicChatroomController setSwitchInfo:switchInfo];
+        [weakSelf.publicChatroomViewController setSwitchInfo:switchInfo];
     } failure:^(NSError *error) {
         [PCCUtils showHUDWithTitle:@"聊天室状态获取失败！" detail:error.localizedDescription view:weakSelf.view];
     }];
@@ -244,10 +299,11 @@
 #pragma mark - exit
 - (void)exitCurrentController {//退出前释放播放器，连麦，socket资源
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    [self.mediaVC clearCountdownTimer];
     [self.mediaVC clearResource];
     [self.linkMicVC clearResource];
-    [self.publicChatroomController clearResource];
-    [self.privateChatroomController clearResource];
+    [self.publicChatroomViewController clearResource];
+    [self.privateChatroomViewController clearResource];
     [self clearSocketIO];
     if (self.pollingTimer) {
         [self.pollingTimer invalidate];
@@ -267,10 +323,13 @@
 
 #pragma mark - SocketIO init / clear
 - (void)initSocketIOWithTokenInfo:(NSDictionary *)responseDict {
-    self.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:responseDict[@"chat_token"] enableLog:NO];//初始化 socketIO 连接对象
+    if (self.socketIO) {
+        return;
+    }
+    self.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:responseDict[@"chat_token"] url:nil enableLog:NO];//初始化 socketIO 连接对象
     self.socketIO.delegate = self;
     [self.socketIO connect];
-    //self.socketIO.debugMode = YES;
+//  self.socketIO.debugMode = YES;
 }
 
 - (void)clearSocketIO {
@@ -301,13 +360,13 @@
 #pragma mark Socket message
 - (void)socketIO:(PLVSocketIO *)socketIO didReceivePublicChatMessage:(PLVSocketChatRoomObject *)chatObject {
 //    NSLog(@"%@--type:%lu, event:%@", NSStringFromSelector(_cmd), (unsigned long)chatObject.eventType, chatObject.event);
-    [self.publicChatroomController addNewChatroomObject:chatObject];
+    [self.publicChatroomViewController addNewChatroomObject:chatObject];
 }
 
 - (void)socketIO:(PLVSocketIO *)socketIO didReceivePrivateChatMessage:(PLVSocketChatRoomObject *)chatObject {
 //    NSLog(@"%@--type:%lu, event:%@", NSStringFromSelector(_cmd), (unsigned long)chatObject.eventType, chatObject.event);
-    if (self.privateChatroomController) {
-        [self.privateChatroomController addNewChatroomObject:chatObject];
+    if (self.privateChatroomViewController) {
+        [self.privateChatroomViewController addNewChatroomObject:chatObject];
     }
 }
 
@@ -371,7 +430,7 @@
 #pragma mark Custom message
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveCustomMessage:(NSDictionary *)customMessage {
     NSLog(@"%@--%@",NSStringFromSelector(_cmd),customMessage[@"EVENT"]);
-    [self.publicChatroomController addCustomMessage:customMessage mine:NO];
+    [self.publicChatroomViewController addCustomMessage:customMessage mine:NO];
 }
 
 #pragma mark Connect state
@@ -383,8 +442,8 @@
 - (void)socketIO:(PLVSocketIO *)socketIO connectOnErrorWithInfo:(NSString *)info {
     NSLog(@"%@--%@",NSStringFromSelector(_cmd),info);
     [PCCUtils showChatroomMessage:@"聊天室连接失败" addedToView:self.pageController.view];
-    if (self.publicChatroomController) {
-        [self.publicChatroomController recoverChatroomStatus];
+    if (self.publicChatroomViewController) {
+        [self.publicChatroomViewController recoverChatroomStatus];
     }
 }
 
@@ -415,18 +474,20 @@
 
 - (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag {
     if (!self.mediaVC.skinView.fullscreen) {
-        if (flag) {
-            CGFloat safeAreaY = 20.0;
-            if (@available(iOS 11.0, *)) {
-                safeAreaY = self.view.safeAreaLayoutGuide.layoutFrame.origin.y;
+        if (self.linkMicVC.linkMicType == PLVLinkMicTypeLive) {
+            if (flag) {
+                CGFloat safeAreaY = 20.0;
+                if (@available(iOS 11.0, *)) {
+                    safeAreaY = self.view.safeAreaLayoutGuide.layoutFrame.origin.y;
+                }
+                CGRect linkMicRect = self.linkMicVC.view.frame;
+                linkMicRect = CGRectMake(0.0, safeAreaY, linkMicRect.size.width, linkMicRect.size.height);
+                self.linkMicVC.view.frame = linkMicRect;
+                [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
+            } else {
+                self.linkMicVC.view.frame = CGRectMake(0.0, self.mediaViewControllerHeight + PageControllerTopBarHeight, self.view.bounds.size.width, self.linkMicVC.originSize.height);
+                [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
             }
-            CGRect linkMicRect = self.linkMicVC.view.frame;
-            linkMicRect = CGRectMake(0.0, safeAreaY, linkMicRect.size.width, linkMicRect.size.height);
-            self.linkMicVC.view.frame = linkMicRect;
-            [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
-        } else {
-            self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-            [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
         }
         
         if ([self.mediaVC isKindOfClass:PLVPPTLiveMediaViewController.class]) {
@@ -462,6 +523,10 @@
     });
 }
 
+- (void)reLogin:(PLVChatroomController *)chatroom {
+    [self exitCurrentController];
+}
+
 #pragma mark - PLVBaseMediaViewControllerDelegate
 - (void)quit:(PLVBaseMediaViewController *)mediaVC error:(NSError *)error {
     if (error) {
@@ -478,13 +543,42 @@
     
     [self.triviaCardVC layout:self.mediaVC.skinView.fullscreen];
     if (self.mediaVC.skinView.fullscreen) {
-        [self.publicChatroomController tapChatInputView];
-        [self.privateChatroomController tapChatInputView];
+        [self.publicChatroomViewController tapChatInputView];
+        [self.privateChatroomViewController tapChatInputView];
+    }
+    
+    if (self.linkMicVC.linkMicType != PLVLinkMicTypeLive) {
+        if (self.linkMicVC.linkMicViewArray.count > 0) {
+            CGRect linkMicRect = self.linkMicVC.view.frame;
+            if (self.mediaVC.skinView.fullscreen) {
+                linkMicRect.origin.x = 0.0;
+                if (@available(iOS 11.0, *)) {
+                    linkMicRect.origin.x = self.view.safeAreaLayoutGuide.layoutFrame.origin.x;
+                }
+                linkMicRect.origin.y = 0.0;
+                linkMicRect.size.width = self.view.bounds.size.width - 2.0 * linkMicRect.origin.x;
+                [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
+            } else {
+                linkMicRect.origin.x = 0.0;
+                linkMicRect.origin.y = self.mediaViewControllerHeight;
+                linkMicRect.size.width = self.view.bounds.size.width;
+                [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
+                [self changeChatroomFrame:linkMicRect.origin.y + linkMicRect.size.height];
+            }
+            self.linkMicVC.view.frame = linkMicRect;
+        } else {
+            [self changeChatroomFrame:self.mediaViewControllerHeight];
+        }
     }
 }
 
 - (void)sendText:(PLVBaseMediaViewController *)mediaVC text:(NSString *)text{
-    [self.publicChatroomController sendTextMessage:text];
+    [self.publicChatroomViewController sendTextMessage:text];
+}
+
+- (void)streamStateDidChange:(PLVBaseMediaViewController *)mediaVC streamState:(PLVLiveStreamState)streamState{
+    self.channelMenuInfo = nil;
+    [self loadChannelMenuInfos];
 }
 
 #pragma mark - PLVTriviaCardViewControllerDelegate
@@ -547,11 +641,46 @@
     [self.socketIO emitACKWithSocketObject:linkMicObject after:after callback:callback];
 }
 
+- (void)changeChatroomFrame:(CGFloat)top {
+    CGRect pageCtrlFrame = CGRectMake(0, top, self.fullSize.width, self.fullSize.height - top);
+    CGRect chatroomFrame = CGRectMake(0, 0, CGRectGetWidth(pageCtrlFrame), CGRectGetHeight(pageCtrlFrame) - PageControllerTopBarHeight);
+    self.pageController.view.frame = pageCtrlFrame;
+    [self.pageController changeFrame];
+    [self.publicChatroomViewController changeChatroomFrame:chatroomFrame];
+    [self.privateChatroomViewController changeChatroomFrame:chatroomFrame];
+    self.liveInfoViewController.view.frame = chatroomFrame;
+    self.liveInfoViewController.view.autoresizingMask = UIViewAutoresizingNone;
+}
+
 - (void)linkMicSuccess:(PLVLinkMicController *)lickMic {
+    if (self.linkMicVC.linkMicType != PLVLinkMicTypeLive) {
+        if (self.mediaVC.skinView.fullscreen) {
+            CGFloat x = 0.0;
+            if (@available(iOS 11.0, *)) {
+                x = self.view.safeAreaLayoutGuide.layoutFrame.origin.x;
+            }
+            self.linkMicVC.view.frame = CGRectMake(x, 0.0, self.view.bounds.size.width - 2.0 * x, self.linkMicVC.originSize.height);
+            [self.mediaVC.view insertSubview:self.linkMicVC.view belowSubview:self.mediaVC.skinView];
+            [self.mediaVC changeFrame:YES block:nil];
+        } else {
+            self.linkMicVC.view.frame = CGRectMake(0.0, self.mediaVC.view.frame.origin.y + self.mediaVC.view.frame.size.height, self.view.bounds.size.width, self.linkMicVC.originSize.height);
+            [self.view insertSubview:self.linkMicVC.view aboveSubview:self.mediaVC.view];
+            [self changeChatroomFrame:self.mediaViewControllerHeight + self.linkMicVC.originSize.height];
+        }
+    }
+    
     [self.mediaVC linkMicSuccess];
 }
 
 - (void)cancelLinkMic:(PLVLinkMicController *)lickMic {
+    if (self.linkMicVC.linkMicType != PLVLinkMicTypeLive) {
+        if (self.mediaVC.skinView.fullscreen) {
+            [self.mediaVC changeFrame:YES block:nil];
+        } else {
+            [self changeChatroomFrame:self.mediaViewControllerHeight];
+        }
+    }
+    
     [self.mediaVC cancelLinkMic];
 }
 

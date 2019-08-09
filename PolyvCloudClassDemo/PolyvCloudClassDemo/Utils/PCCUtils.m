@@ -7,7 +7,7 @@
 //
 
 #import "PCCUtils.h"
-#import <MBProgressHUD/MBProgressHUD.h>
+#import <PolyvFoundationSDK/PLVProgressHUD.h>
 #import <Masonry/Masonry.h>
 
 static PCCUtils *chatroomHud = nil;
@@ -52,8 +52,8 @@ static PCCUtils *chatroomHud = nil;
     if (view == nil) {
         return;
     }
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
-    hud.mode = MBProgressHUDModeText;
+    PLVProgressHUD *hud = [PLVProgressHUD showHUDAddedTo:view animated:YES];
+    hud.mode = PLVProgressHUDModeText;
     hud.label.text = title;
     hud.detailsLabel.text = detail;
     [hud hideAnimated:YES afterDelay:3.0];

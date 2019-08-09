@@ -54,4 +54,6 @@
  */
 - (void)removePageAtIndex:(NSUInteger)index;
 
+- (void)changeFrame;
+
 @end

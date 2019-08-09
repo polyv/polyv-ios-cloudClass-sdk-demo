@@ -10,7 +10,7 @@
 #import "PLVBaseMediaViewController+PPT.h"
 #import "PLVBaseMediaViewController+Live.h"
 
-@interface PLVPPTLiveMediaViewController () <PLVLivePlayerControllerDelegate>
+@interface PLVPPTLiveMediaViewController () <PLVLivePlayerControllerDelegate, PLVPlayerControllerDelegate>
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
@@ -31,6 +31,11 @@
 @synthesize originSecondaryFrame;
 @synthesize pptOnSecondaryView;
 @synthesize pptFlag;
+@synthesize countdownTimeView;
+@synthesize countdownTimeLabel;
+@synthesize countdownTimer;
+@synthesize startTime;
+@synthesize curStreamState;
 
 #pragma mark - life cycle
 - (void)viewDidLoad {
@@ -91,19 +96,16 @@
     [self dealDeviceOrientationDidChangeSubAnimation];
     
     if (self.skinView.fullscreen) {
-        [self.view insertSubview:self.linkMicVC.view belowSubview:self.skinView];
-        CGRect rect = CGRectMake(0.0, 0.0, [UIScreen mainScreen].bounds.size.width, self.linkMicVC.view.frame.size.height);
-        if (@available(iOS 11.0, *)) {
-            CGRect safeFrame = [UIApplication sharedApplication].delegate.window.safeAreaLayoutGuide.layoutFrame;
-            rect.origin.x = safeFrame.origin.x;
-            rect.size.width -= rect.origin.x * 2.0;
-        }
-        self.linkMicVC.view.frame = rect;
         self.danmuInputView.frame = self.view.bounds;
-    } else {
-        self.linkMicVC.view.frame = CGRectMake(0.0, self.linkMicVC.originSecondaryFrame.origin.y, self.view.bounds.size.width, self.linkMicVC.originSecondaryFrame.size.height);
-        [self.view.superview insertSubview:self.linkMicVC.view aboveSubview:self.view];
     }
+    self.countdownTimeView.hidden = self.skinView.fullscreen;
+}
+
+- (CGFloat)getLinkMicHeight {
+    if (self.linkMicVC.linkMicType != PLVLinkMicTypeLive && self.linkMicVC.linkMicViewArray.count > 0) {
+        return self.linkMicVC.originSize.height;
+    }
+    return 0.0;
 }
 
 - (void)loadPlayer {
@@ -173,11 +175,17 @@
     self.skinView.switchCameraBtn.hidden = YES;
     self.secondaryView.alpha = 1.0;
     ((PLVLivePlayerController*)self.player).linkMic = NO;
-    [self reOpenPlayer:nil showHud:NO];
+    [self reOpenPlayerWithLineIndex:-1 codeRate:nil showHud:NO];
     
     BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
     [self.moreView showAudioModeBtn:showAudioModeSwitch];
     [self.skinView linkMicStart:NO];
+}
+
+#pragma mark - PLVPlayerControllerDelegate
+- (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
+    [self clearCountdownTimer];
+    [self mainPlaybackIsPreparedToPlay:notification];
 }
 
 #pragma mark - PLVLivePlayerControllerDelegate
@@ -190,10 +198,17 @@
             [self closeSecondaryView:self.secondaryView];
         }
     }
+    
+    if (self.curStreamState != streamState) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(streamStateDidChange:streamState:)]) {
+            [self.delegate streamStateDidChange:self streamState:streamState];
+        }
+    }
+    self.curStreamState = streamState;
 }
 
 - (void)reconnectPlayer:(PLVLivePlayerController *)livePlayer {
-    [self reOpenPlayer:nil showHud:NO];
+    [self reOpenPlayerWithLineIndex:-1 codeRate:nil showHud:NO];
 }
 
 - (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {

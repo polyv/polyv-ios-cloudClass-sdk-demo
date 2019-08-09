@@ -8,6 +8,8 @@ target 'PolyvCloudClassDemo' do
   pod 'MBProgressHUD', '~> 1.1.0'
   
   # Pods for PolyvCloudClassDemo
-  pod 'PolyvCloudClassSDK', '~> 0.8.0' # polyv 云课堂 SDK
+  pod 'ABN_PolyvCloudClassSDK/Core', '0.9.0-abn' # polyv 云课堂 SDK
+  pod 'PolyvIJKPlayer_Dylib', '~> 0.5.0'
+
 #  pod 'Starscream', '3.0.5'           # Xcode 10 以下添加
 end

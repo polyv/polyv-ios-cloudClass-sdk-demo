@@ -53,6 +53,7 @@
 @property (nonatomic, strong) PLVMoreCellView * codeRateCellV;
 @property (nonatomic, strong) PLVMoreCellView * speedCellV;
 @property (nonatomic, strong) UIButton * backBtn;
+@property (nonatomic, assign) CGFloat lineCellHeight;
 
 @end
 
@@ -107,16 +108,7 @@
             }
         }];
         
-        [self.lineCellV mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.left.offset(lrPadding);
-            make.right.offset(-lrPadding);
-            make.height.offset(0.1); // 暂时屏蔽
-            if (hor) {
-                make.top.mas_equalTo(self.audioCellV.mas_bottom).offset(0);
-            }else{
-                make.centerY.offset(0);
-            }
-        }];
+        [self layoutLineCellV];
         
         [self.codeRateCellV mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.left.offset(lrPadding);
@@ -144,6 +136,26 @@
         
     }
     [self refreshCellViewLine];
+}
+
+- (void)layoutLineCellV {
+    float sw = [UIScreen mainScreen].bounds.size.width;
+    float sh = [UIScreen mainScreen].bounds.size.height;
+    BOOL hor = sw >= sh ? YES : NO;
+    
+    float lrPadding = 28;
+    if (sw == 320) { lrPadding = 10; }
+    
+    [self.lineCellV mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.left.offset(lrPadding);
+        make.right.offset(-lrPadding);
+        make.height.offset(self.lineCellHeight);
+        if (hor) {
+            make.top.mas_equalTo(self.audioCellV.mas_bottom).offset(0);
+        }else{
+            make.centerY.offset(0);
+        }
+    }];
 }
 
 #pragma mark - ----------------- < Private Method > -----------------
@@ -216,11 +228,16 @@
         if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinMoreView:switchAudioMode:)]) {
             [self.delegate playerSkinMoreView:self switchAudioMode:btn.selected];
         }
-    }else if (cellView == self.codeRateCellV){
+    } else if (cellView == self.lineCellV){
+        if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinMoreView:line:)]) {
+            _curLine = [btn.titleLabel.text substringFromIndex:2].integerValue - 1;
+            [self.delegate playerSkinMoreView:self line:self.curLine];
+        }
+    } else if (cellView == self.codeRateCellV){
         if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinMoreView:codeRate:)]) {
             [self.delegate playerSkinMoreView:self codeRate:btn.titleLabel.text];
         }
-    }else if (cellView == self.speedCellV){
+    } else if (cellView == self.speedCellV){
         if (self.delegate && [self.delegate respondsToSelector:@selector(playerSkinMoreView:speed:)]) {
             CGFloat speed = [[btn.titleLabel.text substringToIndex:btn.titleLabel.text.length - 2] floatValue];
             [self.delegate playerSkinMoreView:self speed:speed];
@@ -241,6 +258,25 @@
 
 
 #pragma mark - ----------------- < Public Method > -----------------
+- (void)setLines:(NSUInteger)lines {
+    _lines = lines;
+    self.lineCellHeight = _lines <= 1 ? 0.0 : CellVH;
+    self.lineCellV.hidden = _lines <= 1;
+    [self layoutLineCellV];
+}
+
+- (void)setCurLine:(NSInteger)curLine {
+    NSUInteger index = 0;
+    for (UIButton *btn in self.lineCellV.btnArr) {
+        if (index == curLine) {
+            _curLine = curLine;
+            [self.lineCellV changeCurBtnTo:btn];
+            break;
+        }
+        index++;
+    }
+}
+
 - (void)setCodeRateItems:(NSMutableArray<NSString *> *)codeRateItems{
     _codeRateItems = codeRateItems;
     if (_codeRateItems == nil || _codeRateItems.count == 0) {

@@ -24,7 +24,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 @interface PLVPlayerSkinView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIView *controllView;
-@property (nonatomic, strong) UIImageView *topBgImgV;
 @property (nonatomic, strong) UIImageView *bottomBgImgV;
 @property (nonatomic, strong) UIButton *backBtn;
 @property (nonatomic, strong) UIButton *moreBtn;
@@ -48,7 +47,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 @property (nonatomic, strong) UIView *popView;
 @property (nonatomic, strong) UILabel *seekTimeLable;
 @property (nonatomic, strong) UISlider *seekSlider;
-@property (nonatomic, assign) BOOL popWithSeeked;
 
 @property (nonatomic, assign) CGPoint lastPoint;
 @property (nonatomic, assign) PLVPlayerSkinViewPanType panType;
@@ -230,8 +228,8 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     float lrPadding = 8.0; // 左右间距
     float btnPadding = 44.0 + lrPadding;
 
-    UIEdgeInsets topBgImgVMargin = UIEdgeInsetsMake(self.fullscreen ? 0.0 : -44.0, 0.0, -1.0, 0.0);
-    UIEdgeInsets bottomBgImgVMargin = UIEdgeInsetsMake(-1.0, 0.0, self.fullscreen ? -20.0 : 0.0, 0.0);
+    UIEdgeInsets topBgImgVMargin = UIEdgeInsetsMake(self.fullscreen ? 0.0 : -44.0, -44.0, -1.0, -44.0);
+    UIEdgeInsets bottomBgImgVMargin = UIEdgeInsetsMake(-1.0, -44.0, self.fullscreen ? -20.0 : 0.0, -44.0);
 
     UIEdgeInsets backMargin = UIEdgeInsetsMake(0.0, lrPadding, -1.0, -1.0);
     UIEdgeInsets moreMargin = UIEdgeInsetsMake(0.0, -1.0, -1.0, lrPadding);
@@ -440,7 +438,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 #pragma mark - pop view
 - (void)addSeekPopView {
-    [self addPopView:YES];
+    [self addPopView];
     [self remakePopViewConstraints];
     if (self.seekTimeLable == nil) {
         self.seekTimeLable = [self addLabel:@"00:00" fontSize:20.0 textAlignment:NSTextAlignmentCenter inView:self.popView];
@@ -469,7 +467,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }];
 }
 
-- (void)addPopView:(BOOL)popWithSeeked {
+- (void)addPopView {
     if (self.popView == nil) {
         self.popView = [[UIView alloc] init];
         self.popView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.7];
@@ -478,7 +476,6 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }
     [self.superview.superview addSubview:self.popView];
     self.popView.hidden = NO;
-    self.popWithSeeked = popWithSeeked;
     [self performSelector:@selector(hiddenPopView) withObject:nil afterDelay:3.0];
 }
 
@@ -652,13 +649,13 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
         if (margin.top >= 0.0 || margin.top < -10.0) {
             make.top.equalTo(baseView.mas_top).offset(margin.top);
         }
-        if (margin.left >= 0.0) {
+        if (margin.left >= 0.0 || margin.left < -10.0) {
             make.left.equalTo(baseView.mas_left).offset(margin.left);
         }
         if (margin.bottom >= 0.0 || margin.bottom < -10.0) {
             make.bottom.equalTo(baseView.mas_bottom).offset(-margin.bottom);
         }
-        if (margin.right >= 0.0) {
+        if (margin.right >= 0.0 || margin.right < -10.0) {
             make.right.equalTo(baseView.mas_right).offset(-margin.right);
         }
         if (size.width > 0.0) {
@@ -670,52 +667,9 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }];
 }
 
-- (void)remakePopItemConstraints {
-    NSInteger count = self.popView.subviews.count;
-    __weak typeof(self) weakSelf = self;
-    for (NSUInteger i = 0; i < count; i++) {
-        UIButton *btn = [self.popView.subviews objectAtIndex:i];
-        [btn mas_remakeConstraints:^(MASConstraintMaker *make) {
-            if (weakSelf.fullscreen) {
-                CGFloat dy = ([UIScreen mainScreen].bounds.size.height - 30.0 * count) / (count + 1);
-                make.top.mas_equalTo(dy + i * (30.0 + dy));
-                make.left.mas_offset(50.0);
-            } else {
-                CGFloat dx = ([UIScreen mainScreen].bounds.size.width - 60.0 * count) / (count + 1);
-                make.left.mas_equalTo(dx + i * (60.0 + dx));
-                make.centerY.mas_equalTo(weakSelf.popView.mas_centerY);
-            }
-            make.width.mas_equalTo(60.0);
-            make.height.mas_equalTo(30.0);
-        }];
-    }
-}
-
 - (void)remakePopViewConstraints {
-    self.popView.transform = self.superview.transform;
     CGRect popRect = self.superview.frame;
-    if (!self.popWithSeeked && self.fullscreen) {
-        if ([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight) {
-            CGFloat x = 0.0;
-            if (@available(iOS 11.0, *)) {
-                CGRect safeFrame = self.superview.safeAreaLayoutGuide.layoutFrame;
-                x = safeFrame.origin.x;
-            }
-            popRect = CGRectMake(0.0, self.superview.frame.origin.x + x, [UIScreen mainScreen].bounds.size.width, 160.0);
-        } else {
-            CGRect rect = [UIScreen mainScreen].bounds;
-            if (@available(iOS 11.0, *)) {
-                CGRect safeFrame = self.superview.safeAreaLayoutGuide.layoutFrame;
-                rect.origin.x = safeFrame.origin.x;
-                rect.size.width = safeFrame.size.width;
-            }
-            popRect = CGRectMake(rect.origin.y + rect.size.height - rect.size.width, rect.origin.x + rect.size.width - 160.0, rect.size.width, 160.0);
-        }
-    }
     self.popView.frame = popRect;
-    if (!self.popWithSeeked) {
-        [self remakePopItemConstraints];
-    }
 }
 
 @end

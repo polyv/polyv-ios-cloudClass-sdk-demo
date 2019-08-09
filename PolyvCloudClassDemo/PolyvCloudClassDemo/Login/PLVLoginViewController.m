@@ -7,10 +7,9 @@
 //
 #import "PLVLoginViewController.h"
 #import <Masonry/Masonry.h>
-#import <MBProgressHUD/MBProgressHUD.h>
+#import <PolyvFoundationSDK/PLVProgressHUD.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
-#import <PolyvBusinessSDK/PLVVodConfig.h>
 #import "PLVLiveViewController.h"
 #import "PLVVodViewController.h"
 #import "PCCUtils.h"
@@ -162,12 +161,11 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
             self.appIDTF.text = vodLoginInfo[2];
             self.vIdTF.text = vodLoginInfo[3];
         } else {
-            PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
             PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
             self.channelIdTF.text = liveConfig.channelId;
             self.userIDTF.text = liveConfig.userId;
             self.appIDTF.text = liveConfig.appId;
-            self.vIdTF.text = vodConfig.vodId;
+            self.vIdTF.text = liveConfig.vodId;
         }
         [self refreshLoginBtnUI];
     }
@@ -182,16 +180,22 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 
 #pragma mark - network request
 - (void)loginRequest {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
+    PLVProgressHUD *hud = [PLVProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
     [hud.label setText:@"登录中..."];
     __weak typeof(self) weakSelf = self;
     if (!self.liveSelectView.hidden) {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.appIDTF.text, self.userIDTF.text, self.appSecretTF.text] forKey:NSUserDefaultKey_LiveLoginInfo];
         
         [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:nil appId:self.appIDTF.text userId:self.userIDTF.text appSecret:self.appSecretTF.text completion:^{
-            [PLVLiveVideoAPI liveStatus:self.channelIdTF.text completion:^(BOOL liveing, NSString *liveType) {
-                [hud hideAnimated:YES];
-                [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveing:liveing lievType:liveType];
+            [PLVLiveVideoAPI liveStatus:weakSelf.channelIdTF.text completion:^(BOOL liveing, NSString *liveType) {
+                [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
+                    [hud hideAnimated:YES];
+                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveing:liveing lievType:liveType channelMenuInfo:channelMenuInfo];
+                } failure:^(NSError *error) {
+                    NSLog(@"频道菜单获取失败！%@",error);
+                    [hud hideAnimated:YES];
+                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveing:liveing lievType:liveType channelMenuInfo:nil];
+                }];
             } failure:^(NSError *error) {
                 [hud hideAnimated:YES];
                 [PCCUtils presentAlertViewController:nil message:error.localizedDescription inViewController:weakSelf];
@@ -206,7 +210,14 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
         [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:nil completion:^{
             [PLVLiveVideoAPI getVodType:self.vIdTF.text completion:^(BOOL vodType) {
                 [hud hideAnimated:YES];
-                [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType];
+                [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
+                    [hud hideAnimated:YES];
+                    [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType channelMenuInfo:channelMenuInfo];
+                } failure:^(NSError *error) {
+                    NSLog(@"频道菜单获取失败！%@",error);
+                    [hud hideAnimated:YES];
+                    [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType channelMenuInfo:nil];
+                }];
             } failure:^(NSError *error) {
                 [hud hideAnimated:YES];
                 [weakSelf presentToAlertViewControllerWithError:error inViewController:weakSelf];
@@ -219,7 +230,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 }
 
 #pragma mark - present ViewController
-- (void)presentToLiveViewControllerFromViewController:(UIViewController *)vc liveing:(BOOL)liveing lievType:(NSString *)liveType {
+- (void)presentToLiveViewControllerFromViewController:(UIViewController *)vc liveing:(BOOL)liveing lievType:(NSString *)liveType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
     //必需先设置 PLVLiveVideoConfig 单例里需要的信息，因为在后面的加载中需要使用
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     liveConfig.channelId = self.channelIdTF.text;
@@ -230,6 +241,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVLiveViewController *liveVC = [PLVLiveViewController new];
     liveVC.liveType = [@"ppt" isEqualToString:liveType] ? PLVLiveViewControllerTypeCloudClass : PLVLiveViewControllerTypeLive;
     liveVC.playAD = !liveing;
+    liveVC.channelMenuInfo = channelMenuInfo;
     
     // 抽奖功能必须固定唯一的 nickName 和 userId，如果忘了填写上次的中奖信息，有固定的 userId 还会再次弹出相关填写页面
 //    liveVC.nickName = @"iOS user"; // 设置登录聊天室的用户名
@@ -238,18 +250,19 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     [vc presentViewController:liveVC animated:YES completion:nil];
 }
 
-- (void)presentToVodViewControllerFromViewController:(UIViewController *)vc vodType:(BOOL)vodType {
-    //必需先设置 PLVVodConfig 单例里需要的信息，因为在后面的加载中需要使用
-    PLVVodConfig *vodConfig = [PLVVodConfig sharedInstance];
+- (void)presentToVodViewControllerFromViewController:(UIViewController *)vc vodType:(BOOL)vodType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
+    //必需先设置 PLVLiveVideoConfig 单例里需要的信息，因为在后面的加载中需要使用
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
-    vodConfig.vodId = self.vIdTF.text;
+    liveConfig.vodId = self.vIdTF.text;
     liveConfig.appId = self.appIDTF.text;
+    liveConfig.appSecret = self.appSecretTF.text;
     // 用于回放跑马灯显示
     liveConfig.channelId = self.channelIdTF.text;
     liveConfig.userId = self.userIDTF.text;
     
     PLVVodViewController *vodVC = [PLVVodViewController new];
     vodVC.vodType = vodType ? PLVVodViewControllerTypeCloudClass : PLVVodViewControllerTypeLive;
+    vodVC.channelMenuInfo = channelMenuInfo;
     [vc presentViewController:vodVC animated:YES completion:nil];
 }
 

@@ -7,8 +7,8 @@
 //
 
 #import "PLVPhotoBrowser.h"
-#import <PolyvCloudClassSDK/PLVAuthorizationManager.h>
-#import <MBProgressHUD/MBProgressHUD.h>
+#import <PolyvFoundationSDK/PLVAuthorizationManager.h>
+#import <PolyvFoundationSDK/PLVProgressHUD.h>
 #import <Masonry/Masonry.h>
 
 NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification = @"PLVPhotoBrowserDidShowImageOnScreenNotification"; 
@@ -200,8 +200,8 @@ NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification = @"PLVPhotoBrow
 }
 
 - (void)showHUDWithTitle:(NSString *)title detail:(NSString *)detail {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.backgroundView animated:YES];
-    hud.mode = MBProgressHUDModeText;
+    PLVProgressHUD *hud = [PLVProgressHUD showHUDAddedTo:self.backgroundView animated:YES];
+    hud.mode = PLVProgressHUDModeText;
     hud.label.text = title;
     hud.detailsLabel.text = detail;
     [hud hideAnimated:YES afterDelay:3.0];

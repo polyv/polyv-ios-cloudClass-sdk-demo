@@ -77,9 +77,15 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 /// 隐藏皮肤
 - (void)skinHiddenAnimaion;
 
+/// 连麦时，由外层调用来改变frame
+- (void)changeFrame:(BOOL)fullscreen block:(void (^)(void))block;
+
 #pragma mark - protected - abstract
 /// 横竖屏旋转动画时，云课堂相关的副窗口需要做动画的逻辑在这里实现（普通直播不需要）
 - (void)deviceOrientationDidChangeSubAnimation;
+
+/// 获取当前连麦窗口的高度（直播需要重写，回放不需要）
+- (CGFloat)getLinkMicHeight;
 
 /// 加载视频播放器
 - (void)loadPlayer;
@@ -103,5 +109,17 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 @optional
 /// 发送一条评论
 - (void)sendText:(PLVBaseMediaViewController *)mediaVC text:(NSString *)text;
+
+/// 直播流状态改变
+- (void)streamStateDidChange:(PLVBaseMediaViewController *)mediaVC streamState:(PLVLiveStreamState)streamState;
+
+/// 播放器播放结束
+- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo;
+
+/// 播放器Seek完成
+- (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
+
+/// 播放器精准Seek完成
+- (void)playerAccurateSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
 
 @end

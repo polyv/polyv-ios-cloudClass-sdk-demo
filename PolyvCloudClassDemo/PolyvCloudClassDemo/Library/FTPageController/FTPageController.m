@@ -20,6 +20,8 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 @property (nonatomic, strong) NSMutableArray *titles;
 @property (nonatomic, strong) NSMutableArray *controllers;
 
+@property (nonatomic, strong) UIView *topLineView;
+
 @property (nonatomic) NSUInteger nextIndex;
 
 @end
@@ -40,13 +42,19 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
         
         [self setupTitles];
         [self setupPageController];
+        
+        [self.view bringSubviewToFront:self.topLineView];
     }
     return self;
 }
 
+- (void)changeFrame {
+    self.pageViewController.view.frame = CGRectMake(0, PageControllerTopBarHeight, kWidth, CGRectGetHeight(self.view.bounds) - PageControllerTopBarHeight);
+}
+
 -(void)setupPageController {
     self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
-    self.pageViewController.view.frame = CGRectMake(0, PageControllerTopBarHeight, kWidth, CGRectGetHeight(self.view.bounds)-PageControllerTopBarHeight);
+    self.pageViewController.view.frame = CGRectMake(0, PageControllerTopBarHeight, kWidth, CGRectGetHeight(self.view.bounds) - PageControllerTopBarHeight);
     self.pageViewController.dataSource = self;
     self.pageViewController.delegate =self;
     NSArray *initControllers = @[self.controllers[0]];
@@ -72,7 +80,8 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     self.titleCollectionView.showsHorizontalScrollIndicator = NO;
     
     [self.titleCollectionView registerNib:[UINib nibWithNibName:@"FTTitleViewCell" bundle:nil] forCellWithReuseIdentifier:TitleCellIdentifier];
-    
+    // TODO: use code class
+    //[self.titleCollectionView registerClass:[FTTitleViewCell class] forCellWithReuseIdentifier:TitleCellIdentifier];
     [self setTitleItemWidth];
 }
 
@@ -117,6 +126,10 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.topLineView = [[UIView alloc] initWithFrame:CGRectMake(0, PageControllerTopBarHeight-1, kWidth, 1)];
+    self.topLineView.backgroundColor =  [UIColor colorWithRed:243.0/255.0 green:243.0/255.0 blue:244.0/255.0 alpha:1.0];
+    [self.view addSubview:self.topLineView];
 }
 
 - (void)didReceiveMemoryWarning {

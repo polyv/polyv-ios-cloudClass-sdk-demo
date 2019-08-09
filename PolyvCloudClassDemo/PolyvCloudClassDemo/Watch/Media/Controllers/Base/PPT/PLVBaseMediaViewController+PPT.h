@@ -22,4 +22,7 @@
 /// 打开副屏
 - (void)openSecondaryView;
 
+/// 在主播放器准备好播放时的回调里调用
+- (void)mainPlaybackIsPreparedToPlay:(NSNotification *)notification;
+
 @end
