@@ -36,8 +36,12 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewState) {
 @interface PLVTextInputView : UIView
 
 @property (nonatomic, weak) id<PLVTextInputViewDelegate> delegate;
-
+/// 键盘弹出时，输入控件加载在整个APP的主窗口上
 @property (nonatomic, weak) UIView *tapSuperView;
+/// 连麦时，外层需要调整吧输入控件frame的Y坐标
+@property (nonatomic, assign) CGFloat originY;
+/// 连麦时，外层改变输入控件的frame时，需要判断输入控件是否是up的弹出状态
+@property (nonatomic, assign) BOOL up;
 
 /// 键盘状态
 @property (nonatomic, assign) PLVTextInputViewState inputState;

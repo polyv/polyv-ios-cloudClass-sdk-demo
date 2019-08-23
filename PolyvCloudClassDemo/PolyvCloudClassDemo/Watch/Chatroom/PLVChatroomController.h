@@ -31,13 +31,16 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 聊天室消息回调
 - (void)chatroom:(PLVChatroomController *)chatroom emitSocketObject:(PLVSocketChatRoomObject *)object;
 
-/// 输入键盘弹出弹入回调，由外层实现相关逻辑
-- (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag;
-
 /// 从外层获取当前频道的SessionId
 - (NSString *)currentChannelSessionId:(PLVChatroomController *)chatroom;
 
+/// 登录成功后，返回登录消息里的user信息，调用PLVPPTViewController里的setUser
+- (void)chatroom:(PLVChatroomController *)chatroom userInfo:(NSDictionary *)userInfo;
+
 @optional
+/// 输入键盘弹出弹入回调，由外层实现相关逻辑
+- (void)chatroom:(PLVChatroomController *)chatroom followKeyboardAnimation:(BOOL)flag;
+
 /// 发言回调，可用于弹幕显示
 - (void)chatroom:(PLVChatroomController *)chatroom didSendSpeakContent:(NSString *)content;
 
@@ -49,6 +52,12 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 
 /// 查看公告
 - (void)readBulletin:(PLVChatroomController *)chatroom;
+
+/// 当前userId已在别处登录，确认后自动退出直播间
+- (void)reLogin:(PLVChatroomController *)chatroom;
+
+/// 刷新连麦窗口的当前在线人数
+- (void)refreshLinkMicOnlineCount:(PLVChatroomController *)chatroom number:(NSUInteger)number;
 
 @end
 
@@ -140,8 +149,10 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
  */
 - (void)sendTextMessage:(NSString *)text;
 
-#pragma mark - chatInputView
-
+/// 取消键盘的输入
 - (void)tapChatInputView;
+
+/// 在连麦时需要调整聊天室的窗口大小
+- (void)resetChatroomFrame:(CGRect)rect;
 
 @end

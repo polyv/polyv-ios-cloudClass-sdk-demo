@@ -17,18 +17,17 @@
 @property (nonatomic, weak) id<PLVMediaSecondaryViewDelegate> delegate;
 /// 是否全屏
 @property (nonatomic, assign) BOOL fullscreen;
+/// 竖屏时是否可以移动（直播不可以，回放可以）
+@property (nonatomic, assign) BOOL canMove;
 
 /// 加在子View
 - (void)loadSubviews;
-
-/// 显示关闭按钮
-- (void)showCloseBtn;
 
 @end
 
 @protocol PLVMediaSecondaryViewDelegate <NSObject>
 
-/// 点击关闭按钮时回调，有外层处理
-- (void)closeSecondaryView:(PLVMediaSecondaryView *)secondaryView;
+/// 云课堂直播时，单击讲师的连麦窗口切换视频和PPT窗口，普通直播不做处理
+- (void)switchScreenOnManualControl:(PLVMediaSecondaryView *)secondaryView;
 
 @end

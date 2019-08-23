@@ -119,9 +119,9 @@
     if (self) {
         self.messageLB = [[PLVCCLabel alloc] init];
         self.messageLB.numberOfLines = 0;
-        self.messageLB.textColor = [UIColor whiteColor];
+        self.messageLB.textColor = [UIColor colorWithWhite:51.0 / 255.0 alpha:1.0];
         self.messageLB.font = CHAT_TEXT_FONT;
-        self.messageLB.backgroundColor = UIColorFromRGB(0x8CC152);
+        self.messageLB.backgroundColor = UIColorFromRGB(0xafcbec);
         self.messageLB.edgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
         [self addSubview:self.messageLB];
     }

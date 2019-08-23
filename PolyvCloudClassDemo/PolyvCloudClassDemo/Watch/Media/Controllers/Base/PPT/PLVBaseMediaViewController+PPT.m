@@ -16,6 +16,30 @@
 @implementation PLVBaseMediaViewController (PPT)
 
 #pragma mark - public
+- (void)dealDeviceOrientationBeignAnimation {
+    if (self.skinView.fullscreen) {
+        if ([self.player isKindOfClass:[PLVLivePlayerController class]]) {
+            [self.view.superview insertSubview:self.secondaryView atIndex:0];
+        } else {
+            [self.view.superview addSubview:self.secondaryView];
+        }
+    } else {
+        [self.view insertSubview:self.secondaryView belowSubview:self.skinView];
+    }
+}
+
+- (void)dealDeviceOrientationEndAnimation {
+    if (self.skinView.fullscreen) {
+        [self.view insertSubview:self.secondaryView belowSubview:self.skinView];
+    } else {
+        if ([self.player isKindOfClass:[PLVLivePlayerController class]]) {
+            [self.view.superview insertSubview:self.secondaryView atIndex:1];
+        } else {
+            [self.view.superview addSubview:self.secondaryView];
+        }
+    }
+}
+
 - (void)dealDeviceOrientationDidChangeSubAnimation {
     UIView *displayView = self.pptOnSecondaryView ? self.mainView : self.secondaryView;
     [self.player setFrame:displayView.bounds];
@@ -29,12 +53,9 @@
             if (safeFrame.origin.y > 0.0) {
                 safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
             }
-            if (safeFrame.size.width < safeFrame.size.height) {
-                safeFrame.size = CGSizeMake(safeFrame.size.height, safeFrame.size.width);
-            }
-            secondaryRect.origin = CGPointMake(safeFrame.origin.x + safeFrame.size.width - secondaryRect.size.width, 0.0);
+            secondaryRect.origin = CGPointMake(safeFrame.origin.x, 0.0);
         } else {
-            secondaryRect.origin = CGPointMake(self.view.bounds.size.width - secondaryRect.size.width, 0.0);
+            secondaryRect.origin = CGPointMake(0.0, 0.0);
         }
     }
     self.secondaryView.frame = secondaryRect;
@@ -62,7 +83,6 @@
 
 - (void)openSecondaryView {
     [self hiddenSecondaryView:NO];
-    [self.secondaryView showCloseBtn];
 }
 
 #pragma mark - PLVPPTMediaProtocol
@@ -72,9 +92,16 @@
     self.secondaryView.delegate = self;
     self.secondaryView.backgroundColor = [UIColor whiteColor];
     [self.secondaryView loadSubviews];
-    [self.view.superview addSubview:self.secondaryView];
+
     [self loadPPT];
     [self loadPlayer];
+    if ([self.player isKindOfClass:[PLVLivePlayerController class]]) {
+        self.secondaryView.canMove = NO;
+        [self.view.superview insertSubview:self.secondaryView belowSubview:self.view];
+    } else {
+        self.secondaryView.canMove = YES;
+        [self.view.superview addSubview:self.secondaryView];
+    }
 }
 
 #pragma mark - private
@@ -82,51 +109,55 @@
     self.pptVC = [[PLVPPTViewController alloc] init];
     self.pptVC.delegate = self;
     self.pptVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-//    [self.pptVC.backgroundImgView setContentMode:UIViewContentModeScaleAspectFit];
     UIView *displayView = self.pptOnSecondaryView ? self.secondaryView : self.mainView;
     self.pptVC.view.frame = displayView.bounds;
     [displayView insertSubview:self.pptVC.view atIndex:0];
+    [self loadPPTEnd];
 }
 
 - (void)hiddenSecondaryView:(BOOL)hidden {
     self.secondaryView.hidden = hidden;
     [self.skinView modifySwitchScreenBtnState:self.secondaryView.hidden pptOnSecondaryView:self.pptOnSecondaryView];
+    [self resetLinkMicTopControlFrame:hidden];
+}
+
+- (void)resetLinkMicTopControlFrame:(BOOL)close {
+    
 }
 
 #pragma mark - PLVMediaSecondaryViewDelegate
-- (void)closeSecondaryView:(PLVMediaSecondaryView *)secondaryView {
-    [self hiddenSecondaryView:YES];
+- (void)switchScreenOnManualControl:(PLVMediaSecondaryView *)secondaryView {
+    [self switchAction:YES];
 }
 
 #pragma mark - PLVPlayerSkinViewDelegate
-- (void)switchScreenOnManualControl:(PLVPlayerSkinView *)skinView {
+- (void)closeSecondaryView:(PLVPlayerSkinView *)skinView {
     if (self.secondaryView.hidden) {
         [self openSecondaryView];
     } else {
-        [self switchAction:YES];
+        [self hiddenSecondaryView:YES];
     }
 }
 
 #pragma mark - PLVPlayerControllerDelegate
-- (void)adPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)subPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = YES;
     if (!self.pptOnSecondaryView) {//主屏切换为暖场，副屏为PPT
         [self switchAction:NO];
     }
-    if (self.pptOnSecondaryView) {//关闭副屏的PPT
-        [self closeSecondaryView:self.secondaryView];
+    if (self.pptOnSecondaryView && !self.secondaryView.hidden) {//关闭副屏的PPT
+        [self closeSecondaryView:self.skinView];
     }
 }
 
-- (void)mainPreparedToPlay:(PLVPlayerController *)playerController {
+- (void)mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
 
-    if ([playerController isKindOfClass:PLVLivePlayerController.class]) {
+    if ([self.player isKindOfClass:PLVLivePlayerController.class]) {
         [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
     }
     
-    self.pptVC.pptPlayable = YES;
     if (self.pptOnSecondaryView && !self.player.playingAD && !self.pptFlag) {//自动切换主屏为PPT，副屏为视频
         self.pptFlag = YES;
         [self switchAction:NO];
@@ -169,6 +200,12 @@
         self.secondaryView.backgroundColor = self.pptVC.pptPlayable ? [UIColor blackColor] : [UIColor whiteColor];
     } else {
         self.mainView.backgroundColor = self.pptVC.pptPlayable ? [UIColor blackColor] : BlueBackgroundColor;
+    }
+}
+
+- (void)sendPaintInfo:(PLVPPTViewController *)pptVC jsonData:(NSString *)jsonData {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(sendPaintInfo:jsonData:)]) {
+        [self.delegate sendPaintInfo:self jsonData:jsonData];
     }
 }
 

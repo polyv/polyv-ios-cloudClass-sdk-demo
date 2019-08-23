@@ -31,6 +31,10 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinMoreViewType) {
 @property (nonatomic, weak) id<PLVPlayerSkinMoreViewDelegate> delegate;
 /// 弹窗类型
 @property (nonatomic, assign) PLVPlayerSkinMoreViewType type;
+/// 多线路
+@property (nonatomic, assign) NSUInteger lines;
+/// 当前线路
+@property (nonatomic, assign) NSInteger curLine;
 /// 码率列表
 @property (nonatomic, strong) NSMutableArray<NSString *> *codeRateItems;
 /// 当前码率
@@ -55,10 +59,13 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinMoreViewType) {
 /// 切换为音频模式
 - (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView switchAudioMode:(BOOL)switchAudioMode;
 
-/// 码率
+/// 切换线路
+- (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView line:(NSUInteger)line;
+
+/// 切换码率
 - (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView codeRate:(NSString *)codeRate;
 
-/// 速率
+/// 切换速率
 - (void)playerSkinMoreView:(PLVPlayerSkinMoreView *)skinMoreView speed:(CGFloat)speed;
 
 @end

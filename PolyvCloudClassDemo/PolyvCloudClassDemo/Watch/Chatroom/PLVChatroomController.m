@@ -188,22 +188,25 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     return self;
 }
 
-#pragma mark - Public
-
-- (void)loadSubViews:(UIView *)tapSuperView {
+- (CGFloat)getInputViewHeight {
     CGFloat h = 50.0;
     if (@available(iOS 11.0, *)) {
         CGRect rect = [UIApplication sharedApplication].delegate.window.bounds;
         CGRect layoutFrame = [UIApplication sharedApplication].delegate.window.safeAreaLayoutGuide.layoutFrame;
         h += (rect.size.height - layoutFrame.origin.y - layoutFrame.size.height);
     }
-    
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds)-h) style:UITableViewStylePlain];
+    return h;
+}
+
+#pragma mark - Public
+- (void)loadSubViews:(UIView *)tapSuperView {
+    CGFloat h = [self getInputViewHeight];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - h) style:UITableViewStylePlain];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.allowsSelection = NO;
     self.tableView.showsHorizontalScrollIndicator = NO;
-    self.tableView.backgroundColor = [UIColor clearColor];
+    self.tableView.backgroundColor = UIColorFromRGB(0xe9ebf5);
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.estimatedRowHeight = 0;
     self.tableView.estimatedSectionHeaderHeight = 0;
@@ -217,12 +220,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         [self refreshClickAction:refreshControl];
     }
     
-    self.chatInputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds)-h, CGRectGetWidth(self.view.bounds), h)];
+    self.chatInputView = [[PLVTextInputView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.view.bounds) - h, CGRectGetWidth(self.view.bounds), h)];
     self.chatInputView.delegate = self;
     self.chatInputView.tapSuperView = tapSuperView;
     [self.view addSubview:self.chatInputView];
     self.chatInputView.disableOtherButtonsInTeacherMode = !self.allowToSpeakInTeacherMode;
     [self.chatInputView loadViews:self.type enableMore:NO];
+    self.chatInputView.originY = self.chatInputView.frame.origin.y;
     
     self.showLatestMessageBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.showLatestMessageBtn.layer.cornerRadius = 15.0;
@@ -247,6 +251,21 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     
     self.reloadTableTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(reloadTable) userInfo:nil repeats:YES];
     [self.reloadTableTimer fire];
+}
+
+- (void)resetChatroomFrame:(CGRect)rect {
+    self.view.frame = rect;
+    self.view.clipsToBounds = YES;
+    self.view.autoresizingMask = UIViewAutoresizingNone;
+
+    CGFloat h = CGRectGetHeight(self.view.bounds) - [self getInputViewHeight];
+    self.tableView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), h);
+    if (!self.chatInputView.up) {// 输入控件的键盘弹出时，不调整frame
+        CGSize inputSize = self.chatInputView.frame.size;
+        CGFloat y = CGRectGetHeight(self.view.bounds) - inputSize.height;
+        self.chatInputView.frame = CGRectMake(0, y >= 0.0 ? y : 0.0, inputSize.width, inputSize.height);
+    }
+    self.chatInputView.originY = h;
 }
 
 - (void)clearResource {
@@ -276,16 +295,30 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_LOGIN: {
             NSString *userId = object.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserUserIdKey];
-            [self.chatroomQueue addSocketChatRoomObject:object me:[userId isEqualToString:socketUser.userId]];
+            BOOL me = [userId isEqualToString:socketUser.userId];
+            [self.chatroomQueue addSocketChatRoomObject:object me:me];
+            if (me && self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
+                [self.delegate chatroom:self userInfo:object.jsonDict];
+            }
+        } break;
+        case PLVSocketChatRoomEventType_RELOGIN: {
+            __weak typeof(self) weakSelf = self;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"当前userId已在别处登录，点击确认后自动退出直播间" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(reLogin:)]) {
+                    [weakSelf.delegate reLogin:weakSelf];
+                }
+            }]];
+            [self presentViewController:alertController animated:YES completion:nil];
         } break;
         case PLVSocketChatRoomEventType_SET_NICK: {
             NSString *status = object.jsonDict[@"status"];
             if ([status isEqualToString:@"success"]) {// success：广播消息
                 if ([object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
                     [[PLVChatroomManager sharedManager] renameUserNick:object.jsonDict[@"nick"]];
+                    [self showMessage:object.jsonDict[@"message"]];
                 }
-            } //else 单播消息（出错）
-            [self showMessage:object.jsonDict[@"message"]];
+            }
         } break;
         case PLVSocketChatRoomEventType_CLOSEROOM: {
             _closed = [object.jsonDict[@"value"][@"closed"] boolValue];
@@ -359,9 +392,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self addModel:model];
         } break;
     }
-    if (object.eventType==PLVSocketChatRoomEventType_LOGIN
-        || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
+    if (object.eventType==PLVSocketChatRoomEventType_LOGIN || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
         self.onlineCount = [object.jsonDict[@"onlineUserNumber"] unsignedIntegerValue];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(refreshLinkMicOnlineCount:number:)]) {
+            [self.delegate refreshLinkMicOnlineCount:self number:self.onlineCount];
+        }
     }
 }
 
@@ -412,7 +447,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 #pragma mark - Private methods
-
 - (void)tapChatInputView {
     if (self.chatInputView) {
         [self.chatInputView tapAction];
@@ -935,17 +969,17 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 - (void)uploadImage:(UIImage *)image imageId:(NSString *)imageId imageName:(NSString *)imageName {
     __weak typeof(self) weakSelf = self;
-    [PLVLiveVideoAPI uploadImage:image imageName:imageName progress:^(NSProgress * _Nonnull progress) {
-        [self uploadImageProgress:progress.fractionCompleted withImageId:imageId];
+    [PLVLiveVideoAPI uploadImage:image imageName:imageName progress:^(float fractionCompleted) {
+        [weakSelf uploadImageProgress:fractionCompleted withImageId:imageId];
     } success:^(NSDictionary * _Nonnull uploadImageTokenDict, NSString * _Nonnull key, NSString * _Nonnull imageName) {
-        [self uploadImageProgress:1.0 withImageId:imageId];
+        [weakSelf uploadImageProgress:1.0 withImageId:imageId];
         
         PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
         PLVSocketChatRoomObject *uploadedObject = [PLVSocketChatRoomObject chatRoomObjectForUploadImage:@(weakSelf.roomId).stringValue accountId:liveConfig.userId sessionId:[weakSelf currentChannelSessionId] tokenDict:uploadImageTokenDict key:key imageId:imageId imageWidth:image.size.width imageHeight:image.size.height];
         [weakSelf emitChatroomMessageWithObject:uploadedObject];
     } fail:^(NSError * _Nonnull error) {
         NSLog(@"上传图片失败：%@", error.description);
-        [self uploadImageFail:imageId];
+        [weakSelf uploadImageFail:imageId];
     }];
 }
 

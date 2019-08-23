@@ -78,6 +78,7 @@
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView*)collectionView {
+    if (!self.viewerSendImgEnabled) { return 1; }
     return 3;
 }
 
@@ -89,15 +90,21 @@
     PLVMoreCollectionViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:PLVMoreCollectionViewCellIdentifier forIndexPath:indexPath];
     
     NSInteger index = indexPath.row + indexPath.section * NumberOfItemsInSection;
-    if (index == 0) {
-        [cell.moreBtn setImage:[UIImage imageNamed:@"plv_album.png"] forState:UIControlStateNormal];
-        [cell.moreBtn setTitle:@"照片" forState:UIControlStateNormal];
-        [cell.moreBtn addTarget:self action:@selector(openAlbum:) forControlEvents:UIControlEventTouchUpInside];
-    } else if (index == 1) {
-        [cell.moreBtn setImage:[UIImage imageNamed:@"plv_shoot.png"] forState:UIControlStateNormal];
-        [cell.moreBtn setTitle:@"拍摄" forState:UIControlStateNormal];
-        [cell.moreBtn addTarget:self action:@selector(shoot:) forControlEvents:UIControlEventTouchUpInside];
-    }else if (index == 2) {
+    if (self.viewerSendImgEnabled) {
+        if (index == 0) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_album.png"] forState:UIControlStateNormal];
+            [cell.moreBtn setTitle:@"照片" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(openAlbum:) forControlEvents:UIControlEventTouchUpInside];
+        } else if (index == 1) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_shoot.png"] forState:UIControlStateNormal];
+            [cell.moreBtn setTitle:@"拍摄" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(shoot:) forControlEvents:UIControlEventTouchUpInside];
+        }else if (index == 2) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
+            [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }else{
         [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
         [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
         [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
@@ -141,6 +148,13 @@
         size = CGSizeMake(self.flowLayout.sectionInset.right, self.collectionView.bounds.size.height);
     }
     return size;
+}
+
+#pragma mark - Public
+- (void)setViewerSendImgEnabled:(BOOL)viewerSendImgEnabled{
+    BOOL oriValue = _viewerSendImgEnabled;
+    _viewerSendImgEnabled = viewerSendImgEnabled;
+    if (oriValue != viewerSendImgEnabled) { [self.collectionView reloadData]; }
 }
 
 @end
