@@ -35,6 +35,8 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 @property (nonatomic, weak) IBOutlet UITextField *vIdTF;
 @property (nonatomic, weak) IBOutlet UIButton *loginBtn;
 
+@property (weak, nonatomic) IBOutlet UISwitch *enterSwitch;
+
 @end
 
 @implementation PLVLoginViewController
@@ -246,8 +248,14 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     // 抽奖功能必须固定唯一的 nickName 和 userId，如果忘了填写上次的中奖信息，有固定的 userId 还会再次弹出相关填写页面
 //    liveVC.nickName = @"iOS user"; // 设置登录聊天室的用户名
 //    liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
-   
-    [vc presentViewController:liveVC animated:YES completion:nil];
+
+    if (self.enterSwitch.isOn) {
+        if (@available(iOS 13.0, *)) { liveVC.modalPresentationStyle = UIModalPresentationFullScreen; }
+        [vc presentViewController:liveVC animated:YES completion:nil];
+    } else {
+        // 支持导航跳转，暂不支持系统导航栏控制（影响UI及退出等）
+        [self.navigationController pushViewController:liveVC animated:YES];
+    }
 }
 
 - (void)presentToVodViewControllerFromViewController:(UIViewController *)vc vodType:(BOOL)vodType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
@@ -263,7 +271,14 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVVodViewController *vodVC = [PLVVodViewController new];
     vodVC.vodType = vodType ? PLVVodViewControllerTypeCloudClass : PLVVodViewControllerTypeLive;
     vodVC.channelMenuInfo = channelMenuInfo;
-    [vc presentViewController:vodVC animated:YES completion:nil];
+    
+    if (self.enterSwitch.isOn) {
+        if (@available(iOS 13.0, *)) { vodVC.modalPresentationStyle = UIModalPresentationFullScreen; }
+        [vc presentViewController:vodVC animated:YES completion:nil];
+    } else {
+        // 支持导航跳转，暂不支持系统导航栏控制（影响UI及退出等）
+        [self.navigationController pushViewController:vodVC animated:YES];
+    }
 }
 
 - (void)presentToAlertViewControllerWithError:(NSError *)error inViewController:(UIViewController *)vc {

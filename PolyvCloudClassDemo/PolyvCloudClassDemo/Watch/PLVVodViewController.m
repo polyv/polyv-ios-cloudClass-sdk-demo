@@ -68,6 +68,22 @@
 //    [self playerPolling];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (self.navigationController) {
+        self.navigationController.navigationBarHidden = YES;
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if (self.navigationController) {
+        self.navigationController.navigationBarHidden = NO;
+    }
+}
+
 - (void)playerPolling {
     if (@available(iOS 10.0, *)) {
         self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
@@ -155,7 +171,11 @@
         [self.pollingTimer invalidate];
         self.pollingTimer = nil;
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.navigationController) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC {

@@ -28,4 +28,14 @@
     return YES;
 }
 
+// 禁用第三方键盘（H5界面偏移问题）\
+使用第三方键盘时，如出现中奖和h5交互，用户输出文字时界面不会正常偏移\
+如不禁用，可在输出信息时切换回系统键盘
+- (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
+    if ([extensionPointIdentifier isEqualToString:UIApplicationKeyboardExtensionPointIdentifier]) {
+        return NO;
+    }
+    return YES;
+}
+
 @end

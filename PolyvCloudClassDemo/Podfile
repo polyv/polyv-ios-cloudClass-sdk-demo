@@ -6,11 +6,9 @@ target 'PolyvCloudClassDemo' do
   use_frameworks!
 
   pod 'Masonry', '~> 1.1.0'
-  pod 'SDWebImage', '~> 4.4.0'
-#pod 'SDWebImage', '~> 4.2.0'
+  pod 'SDWebImage', '4.4.0'
   
   # Pods for PolyvCloudClassDemo
-  pod 'PolyvCloudClassSDK', '0.9.0-beta' # polyv 云课堂 SDK
+  pod 'PolyvCloudClassSDK', '0.9.0' # polyv 云课堂 SDK
 
-  #  pod 'Starscream', '3.0.5'           # Xcode 10 以下添加
 end

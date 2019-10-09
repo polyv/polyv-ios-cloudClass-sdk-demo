@@ -25,6 +25,7 @@
 @property (nonatomic, strong) PLVVideoMarquee *videoMarquee; // 视频跑马灯
 @property (nonatomic, strong) UIButton *backBtn;
 @property (nonatomic, assign) BOOL iPad;
+@property (nonatomic, assign) BOOL hadSetEnableDanmuModule;
 
 @end
 
@@ -147,6 +148,7 @@
 - (void)setEnableDanmuModule:(BOOL)enableDanmuModule{
     _enableDanmuModule = enableDanmuModule;
     [self refreshDanmuModuleState];
+    _hadSetEnableDanmuModule = YES;
 }
 
 - (void)setShowDanmuOnPortrait:(BOOL)showDanmuOnPortrait{
@@ -238,7 +240,7 @@
     
     UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
 
-    if (UIDeviceOrientationIsFlat(orientation) || orientation == UIDeviceOrientationUnknown) {
+    if (self.hadSetEnableDanmuModule && (UIDeviceOrientationIsFlat(orientation) || orientation == UIDeviceOrientationUnknown)) {
         return;
     }
     

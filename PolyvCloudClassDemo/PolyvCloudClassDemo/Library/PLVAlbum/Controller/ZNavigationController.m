@@ -25,7 +25,7 @@ UIColor *ViewBackgroupColor;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if ([UIScreen mainScreen].bounds.size.height == 812) {
+    if ([UIScreen mainScreen].bounds.size.height >= 812) {
         ToolbarHeight = 84.0;
         LimitMemeory = 1024 * 1024 * 120;
         MemeoryLarge = 1024 * 1024 * 80;

@@ -7,6 +7,7 @@
 //
 
 #import "PLVChatroomManager.h"
+#import <PolyvFoundationSDK/PLVFdUtil.h>
 
 static PLVChatroomManager *manager = nil;
 
@@ -37,8 +38,8 @@ static PLVChatroomManager *manager = nil;
 
 + (PLVChatroomModel *)modelWithHistoryMessageDict:(NSDictionary *)messageDict {
     PLVChatroomModel *model;
-    NSString *msgType = messageDict[@"msgType"];
-    NSString *msgSource = messageDict[@"msgSource"];
+    NSString *msgType = Fd_StringValueWithJsonValue(messageDict[@"msgType"]);
+    NSString *msgSource = Fd_StringValueWithJsonValue(messageDict[@"msgSource"]);
     
     if (msgType) {
         if ([msgType isEqualToString:@"customMessage"]) { // 自定义消息
@@ -54,7 +55,7 @@ static PLVChatroomManager *manager = nil;
             model = [PLVChatroomModel modelWithObject:chatroomObject];
         } // redpaper（红包）、get_redpaper（领红包）
     } else {
-        NSString *uid = [NSString stringWithFormat:@"%@",messageDict[@"user"][@"uid"]];
+        NSString *uid = Fd_StringValueWithJsonValue(messageDict[@"user"][@"uid"]);
         if ([uid isEqualToString:@"1"] || [uid isEqualToString:@"2"]) {
             // uid = 1，打赏消息；uid = 2，自定义消息
         }else { // 发言消息
@@ -75,10 +76,10 @@ static PLVChatroomManager *manager = nil;
     
     PLVChatroomCustomModel *customModel;
     NSString *event = customMessage[@"EVENT"];
-    if ([customMessage[@"version"] integerValue] == 1) {
+    if (Fd_IntegerValueWithJsonValue(customMessage[@"version"]) == 1) {
         if (!mine) {
             // 如果提交的消息广播返回了自己需要过滤掉此消息
-            NSString *userId = customMessage[@"user"][@"userId"];
+            NSString *userId = Fd_StringValueWithJsonValue(customMessage[@"user"][@"userId"]);
             if ([userId isEqualToString:manager.socketUser.userId]) {
                 return nil;
             }
