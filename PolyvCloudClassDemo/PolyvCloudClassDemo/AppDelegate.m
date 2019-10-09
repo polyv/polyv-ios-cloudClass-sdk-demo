@@ -19,7 +19,7 @@
     liveConfig.userId = ;
     liveConfig.appSecret = ;
     
-    /// 直播后，在（https://live.polyv.net/#/channel/你的频道号/playback）中可把某段视频转存到回放列表，然后在官网（https://my.polyv.net/secure/video/）上找到回放的 vodId 字符串值
+    /// 直播回放Id
     liveConfig.vodId = ;
     
     // 配置统计后台参数：用户Id、用户昵称及自定义参数
