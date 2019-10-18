@@ -9,7 +9,7 @@
 #import "PLVPlayerSkinView.h"
 #import <MediaPlayer/MPVolumeView.h>
 #import <Masonry/Masonry.h>
-#import <PolyvFoundationSDK/PLVDateUtil.h>
+#import <PolyvFoundationSDK/PLVFdUtil.h>
 #import "PLVBrightnessView.h"
 #import "PCCUtils.h"
 
@@ -260,10 +260,18 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
             closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
-            danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            if (self.type == PLVPlayerSkinViewTypeNormalLive) {
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding);
+            } else {
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            }
         } else {
             closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
-            danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2);
+            if (self.type == PLVPlayerSkinViewTypeNormalLive) {
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding);
+            } else {
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2);
+            }
         }
     } else {
         UIEdgeInsets sliderBackgroundMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, 0.0);
@@ -403,7 +411,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
                 CGFloat dx = p.x - self.lastPoint.x;
                 self.slider.value = [self valueOfDistance:dx baseValue:self.slider.value];
                 self.seekSlider.value = self.slider.value;
-                NSString *text = [PLVDateUtil secondsToString:self.slider.value * self.duration];
+                NSString *text = [PLVFdUtil secondsToString:self.slider.value * self.duration];
                 self.currentPlayTimeLabel.text = text;
                 self.seekTimeLable.text = text;
                 if (gestureRecognizer.state == UIGestureRecognizerStateEnded || gestureRecognizer.state == UIGestureRecognizerStateCancelled) {

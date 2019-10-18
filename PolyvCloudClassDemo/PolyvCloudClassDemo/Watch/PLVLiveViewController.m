@@ -62,18 +62,26 @@
     
     [self initData];
     
-    BOOL watchPermission = [PLVChatroomController havePermissionToWatchLive:self.channelId];
-    if (watchPermission) {
-        [self addMediaViewController];
-        [self loadChannelMenuInfos];
-    } else {
-        __weak typeof(self) weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf exitCurrentControllerWithAlert:nil message:@"您未被授权观看本直播"];
-        });
-    }
+    [self addMediaViewController];
+    [self loadChannelMenuInfos];
     
 //    [self playerPolling];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    if (self.navigationController) {
+        self.navigationController.navigationBarHidden = YES;
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if (self.navigationController) {
+        self.navigationController.navigationBarHidden = NO;
+    }
 }
 
 - (void)playerPolling {
@@ -131,6 +139,7 @@
     self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
     self.mediaVC.view.frame = self.mediaVC.originFrame;
     [self.view addSubview:self.mediaVC.view];
+    //self.mediaVC.showDanmuOnPortrait = YES; // 竖屏显示弹幕按钮
     
     CGFloat secondaryWidth = (int)([UIScreen mainScreen].bounds.size.width / self.linkMicVC.colNum);
     CGFloat secondaryHeight = (int)(secondaryWidth * PPTPlayerViewScale);
@@ -204,7 +213,7 @@
     }
     
     if (titles.count>0 && controllers.count>0 && titles.count==controllers.count) {
-        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers barHeight:barHeight touchHeight:26.0];
+        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers barHeight:barHeight touchHeight:16.0];
         self.pageController.delegate = self;
         self.pageController.view.frame = pageCtrlFrame;
         [self.view insertSubview:self.pageController.view belowSubview:self.mediaVC.view];  // 需要添加在播放器下面，使得播放器全屏的时候能盖住聊天室
@@ -333,7 +342,11 @@
         [self.pollingTimer invalidate];
         self.pollingTimer = nil;
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.navigationController) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void)exitCurrentControllerWithAlert:(NSString *)title message:(NSString *)message {
@@ -365,6 +378,12 @@
 }
 
 #pragma mark - PLVSocketIODelegate
+- (void)socketIO:(PLVSocketIO *)socketIO didLoginFailed:(NSDictionary *)jsonDict {
+    NSLog(@"%s %@",__FUNCTION__,jsonDict);
+    [socketIO disconnect];
+    [self exitCurrentControllerWithAlert:nil message:@"您未被授权观看本直播"];
+}
+
 // 此方法可能多次调用，如锁屏后返回会重连聊天室
 - (void)socketIO:(PLVSocketIO *)socketIO didConnectWithInfo:(NSString *)info {
     NSLog(@"%@--%@", NSStringFromSelector(_cmd), info);

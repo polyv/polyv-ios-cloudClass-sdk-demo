@@ -19,12 +19,22 @@
     liveConfig.userId = ;
     liveConfig.appSecret = ;
     
-    /// 直播后，在（https://live.polyv.net/#/channel/你的频道号/playback）中可把某段视频转存到回放列表，然后在官网（https://my.polyv.net/secure/video/）上找到回放的 vodId 字符串值
+    /// 直播回放Id
     liveConfig.vodId = ;
     
     // 配置统计后台参数：用户Id、用户昵称及自定义参数
     [PLVLiveVideoConfig setViewLogParam:nil param2:nil param4:nil param5:nil];
     
+    return YES;
+}
+
+// 禁用第三方键盘（H5界面偏移问题）\
+使用第三方键盘时，如出现中奖和h5交互，用户输出文字时界面不会正常偏移\
+如不禁用，可在输出信息时切换回系统键盘
+- (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
+    if ([extensionPointIdentifier isEqualToString:UIApplicationKeyboardExtensionPointIdentifier]) {
+        return NO;
+    }
     return YES;
 }
 

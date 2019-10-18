@@ -9,7 +9,7 @@
 #import "PLVChatroomController.h"
 #import <Masonry/Masonry.h>
 #import <SDWebImage/SDWebImageDownloader.h>
-#import <PolyvFoundationSDK/PLVDateUtil.h>
+#import <PolyvFoundationSDK/PLVFdUtil.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
 #import "PLVChatroomModel.h"
@@ -126,7 +126,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 - (void)setSwitchInfo:(NSDictionary *)switchInfo {
     _switchInfo = switchInfo;
     if (self.type != PLVTextInputViewTypePrivate) {
-        //_closed = ![switchInfo[@"chat"] boolValue];
+        _closed = ![switchInfo[@"chat"] boolValue];
         self.enableWelcome = [switchInfo[@"welcome"] boolValue]; // 欢迎语开关
         if ([switchInfo[@"viewerSendImgEnabled"] boolValue]) { // 图片开关
             [self.chatInputView loadViews:self.type enableMore:YES];
@@ -295,7 +295,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_LOGIN: {
             NSString *userId = object.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserUserIdKey];
-            BOOL me = [userId isEqualToString:socketUser.userId];
+            BOOL me = [Fd_StringValueWithJsonValue(userId) isEqualToString:socketUser.userId];
             [self.chatroomQueue addSocketChatRoomObject:object me:me];
             if (me && self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
                 [self.delegate chatroom:self userInfo:object.jsonDict];
@@ -312,9 +312,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self presentViewController:alertController animated:YES completion:nil];
         } break;
         case PLVSocketChatRoomEventType_SET_NICK: {
-            NSString *status = object.jsonDict[@"status"];
+            NSString *status = Fd_StringValueWithJsonValue(object.jsonDict[@"status"]);
             if ([status isEqualToString:@"success"]) {// success：广播消息
-                if ([object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
+                if ([Fd_StringValueWithJsonValue(object.jsonDict[@"userId"]) isEqualToString:socketUser.userId]) {
                     [[PLVChatroomManager sharedManager] renameUserNick:object.jsonDict[@"nick"]];
                     [self showMessage:object.jsonDict[@"message"]];
                 }
@@ -331,17 +331,18 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self clearAllData];
         } break;
         case PLVSocketChatRoomEventType_ADD_SHIELD: {
-            if ([object.jsonDict[@"value"] isEqualToString:socketUser.clientIp]) {
+            if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
                 socketUser.banned = YES;
             }
         } break;
         case PLVSocketChatRoomEventType_REMOVE_SHIELD: {
-            if ([object.jsonDict[@"value"] isEqualToString:socketUser.clientIp]) {
+            if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
                 socketUser.banned = NO;
             }
         } break;
         case PLVSocketChatRoomEventType_KICK: {
-            if ([object.jsonDict[@"user"][@"userId"] isEqualToString:socketUser.userId]) {
+            NSString *userId = Fd_StringValueWithJsonValue(object.jsonDict[@"user"][@"userId"]);
+            if ([userId isEqualToString:socketUser.userId]) {
                 [forbiddenUsers addObject:@(self.roomId)];
                 if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:didOpenError:)]) {
                     [self.delegate chatroom:self didOpenError:PLVChatroomErrorCodeBeKicked];
@@ -383,7 +384,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             }
         } break;
         case PLVSocketChatRoomEventType_LIKES: {
-            if (![object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
+            if (![Fd_StringValueWithJsonValue(object.jsonDict[@"userId"]) isEqualToString:socketUser.userId]) {
                 [self handleLikeSocket:object];
             }
         } break;
@@ -393,7 +394,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } break;
     }
     if (object.eventType==PLVSocketChatRoomEventType_LOGIN || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
-        self.onlineCount = [object.jsonDict[@"onlineUserNumber"] unsignedIntegerValue];
+        self.onlineCount = Fd_IntegerValueWithJsonValue(object.jsonDict[@"onlineUserNumber"]);
         if (self.delegate && [self.delegate respondsToSelector:@selector(refreshLinkMicOnlineCount:number:)]) {
             [self.delegate refreshLinkMicOnlineCount:self number:self.onlineCount];
         }
@@ -839,6 +840,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     pickerVC.delegate = self;
     ZNavigationController *navigationController = [[ZNavigationController alloc] initWithRootViewController:pickerVC];
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    if (@available(iOS 13.0, *)) { navigationController.modalPresentationStyle = UIModalPresentationFullScreen; }
     [(UIViewController *)self.delegate presentViewController:navigationController animated:YES completion:nil];
 }
 
@@ -847,6 +849,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
     cameraVC.delegate = self;
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    if (@available(iOS 13.0, *)) { cameraVC.modalPresentationStyle = UIModalPresentationFullScreen; }
     [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
 }
 
@@ -959,7 +962,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 #pragma mark Upload Image
 - (void)uploadImage:(UIImage *)image {
-    NSString *imageId = [NSString stringWithFormat:@"chat_img_iOS_%@", [PLVDateUtil curTimeStamp]];
+    NSString *imageId = [NSString stringWithFormat:@"chat_img_iOS_%@", [PLVFdUtil curTimeStamp]];
     NSString *imageName = [NSString stringWithFormat:@"%@.jpeg", imageId];
     PLVSocketChatRoomObject *uploadObject = [PLVSocketChatRoomObject chatRoomObjectForSendImageWithValues:@[imageId, image]];
     PLVChatroomModel *model = [PLVChatroomModel modelWithObject:uploadObject];

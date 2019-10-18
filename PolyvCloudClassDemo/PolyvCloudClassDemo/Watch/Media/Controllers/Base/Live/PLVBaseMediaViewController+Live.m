@@ -119,8 +119,8 @@
         self.danmuLayer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.danmuLayer.hidden = YES;
         self.danmuLayer.userInteractionEnabled = NO;
-        [self.view insertSubview:self.danmuLayer belowSubview:self.skinView];
     }
+    [self.mainView addSubview:self.danmuLayer];
 }
 
 - (void)addDanmuInputView {

@@ -56,9 +56,6 @@
 		229F768F21ABA1600085F5DE /* PLVPlayerSkinView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766321ABA1600085F5DE /* PLVPlayerSkinView.m */; };
 		229F769021ABA1600085F5DE /* PLVBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766521ABA1600085F5DE /* PLVBrightnessView.m */; };
 		229F769121ABA1600085F5DE /* PLVMediaSecondaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766821ABA1600085F5DE /* PLVMediaSecondaryView.m */; };
-		229F827321C79C6500446B9A /* PolyvBusinessSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */; };
-		229F827521C79C6500446B9A /* PolyvCloudClassSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */; };
-		229F827721C79C6500446B9A /* PolyvFoundationSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */; };
 		22AD6182218316A50053F496 /* plv_clear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22AD6181218316A50053F496 /* plv_clear@2x.png */; };
 		22B27D71219BC5F8003550EA /* plv_clear@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22B27D6F219BC5F8003550EA /* plv_clear@3x.png */; };
 		22B27D72219BC5F8003550EA /* plv_logo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22B27D70219BC5F8003550EA /* plv_logo@3x.png */; };
@@ -182,7 +179,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		2207EAF321AE32F40011B0EB /* PLVChatroomQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomQueue.h; sourceTree = "<group>"; };
 		2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomQueue.m; sourceTree = "<group>"; };
 		220CB16B21B8C95B0034C384 /* PLVTextInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVTextInputView.m; sourceTree = "<group>"; };
@@ -256,9 +252,6 @@
 		229F766621ABA1600085F5DE /* PLVPlayerSkinView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinView.h; sourceTree = "<group>"; };
 		229F766721ABA1600085F5DE /* PLVBrightnessView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVBrightnessView.h; sourceTree = "<group>"; };
 		229F766821ABA1600085F5DE /* PLVMediaSecondaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVMediaSecondaryView.m; sourceTree = "<group>"; };
-		229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvBusinessSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvCloudClassSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvFoundationSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		22AD6181218316A50053F496 /* plv_clear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_clear@2x.png"; sourceTree = "<group>"; };
 		22B27D6F219BC5F8003550EA /* plv_clear@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_clear@3x.png"; sourceTree = "<group>"; };
 		22B27D70219BC5F8003550EA /* plv_logo@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_logo@3x.png"; sourceTree = "<group>"; };
@@ -366,8 +359,6 @@
 		22FB80EC212AB55100B5CB53 /* ZJZDanMu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMu.h; sourceTree = "<group>"; };
 		298A8E4522B1430D00706456 /* plv_notice@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@3x.png"; sourceTree = "<group>"; };
 		298A8E4622B1430D00706456 /* plv_notice@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@2x.png"; sourceTree = "<group>"; };
-		337B9B2EFB94B7084528F3CD /* Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-business-cloudClass-PolyvCloudClassDemo/Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		4838A4655D4B6EA2685A4D5C /* Pods-common-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-PolyvCloudClassDemo/Pods-common-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		632516C822AE101D008636C6 /* PLVPlayerInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerInputView.m; sourceTree = "<group>"; };
 		632516C922AE101D008636C6 /* PLVPlayerInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVPlayerInputView.h; sourceTree = "<group>"; };
 		63589FF022BC79A9007D4151 /* dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = dist; sourceTree = "<group>"; };
@@ -375,6 +366,7 @@
 		639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinAudioModeView.m; sourceTree = "<group>"; };
 		63E8C8CF22A64B2B00CF5129 /* PLVPlayerSkinMoreView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinMoreView.h; sourceTree = "<group>"; };
 		63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinMoreView.m; sourceTree = "<group>"; };
+		66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		67219F48217F3B4300756A54 /* plv_btn_download@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@2x.png"; sourceTree = "<group>"; };
 		67219F49217F3B4300756A54 /* plv_btn_download@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@3x.png"; sourceTree = "<group>"; };
 		672D7CE9212D7B1500974886 /* FTPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTPageController.h; sourceTree = "<group>"; };
@@ -406,10 +398,7 @@
 		677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou1_img@2x.png"; sourceTree = "<group>"; };
 		677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@2x.png"; sourceTree = "<group>"; };
 		677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@3x.png"; sourceTree = "<group>"; };
-		7DE2F91846E9E5A421F4F06D /* Pods-common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-PolyvCloudClassDemo/Pods-common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
-		A3211725223B6ED7551DBB2E /* Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-business-cloudClass-PolyvCloudClassDemo/Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
-		B06169596654856DABAB8966 /* Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-sdk_common-PolyvCloudClassDemo/Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
-		C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 		DA45A51022BB6B41004CFEB2 /* PLVLiveInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVLiveInfoViewController.m; sourceTree = "<group>"; };
 		DA45A51122BB6B41004CFEB2 /* PLVLiveInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVLiveInfoViewController.h; sourceTree = "<group>"; };
 		DA45A52422BC83EB004CFEB2 /* plv_img_watch@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_watch@3x.png"; sourceTree = "<group>"; };
@@ -421,7 +410,6 @@
 		DA45A53422BC8D15004CFEB2 /* plv_img_channel_default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_channel_default@2x.png"; sourceTree = "<group>"; };
 		DA45A53522BC8D15004CFEB2 /* plv_img_channel_default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_channel_default@3x.png"; sourceTree = "<group>"; };
 		DA8A0E43CDED52C9A0030B12 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DFDCCFFD5A59384128F9572A /* Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-sdk_common-PolyvCloudClassDemo/Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -429,9 +417,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				229F827321C79C6500446B9A /* PolyvBusinessSDK.framework in Frameworks */,
-				229F827521C79C6500446B9A /* PolyvCloudClassSDK.framework in Frameworks */,
-				229F827721C79C6500446B9A /* PolyvFoundationSDK.framework in Frameworks */,
 				711102FAFCF6DA1944A38DFC /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -989,9 +974,6 @@
 		8F0F50E05503F0F99A6A8D07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */,
-				229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */,
-				229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */,
 				DA8A0E43CDED52C9A0030B12 /* Pods_PolyvCloudClassDemo.framework */,
 			);
 			name = Frameworks;
@@ -1000,14 +982,8 @@
 		AB0E412E19A1496BAD99BFDC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
-				C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */,
-				4838A4655D4B6EA2685A4D5C /* Pods-common-PolyvCloudClassDemo.debug.xcconfig */,
-				7DE2F91846E9E5A421F4F06D /* Pods-common-PolyvCloudClassDemo.release.xcconfig */,
-				DFDCCFFD5A59384128F9572A /* Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig */,
-				B06169596654856DABAB8966 /* Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig */,
-				337B9B2EFB94B7084528F3CD /* Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig */,
-				A3211725223B6ED7551DBB2E /* Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig */,
+				66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
+				6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1435,7 +1411,7 @@
 		};
 		22142F662113094200062C6E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
+			baseConfigurationReference = 66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1456,6 +1432,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolyvCloudClassDemo",
 				);
+				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1501,7 +1478,7 @@
 		};
 		22142F672113094200062C6E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */;
+			baseConfigurationReference = 6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1522,6 +1499,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolyvCloudClassDemo",
 				);
+				MARKETING_VERSION = 0.9.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

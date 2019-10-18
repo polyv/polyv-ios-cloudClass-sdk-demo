@@ -85,7 +85,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 @property (nonatomic, assign) BOOL allowToSpeakInTeacherMode;
 
 /**
- 是否有观看直播权限
+ 是否有观看直播权限（0.9.0废弃，由服务器处理）
+ 参看SocketIO -socketIO: didLoginFailed: 回调方法
 
  @param roomId 房间号
  @return YES/NO
