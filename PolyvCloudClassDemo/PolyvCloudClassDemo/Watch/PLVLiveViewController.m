@@ -24,7 +24,6 @@
 @interface PLVLiveViewController () <PLVBaseMediaViewControllerDelegate, PLVTriviaCardViewControllerDelegate,  PLVLinkMicControllerDelegate, PLVSocketIODelegate, PLVChatroomDelegate, FTPageControllerDelegate>
 
 @property (nonatomic, assign) NSUInteger channelId;//当前直播的频道号
-@property (nonatomic, strong) PLVSocketIO *socketIO;
 
 @property (nonatomic, strong) PLVBaseMediaViewController<PLVLiveMediaProtocol> *mediaVC;//播放器控件
 @property (nonatomic, strong) PLVTriviaCardViewController *triviaCardVC;//答题卡控件
@@ -40,7 +39,11 @@
 @property (nonatomic, assign) BOOL movingChatroom;
 @property (nonatomic, assign) BOOL moveChatroomUp;
 
+@property (nonatomic, strong) PLVSocketIO *socketIO;
+@property (nonatomic, assign) BOOL loginSuccess;
+
 @property (nonatomic, strong) NSTimer *pollingTimer;
+@property (nonatomic, assign) int reconnectCount;
 
 @end
 
@@ -94,6 +97,7 @@
 
 #pragma mark - init
 - (void)initData {
+    self.reconnectCount = 0;
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     self.channelId = liveConfig.channelId.integerValue;
     
@@ -105,7 +109,7 @@
      */
     PLVSocketObject *loginUser = [PLVSocketObject socketObjectForLoginWithRoomId:self.channelId nickName:self.nickName avatar:self.avatarUrl userId:nil accountId:[PLVLiveVideoConfig sharedInstance].userId authorization:nil userType:userType];
     loginUser.defaultUser = NO; // 屏蔽聊天室点击输入栏弹窗提示输入昵称
-    [PLVChatroomManager sharedManager].loginUser = loginUser;
+    [PLVChatroomManager sharedManager].socketUser = loginUser;
 }
 
 - (void)addMediaViewController {
@@ -113,7 +117,7 @@
     self.mediaViewControllerHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
     
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
-    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].loginUser;
+    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].socketUser;
     
     if (self.liveType == PLVLiveViewControllerTypeCloudClass) {
         self.mediaVC = [[PLVPPTLiveMediaViewController alloc] init];
@@ -123,7 +127,7 @@
     
     self.linkMicVC = [[PLVLinkMicController alloc] init];
     self.linkMicVC.delegate = self;
-    self.linkMicVC.login = [PLVChatroomManager sharedManager].loginUser;
+    self.linkMicVC.login = [PLVChatroomManager sharedManager].socketUser;
     if (self.liveType == PLVLiveViewControllerTypeLive) {
         self.linkMicVC.linkMicType = PLVLinkMicTypeNormalLive;//开启视频连麦时，普通直播的连麦窗口是音频模式(旧版推流端)，或者视频模式（新版推流端，对齐云课堂的连麦方式）
     } else {
@@ -316,13 +320,7 @@
 - (void)loadChatroomInfos {
     __weak typeof(self) weakSelf = self;
     [PLVLiveVideoAPI loadChatroomFunctionSwitchWithRoomId:self.channelId completion:^(NSDictionary *switchInfo) {
-        PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
-        [PLVLiveVideoAPI requestAuthorizationForLinkingSocketWithChannelId:weakSelf.channelId Appld:liveConfig.appId appSecret:liveConfig.appSecret success:^(NSDictionary *responseDict) {
-            weakSelf.mediaVC.linkMicVC.linkMicParams = responseDict;
-            [weakSelf initSocketIOWithTokenInfo:responseDict];
-        } failure:^(NSError *error) {
-            [PCCUtils showHUDWithTitle:@"聊天室Token获取失败！" detail:error.localizedDescription view:weakSelf.view];
-        }];
+        [weakSelf initSocketIO];
         [weakSelf.publicChatroomViewController setSwitchInfo:switchInfo];
     } failure:^(NSError *error) {
         [PCCUtils showHUDWithTitle:@"聊天室状态获取失败！" detail:error.localizedDescription view:weakSelf.view];
@@ -359,14 +357,24 @@
 }
 
 #pragma mark - SocketIO init / clear
-- (void)initSocketIOWithTokenInfo:(NSDictionary *)responseDict {
+- (void)initSocketIO {
     if (self.socketIO) {
         return;
     }
-    self.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:responseDict[@"chat_token"] url:nil enableLog:NO];//初始化 socketIO 连接对象
-    self.socketIO.delegate = self;
-    [self.socketIO connect];
-//  self.socketIO.debugMode = YES;
+    
+    __weak typeof(self) weakSelf = self;
+    NSString *chatUserId = [PLVChatroomManager sharedManager].socketUser.userId;
+    [PLVLiveVideoAPI getChatTokenWithChannelId:weakSelf.channelId userId:chatUserId completion:^(NSDictionary * data, NSError * error) {
+        if (error) {
+            [PCCUtils showHUDWithTitle:@"聊天室Token获取失败！" detail:error.localizedDescription view:weakSelf.view];
+        } else {
+            // 初始化 socketIO 连接对象
+            weakSelf.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:data[@"token"] enableLog:NO];
+            weakSelf.socketIO.delegate = weakSelf;
+            [weakSelf.socketIO connect];
+            //weakSelf.socketIO.debugMode = YES;
+        }
+    }];
 }
 
 - (void)clearSocketIO {
@@ -380,24 +388,44 @@
 #pragma mark - PLVSocketIODelegate
 - (void)socketIO:(PLVSocketIO *)socketIO didLoginFailed:(NSDictionary *)jsonDict {
     NSLog(@"%s %@",__FUNCTION__,jsonDict);
-    [socketIO disconnect];
-    [self exitCurrentControllerWithAlert:nil message:@"您未被授权观看本直播"];
+    [self clearSocketIO];
+    
+    NSString *event = jsonDict[@"EVENT"];
+    if ([event isEqualToString:@"LOGIN_REFUSE"]) {
+        [self exitCurrentControllerWithAlert:nil message:@"您未被授权观看本直播"];
+    } else if ([event isEqualToString:@"TOKEN_EXPIRED"]) {
+        if (self.reconnectCount < 3) {
+            self.reconnectCount ++;
+            [self initSocketIO];
+        } else {
+            [PCCUtils showChatroomMessage:@"TOKEN_EXPIRED" addedToView:self.pageController.view];
+        }
+    }
 }
 
 // 此方法可能多次调用，如锁屏后返回会重连聊天室
 - (void)socketIO:(PLVSocketIO *)socketIO didConnectWithInfo:(NSString *)info {
     NSLog(@"%@--%@", NSStringFromSelector(_cmd), info);
-    [socketIO emitMessageWithSocketObject:[PLVChatroomManager sharedManager].loginUser];//登录聊天室
-}
-
-- (void)socketIO:(PLVSocketIO *)socketIO didUserStateChange:(PLVSocketUserState)userState {
-    NSLog(@"%@--userState:%ld", NSStringFromSelector(_cmd), (long)userState);
-    [PCCUtils showChatroomMessage:PLVNameStringWithSocketUserState(userState) addedToView:self.pageController.view];
-    if (userState == PLVSocketUserStateLogined) {
-        PLVSocketObject *socketObject = socketIO.user;
-        socketObject.accountId = [PLVLiveVideoConfig sharedInstance].userId; // 当前需要
-        [PLVChatroomManager sharedManager].socketUser = socketObject;
-    }
+    
+    // 登录 Socket 服务器
+    [socketIO loginSocketServer:[PLVChatroomManager sharedManager].socketUser timeout:5.0 callback:^(NSArray *ackArray) {
+        NSLog(@"login ackArray: %@",ackArray);
+        if (ackArray) {
+            NSString *ackStr = [NSString stringWithFormat:@"%@",ackArray.firstObject];
+            if (ackStr && ackStr.length > 4) {
+                int status = [[ackStr substringToIndex:1] intValue];
+                if (status == 2) {
+                    self.loginSuccess = YES;
+                    [PCCUtils showChatroomMessage:@"登录成功" addedToView:self.pageController.view];
+                    BOOL bannedStatus =  [[ackStr substringWithRange:NSMakeRange(4, 1)] boolValue];
+                    [PLVChatroomManager sharedManager].banned = !bannedStatus;
+                } else {
+                    self.loginSuccess = NO;
+                    [PCCUtils showChatroomMessage:[@"登录失败：" stringByAppendingString:ackStr] addedToView:self.pageController.view];
+                }
+            }
+        }
+    }];
 }
 
 #pragma mark Socket message
@@ -479,7 +507,9 @@
 #pragma mark Connect state
 - (void)socketIO:(PLVSocketIO *)socketIO didDisconnectWithInfo:(NSString *)info {
     NSLog(@"%@--%@",NSStringFromSelector(_cmd),info);
-    [PCCUtils showChatroomMessage:@"聊天室失去连接" addedToView:self.pageController.view];
+    if (self.loginSuccess) {
+        [PCCUtils showChatroomMessage:@"聊天室失去连接" addedToView:self.pageController.view];
+    }
 }
 
 - (void)socketIO:(PLVSocketIO *)socketIO connectOnErrorWithInfo:(NSString *)info {
@@ -509,7 +539,11 @@
 
 - (void)chatroom:(PLVChatroomController *)chatroom emitSocketObject:(PLVSocketChatRoomObject *)object {
     if (self.socketIO.socketIOState == PLVSocketIOStateConnected) {
-        [self.socketIO emitMessageWithSocketObject:object];
+        if (self.loginSuccess) {
+            [self.socketIO emitMessageWithSocketObject:object];
+        } else {
+            [PCCUtils showChatroomMessage:@"聊天室未登录！" addedToView:self.pageController.view];
+        }
     } else {
         [PCCUtils showChatroomMessage:@"聊天室未连接！" addedToView:self.pageController.view];
     }
@@ -533,7 +567,11 @@
 
 - (void)chatroom:(PLVChatroomController *)chatroom emitCustomEvent:(NSString *)event emitMode:(int)emitMode data:(NSDictionary *)data tip:(NSString *)tip {
     if (self.socketIO.socketIOState == PLVSocketIOStateConnected) {
-        [self.socketIO emitCustomEvent:event roomId:self.channelId emitMode:emitMode data:data tip:tip];
+        if (self.loginSuccess) {
+            [self.socketIO emitCustomEvent:event roomId:self.channelId emitMode:emitMode data:data tip:tip];
+        } else {
+            [PCCUtils showChatroomMessage:@"聊天室未登录！" addedToView:self.pageController.view];
+        }
     } else {
         [PCCUtils showChatroomMessage:@"聊天室未连接！" addedToView:self.pageController.view];
     }
@@ -653,13 +691,13 @@
 }
 
 - (void)linkMicController:(PLVLinkMicController *)lickMic emitLinkMicObject:(PLVSocketLinkMicEventType)eventType {
-    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].loginUser;
+    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].socketUser;
     PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channelId userNick:loginUser.nickName userPic:loginUser.avatar userId:(NSUInteger)loginUser.userId.longLongValue userType:loginUser.userType token:nil];
     [self.socketIO emitMessageWithSocketObject:linkMicObject];
 }
 
 - (void)linkMicController:(PLVLinkMicController *)lickMic emitAck:(PLVSocketLinkMicEventType)eventType after:(double)after callback:(void (^)(NSArray * _Nonnull))callback {
-    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].loginUser;
+    PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].socketUser;
     PLVSocketLinkMicObject *linkMicObject = [PLVSocketLinkMicObject linkMicObjectWithEventType:eventType roomId:self.channelId userNick:loginUser.nickName userPic:loginUser.avatar userId:(NSUInteger)loginUser.userId.longLongValue userType:loginUser.userType token:eventType == PLVSocketLinkMicEventType_JOIN_LEAVE ? lickMic.token : nil];
     [self.socketIO emitACKWithSocketObject:linkMicObject after:after callback:callback];
 }

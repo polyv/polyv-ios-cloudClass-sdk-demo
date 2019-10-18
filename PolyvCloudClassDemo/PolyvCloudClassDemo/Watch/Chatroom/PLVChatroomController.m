@@ -332,12 +332,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } break;
         case PLVSocketChatRoomEventType_ADD_SHIELD: {
             if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
-                socketUser.banned = YES;
+                [PLVChatroomManager sharedManager].banned = YES;
             }
         } break;
         case PLVSocketChatRoomEventType_REMOVE_SHIELD: {
             if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
-                socketUser.banned = NO;
+                [PLVChatroomManager sharedManager].banned = NO;
             }
         } break;
         case PLVSocketChatRoomEventType_KICK: {
@@ -538,7 +538,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [PCCUtils showChatroomMessage:[NSString stringWithFormat:@"消息发送失败！%ld", (long)PLVChatroomErrorCodeRoomClose] addedToView:self.view];
             return NO;
         }
-        if (self.type < PLVTextInputViewTypePrivate && [PLVChatroomManager sharedManager].socketUser.isBanned) { // only log.
+        if (self.type < PLVTextInputViewTypePrivate && [PLVChatroomManager sharedManager].isBanned) { // only log.
             NSLog(@"消息发送失败！%ld", (long)PLVChatroomErrorCodeBanned);
             return YES;
         }

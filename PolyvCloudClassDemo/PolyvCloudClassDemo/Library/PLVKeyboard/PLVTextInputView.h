@@ -17,9 +17,7 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewType) {
     /// 云课堂公聊类型
     PLVTextInputViewTypeCloudClassPublic = 2,
     /// 私聊/咨询提问类型
-    PLVTextInputViewTypePrivate          = 3,
-    /// 直播回放类型
-    PLVTextInputViewTypePlayback         = 4
+    PLVTextInputViewTypePrivate          = 3
 };
 
 /// 键盘状态
