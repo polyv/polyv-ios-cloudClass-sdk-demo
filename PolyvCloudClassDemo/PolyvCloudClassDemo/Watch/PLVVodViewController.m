@@ -12,19 +12,17 @@
 #import "PLVPPTVodMediaViewController.h"
 #import "FTPageController.h"
 #import "PLVLiveInfoViewController.h"
-#import "PLVChatPlaybackController.h"
 
-#define PPTPlayerViewScale (3.0 / 4.0)
+#define PPTPlayerViewScale (9.0 / 16.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
 
-@interface PLVVodViewController () <PLVBaseMediaViewControllerDelegate, PLVChatPlaybackControllerDelegate>
+@interface PLVVodViewController () <PLVBaseMediaViewControllerDelegate>
 
 @property (nonatomic, strong) PLVBaseMediaViewController<PLVVodMediaProtocol> *mediaVC;
 @property (nonatomic, assign) CGFloat mediaViewControllerHeight;
 @property (nonatomic, assign) CGRect chatroomFrame;
 @property (nonatomic, strong) FTPageController *pageController;
 @property (nonatomic, strong) PLVLiveInfoViewController *liveInfoViewController;
-@property (nonatomic, strong) PLVChatPlaybackController *chatPlaybackCtl;
 
 @property (nonatomic, strong) NSTimer *pollingTimer;
 
@@ -57,24 +55,26 @@
     self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
     self.mediaVC.view.frame = self.mediaVC.originFrame;
     [self.view addSubview:self.mediaVC.view];
+    
+    /// 如果不需要显示直播介绍的tab的话，可以注释这句代码
+    [self loadChannelMenuInfos];
+    
     if (self.vodType == PLVVodViewControllerTypeCloudClass) {
         CGFloat w = (int)([UIScreen mainScreen].bounds.size.width / 3.0);
-        [(PLVPPTVodMediaViewController *)self.mediaVC loadSecondaryView:CGRectMake(self.view.frame.size.width - w, self.mediaViewControllerHeight + PageControllerTopBarHeight, w, (int)(w * PPTPlayerViewScale))];
+        [(PLVPPTVodMediaViewController *)self.mediaVC loadSecondaryView:CGRectMake(self.view.frame.size.width - w, self.mediaViewControllerHeight + self.pageController.barHeight, w, (int)(w * PPTPlayerViewScale))];
     }
     self.mediaVC.player.pauseInBackground = YES; // 默认回后台暂停
     
-    [self loadChannelMenuInfos];
-    
-    self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(playerPolling) userInfo:nil repeats:YES];
+//    [self playerPolling];
 }
 
 - (void)playerPolling {
-    //NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
-    if (self.chatPlaybackCtl) {
-        [self.chatPlaybackCtl scrollToTime:self.mediaVC.player.currentPlaybackTime];
+    if (@available(iOS 10.0, *)) {
+        self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
+        }];
     }
 }
-
 - (void)loadChannelMenuInfos {
     if (self.channelMenuInfo) {
         [self setupChatroomItem];
@@ -90,8 +90,9 @@
 }
 
 - (void)setupChatroomItem {
+    CGFloat barHeight = 44.0;
     CGRect pageCtrlFrame = CGRectMake(0, self.mediaViewControllerHeight, self.view.frame.size.width, self.view.frame.size.height - self.mediaViewControllerHeight);
-    self.chatroomFrame = CGRectMake(0, 0, CGRectGetWidth(pageCtrlFrame), CGRectGetHeight(pageCtrlFrame) - PageControllerTopBarHeight);
+    self.chatroomFrame = CGRectMake(0, 0, CGRectGetWidth(pageCtrlFrame), CGRectGetHeight(pageCtrlFrame) - barHeight);
     
     NSMutableArray *titles = [NSMutableArray new];
     NSMutableArray *controllers = [NSMutableArray new];
@@ -107,19 +108,12 @@
         }
     }
     
-    self.chatPlaybackCtl = [[PLVChatPlaybackController alloc] initChatPlaybackControllerWithVid:[PLVLiveVideoConfig sharedInstance].vodId  frame:self.chatroomFrame];
-    self.chatPlaybackCtl.delegate = self;
-    [self.chatPlaybackCtl loadSubViews:self.view];
-    [self.chatPlaybackCtl configUserInfoWithNick:nil pic:nil userId:nil];
-    [titles addObject:@"聊天信息"];
-    [controllers addObject:self.chatPlaybackCtl];
-    
     if (titles.count>0 && controllers.count>0 && titles.count==controllers.count) {
-        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers];
-        self.pageController.view.backgroundColor = [UIColor colorWithWhite:236 / 255.0 alpha:1];
+        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers barHeight:barHeight touchHeight:0.0];
         self.pageController.view.frame = pageCtrlFrame;
         [self.view insertSubview:self.pageController.view belowSubview:self.mediaVC.view];  // 需要添加在播放器下面，使得播放器全屏的时候能盖住聊天室
         [self addChildViewController:self.pageController];
+        [self.pageController cornerRadius:NO];
     }
 }
 
@@ -129,19 +123,6 @@
     self.liveInfoViewController.menu = descMenu;
     self.liveInfoViewController.vod = YES;
     self.liveInfoViewController.view.frame = self.chatroomFrame;
-}
-
-#pragma mark - <PLVChatPlaybackControllerDelegate>
-
-- (NSTimeInterval)currentPlaybackTime {
-    return self.mediaVC.player.currentPlaybackTime;
-}
-
-- (NSTimeInterval)videoDurationTime {
-    return self.mediaVC.player.duration;
-}
-
-- (void)playbackController:(PLVChatPlaybackController *)playbackController followKeyboardAnimation:(BOOL)flag {
 }
 
 #pragma mark - view controls
@@ -179,16 +160,6 @@
 
 - (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC {
     [self setNeedsStatusBarAppearanceUpdate];//横竖屏切换前，更新Status Bar的状态
-}
-
-- (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player {
-    if (self.chatPlaybackCtl) {
-        [self.chatPlaybackCtl seekToTime:player.currentPlaybackTime];
-    }
-}
-
-- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo {
-    NSLog(@"userInfo: %@",userInfo);
 }
 
 @end

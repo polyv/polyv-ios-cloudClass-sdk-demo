@@ -15,14 +15,23 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 
 @interface FTPageController () <UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UIPageViewControllerDataSource,UIPageViewControllerDelegate>
 
+@property (nonatomic, assign) CGFloat barHeight;
+@property (nonatomic, assign) CGFloat touchHeight;
 @property (nonatomic, strong) UICollectionView *titleCollectionView;
 @property (nonatomic, strong) UIPageViewController *pageViewController;
 @property (nonatomic, strong) NSMutableArray *titles;
 @property (nonatomic, strong) NSMutableArray *controllers;
 
+@property (nonatomic, strong) UIBezierPath *basePath;
+@property (nonatomic, strong) UIBezierPath *maskPath;
+@property (nonatomic, strong) UIView *touchView;
+@property (nonatomic, strong) UIView *touchLineView;
 @property (nonatomic, strong) UIView *topLineView;
 
 @property (nonatomic) NSUInteger nextIndex;
+
+@property (nonatomic, assign) BOOL canMove;
+@property (nonatomic, assign) CGPoint lastPoint;
 
 @end
 
@@ -33,9 +42,11 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 
 #pragma mark - Initialize
 
-- (instancetype)initWithTitles:(NSArray<NSString *> *)titles controllers:(NSArray<UIViewController *> *)controllers {
+- (instancetype)initWithTitles:(NSArray<NSString *> *)titles controllers:(NSArray<UIViewController *> *)controllers barHeight:(CGFloat)barHeight touchHeight:(CGFloat)touchHeight {
     self = [super init];
     if (self) {
+        self.barHeight = barHeight;
+        self.touchHeight = touchHeight;
         _selectedIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
         self.titles = [[NSMutableArray alloc] initWithArray:titles];
         self.controllers = [[NSMutableArray alloc] initWithArray:controllers];
@@ -49,12 +60,12 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 }
 
 - (void)changeFrame {
-    self.pageViewController.view.frame = CGRectMake(0, PageControllerTopBarHeight, kWidth, CGRectGetHeight(self.view.bounds) - PageControllerTopBarHeight);
+    self.pageViewController.view.frame = CGRectMake(0, self.barHeight, kWidth, CGRectGetHeight(self.view.bounds) - self.barHeight);
 }
 
 -(void)setupPageController {
     self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
-    self.pageViewController.view.frame = CGRectMake(0, PageControllerTopBarHeight, kWidth, CGRectGetHeight(self.view.bounds) - PageControllerTopBarHeight);
+    self.pageViewController.view.frame = CGRectMake(0, self.barHeight, kWidth, CGRectGetHeight(self.view.bounds) - self.barHeight);
     self.pageViewController.dataSource = self;
     self.pageViewController.delegate =self;
     NSArray *initControllers = @[self.controllers[0]];
@@ -70,7 +81,7 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 -(void)setupTitles {
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.titleCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, kWidth, PageControllerTopBarHeight) collectionViewLayout:layout];
+    self.titleCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, self.touchHeight - 1.0, kWidth, self.barHeight - self.touchHeight) collectionViewLayout:layout];
     self.titleCollectionView.backgroundColor = [UIColor whiteColor];
     self.titleCollectionView.dataSource = self;
     self.titleCollectionView.delegate = self;
@@ -79,10 +90,67 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     self.titleCollectionView.showsVerticalScrollIndicator = NO;
     self.titleCollectionView.showsHorizontalScrollIndicator = NO;
     
-    [self.titleCollectionView registerNib:[UINib nibWithNibName:@"FTTitleViewCell" bundle:nil] forCellWithReuseIdentifier:TitleCellIdentifier];
-    // TODO: use code class
-    //[self.titleCollectionView registerClass:[FTTitleViewCell class] forCellWithReuseIdentifier:TitleCellIdentifier];
-    [self setTitleItemWidth];
+    [self.titleCollectionView registerClass:[FTTitleViewCell class] forCellWithReuseIdentifier:TitleCellIdentifier];
+
+    if (self.touchHeight > 0.0) {
+        [self addTouchView];
+    }
+}
+
+- (void)addTouchView {
+    self.touchView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.touchHeight)];
+    self.touchView.backgroundColor = [UIColor whiteColor];
+    self.touchView.layer.mask = [[CAShapeLayer alloc] init];
+    self.touchView.layer.mask.frame = self.touchView.bounds;
+    [self.view addSubview:self.touchView];
+    self.basePath = [UIBezierPath bezierPathWithRect:self.touchView.bounds];
+    self.maskPath = [UIBezierPath bezierPathWithRoundedRect:self.touchView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii:CGSizeMake(8.0, 8.0)];
+    
+    self.touchLineView = [[UIView alloc] initWithFrame:CGRectMake((self.touchView.bounds.size.width - 50.0) * 0.5, 5.0, 50.0, 5.0)];
+    self.touchLineView.backgroundColor = [UIColor colorWithWhite:234.0 / 255.0 alpha:1.0];
+    self.touchLineView.layer.cornerRadius = 2.5;
+    [self.touchView addSubview:self.touchLineView];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
+    [self.touchView addGestureRecognizer:tap];
+    
+    self.lastPoint = self.view.bounds.origin;
+    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureRecognizer:)];
+    [self.touchView addGestureRecognizer:panGestureRecognizer];
+}
+
+- (void)cornerRadius:(BOOL)flag {
+    if (flag) {
+        ((CAShapeLayer *)self.touchView.layer.mask).path = self.maskPath.CGPath;
+    } else {
+        ((CAShapeLayer *)self.touchView.layer.mask).path = self.basePath.CGPath;
+    }
+}
+
+- (void)tapAction {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(moveChatroom:)]) {
+        [self.delegate moveChatroom:self];
+    }
+}
+
+#pragma mark - gesture
+- (void)handlePanGestureRecognizer:(UIPanGestureRecognizer*)gestureRecognizer {
+    CGPoint p = [gestureRecognizer locationInView:self.view.superview];
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(canMoveChatroom:)]) {
+            self.canMove = [self.delegate canMoveChatroom:self];
+        }
+    } else if (gestureRecognizer.state == UIGestureRecognizerStateChanged) {
+        if (self.canMove && self.delegate && [self.delegate respondsToSelector:@selector(moveChatroom:toPointY:)]) {
+            [self.delegate moveChatroom:self toPointY:p.y - self.lastPoint.y];
+        }
+    } else {
+        if (self.canMove) {
+            self.canMove = NO;
+            [self tapAction];
+        }
+    }
+    self.lastPoint = p;
 }
 
 #pragma mark - Public methods
@@ -92,7 +160,6 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
         [self.titles addObject:title];
         [self.controllers addObject:controller];
         
-        [self setTitleItemWidth];
         [self.titleCollectionView reloadData];
     }
 }
@@ -105,7 +172,6 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
         [self.titles insertObject:title atIndex:index];
         [self.controllers insertObject:controller atIndex:index];
         
-        [self setTitleItemWidth];
         [self.titleCollectionView reloadData];
     }
 }
@@ -115,7 +181,6 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
         [self.titles removeObjectAtIndex:index];
         [self.controllers removeObjectAtIndex:index];
         
-        [self setTitleItemWidth];
         [self.titleCollectionView reloadData];
     }
 }
@@ -125,9 +190,9 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor colorWithWhite:31.0 / 255.0 alpha:1.0];
     
-    self.topLineView = [[UIView alloc] initWithFrame:CGRectMake(0, PageControllerTopBarHeight-1, kWidth, 1)];
+    self.topLineView = [[UIView alloc] initWithFrame:CGRectMake(0, self.barHeight - 1, kWidth, 1)];
     self.topLineView.backgroundColor =  [UIColor colorWithRed:243.0/255.0 green:243.0/255.0 blue:244.0/255.0 alpha:1.0];
     [self.view addSubview:self.topLineView];
 }
@@ -158,11 +223,13 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return  CGSizeMake(_titleItemWidth, CGRectGetHeight(collectionView.bounds));
+    NSString *text = self.titles[indexPath.item];
+    CGFloat width = [text sizeWithAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:16.0]}].width;
+    return CGSizeMake(width + 32.0, CGRectGetHeight(collectionView.bounds));
 }
 
 -(UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(0, 5, 0, 5);
+    return UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
 }
 
 #pragma mark - <UICollectionViewDeleaget>
@@ -237,15 +304,6 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 }
 
 #pragma mark - Private methods
-
-- (void)setTitleItemWidth {
-    if (self.titles.count < 4) {
-        _titleItemWidth = (kWidth-10)/(self.titles.count);
-    }else {
-        _titleItemWidth = (kWidth-10)/4;
-        self.titleCollectionView.contentSize = CGSizeMake(_titleItemWidth*self.titles.count+20, PageControllerTopBarHeight);
-    }
-}
 
 // 选择标题（视图加载之后设置）
 -(void)selectedTitle:(NSUInteger)index {

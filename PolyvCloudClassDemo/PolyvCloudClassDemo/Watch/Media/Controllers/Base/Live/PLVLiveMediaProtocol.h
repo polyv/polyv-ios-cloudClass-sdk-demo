@@ -49,6 +49,12 @@
 /// 取消连麦，由外层连麦控件调用
 - (void)cancelLinkMic;
 
+/// 切换连麦人的位置，manualControl为YES时，是自己主动切换主副屏窗口，为NO时是推流端的讲师切换主副屏窗口
+- (void)linkMicSwitchViewAction:(BOOL)manualControl;
+
+/// 登录成功后，返回登录消息里的user信息，调用PLVPPTViewController里的setUser
+- (void)setUserInfo:(NSDictionary *)userInfo;
+
 /**
  获取当前直播的seesionId
  

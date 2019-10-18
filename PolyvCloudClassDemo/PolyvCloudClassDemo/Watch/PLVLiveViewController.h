@@ -27,6 +27,9 @@ typedef NS_ENUM(NSInteger, PLVLiveViewControllerType) {
 /// 聊天室相关的Tab信息
 @property (nonatomic, strong) PLVLiveVideoChannelMenuInfo *channelMenuInfo;
 
+/// 是否参与者
+@property (nonatomic, assign) BOOL viewer;
+
 /// 聊天室自定义用户昵称，不设置时默认生成
 @property (nonatomic, strong) NSString *nickName;
 /// 聊天室自定义用户头像地址，不设置时使用默认地址（建议使用 HTTPS 协议地址）

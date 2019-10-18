@@ -56,7 +56,7 @@ static PCCUtils *chatroomHud = nil;
     hud.mode = PLVProgressHUDModeText;
     hud.label.text = title;
     hud.detailsLabel.text = detail;
-    [hud hideAnimated:YES afterDelay:3.0];
+    [hud hideAnimated:YES afterDelay:2.0];
 }
 
 + (void)showChatroomMessage:(NSString *)message addedToView:(UIView *)view {
@@ -94,7 +94,7 @@ static PCCUtils *chatroomHud = nil;
     //UIEdgeInsets messageMargin = UIEdgeInsetsMake(-1.0, 10.0, 44.0, -1.0);
     //CGSize size = [messageLabel sizeThatFits:CGSizeMake(1000.0, 32.0)];
     //[self remakeConstraints:messageLabel margin:messageMargin size:CGSizeMake(size.width + 32.0, 32.0) baseView:self];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [messageLabel removeFromSuperview];
     });
 }

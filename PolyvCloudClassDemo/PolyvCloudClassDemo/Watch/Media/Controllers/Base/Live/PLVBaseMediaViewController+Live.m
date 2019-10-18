@@ -44,6 +44,10 @@
     }
 }
 
+- (void)setUserInfo:(NSDictionary *)userInfo {
+    self.linkMicVC.PPTVC.userInfo = userInfo;
+}
+
 - (void)loadCountdownTimeLabel:(NSDate *)startTime {
     self.startTime = startTime;
     if (!self.countdownTimeView) {
@@ -151,17 +155,6 @@
 
 - (void)refresh:(PLVPlayerSkinView *)skinView {
     [self reOpenPlayerWithLineIndex:-1 codeRate:nil showHud:NO];
-}
-
-- (void)linkMic:(PLVPlayerSkinView *)skinView {
-    [self.linkMicVC linkMic];
-}
-
-- (void)switchCamera:(PLVPlayerSkinView *)skinView {
-    PLVLinkMicView *linkMicView = [self.linkMicVC.linkMicViewArray objectAtIndex:0];
-    if (linkMicView.switchCameraBtn) {
-        [self.linkMicVC switchCamera:nil];
-    }
 }
 
 - (void)playerSkinView:(PLVPlayerSkinView *)skinView switchDanmu:(BOOL)switchDanmu {

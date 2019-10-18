@@ -21,17 +21,15 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     PLVPlayerSkinViewTypeAdjusBrightness    = 3 //在屏幕右边，上下滑动调节亮度
 };
 
-@interface PLVPlayerSkinView () <UIGestureRecognizerDelegate>
+@interface PLVPlayerSkinView ()
 
+@property (nonatomic, strong) UIPanGestureRecognizer *pan;
 @property (nonatomic, strong) UIView *controllView;
 @property (nonatomic, strong) UIImageView *bottomBgImgV;
-@property (nonatomic, strong) UIButton *backBtn;
 @property (nonatomic, strong) UIButton *moreBtn;
 @property (nonatomic, strong) UIButton *mainBtn;
 @property (nonatomic, strong) UIButton *refreshBtn;
-@property (nonatomic, strong) UIButton *linkMicBtn;
-@property (nonatomic, strong) UIButton *switchScreenBtn;
-@property (nonatomic, strong) UIButton *zoomScreenBtn;
+@property (nonatomic, strong) UIButton *closeSecondaryBtn;
 @property (nonatomic, strong) UIButton *danmuBtn;
 @property (nonatomic, assign) NSInteger openDanmuByUser;
 @property (nonatomic, strong) UIButton * showInputBtn;
@@ -121,26 +119,14 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     }
 }
 
-- (IBAction)linkMicBtnAction:(id)sender {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(linkMic:)]) {
-        [self.delegate linkMic:self];
-    }
-}
-
-- (IBAction)switchScreenBtnAction:(id)sender {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(switchScreenOnManualControl:)]) {
-        [self.delegate switchScreenOnManualControl:self];
+- (IBAction)closeSecondaryBtnAction:(id)sender {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(closeSecondaryView:)]) {
+        [self.delegate closeSecondaryView:self];
     }
 }
 
 - (IBAction)zoomScreenBtnAction:(id)sender {
     [PCCUtils changeDeviceOrientation:UIDeviceOrientationLandscapeLeft];
-}
-
-- (IBAction)switchCameraBtnAction:(id)sender {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(switchCamera:)]) {
-        [self.delegate switchCamera:self];
-    }
 }
 
 - (IBAction)showInputBtnAction:(id)sender {
@@ -155,42 +141,54 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     self.duration = 0.0;
     
     //手指移动调节声音，亮度，播放seek
-    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
-    pan.delegate = self;
-    [self.superview addGestureRecognizer:pan];
+    [self addPanGestureRecognizer];
     
     //顶部底部背景
-    self.topBgImgV = [[UIImageView alloc]init];
+    self.topBgImgV = [[UIImageView alloc] init];
     self.topBgImgV.image = [self playerSkinImage:@"plv_skin_topbg"];
     self.topBgImgV.userInteractionEnabled = NO;
     [self addSubview:self.topBgImgV];
+    
+    self.bottomBgImgV = [[UIImageView alloc] init];
+    self.bottomBgImgV.image = [self playerSkinImage:@"plv_skin_bottombg"];
+    self.bottomBgImgV.userInteractionEnabled = NO;
+    [self addSubview:self.bottomBgImgV];
     
     self.controllView = [[UIView alloc] initWithFrame:self.bounds];
     self.controllView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:self.controllView];
     
-    self.bottomBgImgV = [[UIImageView alloc]init];
-    self.bottomBgImgV.image = [self playerSkinImage:@"plv_skin_bottombg"];
-    self.bottomBgImgV.userInteractionEnabled = NO;
-    [self.controllView addSubview:self.bottomBgImgV];
-    
     //直播，点播都共有的按钮
     self.mainBtn = [self addButton:@"plv_skin_play" selectedImgName:@"plv_skin_pause" title:nil fontSize:17.0 action:@selector(mainBtnAction:) inView:self.controllView];
-    self.backBtn = [self addButton:@"plv_skin_back" selectedImgName:nil title:nil fontSize:17.0 action:@selector(backBtnAction:) inView:self];
+    
+//    self.backBtn = [self addButton:@"plv_skin_back" selectedImgName:nil title:nil fontSize:17.0 action:@selector(backBtnAction:) inView:self.superview];
+    self.backBtn = [self addButton:nil selectedImgName:nil title:nil fontSize:17.0 action:@selector(backBtnAction:) inView:self.superview];
+    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 44.0, 44.0)];
+    backView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+    backView.userInteractionEnabled = NO;
+    UIImageView *maskView = [[UIImageView alloc] initWithImage:[self playerSkinImage:@"plv_skin_back"]];
+    maskView.frame = CGRectMake(0.0, 0.0, 44.0, 44.0);
+    backView.maskView = maskView;
+    [self.backBtn addSubview:backView];
+    
     self.moreBtn = [self addButton:@"plv_skin_more" selectedImgName:nil title:nil fontSize:17.0 action:@selector(moreBtnAction:) inView:self.controllView];
-    self.switchScreenBtn = [self addButton:@"plv_skin_switchscreen" title:nil action:@selector(switchScreenBtnAction:)];
+    self.closeSecondaryBtn = [self addButton:@"plv_close_secondary" title:nil action:@selector(closeSecondaryBtnAction:)];
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeNormalVod) {
-        self.switchScreenBtn.hidden = YES;
+        self.closeSecondaryBtn.hidden = YES;
     }
-    self.zoomScreenBtn = [self addButton:@"plv_skin_fullscreen" title:nil action:@selector(zoomScreenBtnAction:)];
+    
+//    self.zoomScreenBtn = [self addButton:@"plv_skin_fullscreen" selectedImgName:nil title:nil fontSize:17.0 action:@selector(zoomScreenBtnAction:) inView:self.superview];
+    self.zoomScreenBtn = [self addButton:nil selectedImgName:nil title:nil fontSize:17.0 action:@selector(zoomScreenBtnAction:) inView:self.superview];
+    UIView *backView1 = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 44.0, 44.0)];
+    backView1.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+    backView1.userInteractionEnabled = NO;
+    UIImageView *maskView1 = [[UIImageView alloc] initWithImage:[self playerSkinImage:@"plv_skin_fullscreen"]];
+    maskView1.frame = CGRectMake(0.0, 0.0, 44.0, 44.0);
+    backView1.maskView = maskView1;
+    [self.zoomScreenBtn addSubview:backView1];
     
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
         self.refreshBtn = [self addButton:@"plv_skin_refresh" title:nil action:@selector(refreshBtnAction:)];
-        self.switchCameraBtn = [self addButton:nil title:nil action:@selector(switchCameraBtnAction:)];
-        [self.switchCameraBtn setImage:[UIImage imageNamed:@"plv_skin_switchCamera"] forState:UIControlStateNormal];
-        self.switchCameraBtn.hidden = YES;
-        self.linkMicBtn = [self addButton:@"plv_skin_hangup" selectedImgName:nil title:nil fontSize:17.0 action:@selector(linkMicBtnAction:) inView:self.controllView];
-        self.linkMicBtn.hidden = YES;
         
         self.danmuBtn = [self addButton:@"plv_skin_danmu_close" selectedImgName:@"plv_skin_danmu_open" title:nil fontSize:17.0 action:@selector(danmuBtnAction:) inView:self.controllView];
         self.danmuBtn.hidden = YES;
@@ -224,6 +222,19 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     [self layout];
 }
 
+#pragma mark - addPanGestureRecognizer
+- (void)addPanGestureRecognizer {
+    [self removePanGestureRecognizer];
+    self.pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+    [self.superview.subviews[0] addGestureRecognizer:self.pan];
+}
+
+#pragma mark - removePanGestureRecognizer
+- (void)removePanGestureRecognizer {
+    [self.superview.subviews[0] removeGestureRecognizer:self.pan];
+    self.pan = nil;
+}
+
 - (void)layout {
     float lrPadding = 8.0; // 左右间距
     float btnPadding = 44.0 + lrPadding;
@@ -237,33 +248,23 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     UIEdgeInsets refreshMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 1, 0.0, -1.0); // 从左开始数第二
 
     UIEdgeInsets danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2); // 从右开始倒数第三
-    UIEdgeInsets switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1); // 从右开始倒数第二
+    UIEdgeInsets closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1); // 从右开始倒数第二
     UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding);
     self.zoomScreenBtn.hidden = NO;
     
     UIEdgeInsets showDanmuMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 2 + 35.0, 6.0, lrPadding + btnPadding * 2 + 35.0);
     
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
-        UIEdgeInsets switchCameraMargin = UIEdgeInsetsMake(-1.0, -1.0, 128.0, 10.0);
-        UIEdgeInsets linkMicMargin = UIEdgeInsetsMake(-1.0, -1.0, 64.0, 10.0);
-        if (self.type == PLVPlayerSkinViewTypeCloudClassLive) {
-            switchCameraMargin = UIEdgeInsetsMake(-1.0, -1.0, 192.0, 10.0);
-            linkMicMargin = UIEdgeInsetsMake(-1.0, -1.0, 128.0, 10.0);
-        }
-        
         if (self.fullscreen) {
             backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
             moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
             danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
         } else {
-            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
             danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2);
         }
-        
-        [self remakeConstraints:self.switchCameraBtn margin:switchCameraMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-        [self remakeConstraints:self.linkMicBtn margin:linkMicMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     } else {
         UIEdgeInsets sliderBackgroundMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, 0.0);
         UIEdgeInsets progressMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, -1.0);
@@ -273,9 +274,9 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
             moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
         } else {
-            switchScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
         }
         
         [self remakeConstraints:self.sliderBackgroundView margin:sliderBackgroundMargin size:CGSizeMake(-1.0, 2.0) baseView:self.controllView];
@@ -291,7 +292,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     [self remakeConstraints:self.mainBtn margin:mainMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.refreshBtn margin:refreshMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.danmuBtn margin:danmuMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.switchScreenBtn margin:switchScreenMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
+    [self remakeConstraints:self.closeSecondaryBtn margin:closeSecondaryMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.zoomScreenBtn margin:zoomScreenMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
     [self remakeConstraints:self.showInputBtn margin:showDanmuMargin size:CGSizeMake(-1.0, 32.0) baseView:self.controllView];
     
@@ -303,24 +304,16 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 - (void)modifySwitchScreenBtnState:(BOOL)secondaryViewClosed pptOnSecondaryView:(BOOL)pptOnSecondaryView {
     if (secondaryViewClosed) {
         if (pptOnSecondaryView) {
-            [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_ppt"] forState:UIControlStateNormal];
-            [self.switchScreenBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
+            [self.closeSecondaryBtn setImage:[self playerSkinImage:@"plv_skin_camera"] forState:UIControlStateNormal];
+            [self.closeSecondaryBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [self.closeSecondaryBtn setTitle:nil forState:UIControlStateNormal];
         } else {
-            [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_camera"] forState:UIControlStateNormal];
-            [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
+            [self.closeSecondaryBtn setImage:[self playerSkinImage:@"plv_skin_camera"] forState:UIControlStateNormal];
+            [self.closeSecondaryBtn setTitle:nil forState:UIControlStateNormal];
         }
     } else {
-        [self.switchScreenBtn setImage:[self playerSkinImage:@"plv_skin_switchscreen"] forState:UIControlStateNormal];
-        [self.switchScreenBtn setTitle:nil forState:UIControlStateNormal];
-    }
-}
-
-- (void)linkMicStatus:(BOOL)select {
-    if (select) {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_linkmic"] forState:UIControlStateNormal];
-    } else {
-        [self.linkMicBtn setImage:[self playerSkinImage:@"plv_skin_hangup"] forState:UIControlStateNormal];
+        [self.closeSecondaryBtn setImage:[self playerSkinImage:@"plv_close_secondary"] forState:UIControlStateNormal];
+        [self.closeSecondaryBtn setTitle:nil forState:UIControlStateNormal];
     }
 }
 

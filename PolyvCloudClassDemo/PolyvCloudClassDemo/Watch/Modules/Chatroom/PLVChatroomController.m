@@ -253,17 +253,19 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [self.reloadTableTimer fire];
 }
 
-- (void)changeChatroomFrame:(CGRect)rect {
+- (void)resetChatroomFrame:(CGRect)rect {
     self.view.frame = rect;
+    self.view.clipsToBounds = YES;
     self.view.autoresizingMask = UIViewAutoresizingNone;
 
-    CGFloat h = [self getInputViewHeight];
-    self.tableView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - h);
+    CGFloat h = CGRectGetHeight(self.view.bounds) - [self getInputViewHeight];
+    self.tableView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), h);
     if (!self.chatInputView.up) {// 输入控件的键盘弹出时，不调整frame
         CGSize inputSize = self.chatInputView.frame.size;
-        self.chatInputView.frame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - inputSize.height, inputSize.width, inputSize.height);
+        CGFloat y = CGRectGetHeight(self.view.bounds) - inputSize.height;
+        self.chatInputView.frame = CGRectMake(0, y >= 0.0 ? y : 0.0, inputSize.width, inputSize.height);
     }
-    self.chatInputView.originY = CGRectGetHeight(self.view.bounds) - h;
+    self.chatInputView.originY = h;
 }
 
 - (void)clearResource {
@@ -293,7 +295,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_LOGIN: {
             NSString *userId = object.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserUserIdKey];
-            [self.chatroomQueue addSocketChatRoomObject:object me:[userId isEqualToString:socketUser.userId]];
+            BOOL me = [userId isEqualToString:socketUser.userId];
+            [self.chatroomQueue addSocketChatRoomObject:object me:me];
+            if (me && self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
+                [self.delegate chatroom:self userInfo:object.jsonDict];
+            }
         } break;
         case PLVSocketChatRoomEventType_RELOGIN: {
             __weak typeof(self) weakSelf = self;
@@ -310,9 +316,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             if ([status isEqualToString:@"success"]) {// success：广播消息
                 if ([object.jsonDict[@"userId"] isEqualToString:socketUser.userId]) {
                     [[PLVChatroomManager sharedManager] renameUserNick:object.jsonDict[@"nick"]];
+                    [self showMessage:object.jsonDict[@"message"]];
                 }
-            } //else 单播消息（出错）
-            [self showMessage:object.jsonDict[@"message"]];
+            }
         } break;
         case PLVSocketChatRoomEventType_CLOSEROOM: {
             _closed = [object.jsonDict[@"value"][@"closed"] boolValue];
@@ -386,9 +392,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self addModel:model];
         } break;
     }
-    if (object.eventType==PLVSocketChatRoomEventType_LOGIN
-        || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
+    if (object.eventType==PLVSocketChatRoomEventType_LOGIN || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
         self.onlineCount = [object.jsonDict[@"onlineUserNumber"] unsignedIntegerValue];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(refreshLinkMicOnlineCount:number:)]) {
+            [self.delegate refreshLinkMicOnlineCount:self number:self.onlineCount];
+        }
     }
 }
 

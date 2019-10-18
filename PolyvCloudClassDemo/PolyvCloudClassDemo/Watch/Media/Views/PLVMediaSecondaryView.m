@@ -10,7 +10,6 @@
 
 @interface PLVMediaSecondaryView ()
 
-@property (nonatomic, strong) UIButton *closeBtn;
 @property (nonatomic, assign) CGPoint lastPoint;
 @property (nonatomic, assign) CGRect rangeRect;
 
@@ -21,48 +20,28 @@
 #pragma mark - public
 - (void)loadSubviews {
     self.clipsToBounds = YES;
-    self.closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.closeBtn.frame = CGRectMake(0.0, 0.0, 30.0, 30.0);
-    [self.closeBtn setImage:[UIImage imageNamed:@"plv_skin_close"] forState:UIControlStateNormal];
-    [self.closeBtn addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:self.closeBtn];
-    [self showCloseBtn];
     
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showCloseBtn)];
-    [self addGestureRecognizer:tapGestureRecognizer];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
+    [self addGestureRecognizer:tap];
     
     self.lastPoint = self.bounds.origin;
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureRecognizer:)];
     [self addGestureRecognizer:panGestureRecognizer];
 }
 
-- (IBAction)close:(id)sender {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(closeSecondaryView:)]) {
-        [self.delegate closeSecondaryView:self];
+- (void)tapAction {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(switchScreenOnManualControl:)]) {
+        [self.delegate switchScreenOnManualControl:self];
     }
-}
-
-#pragma mark - show / hide
-- (void)hiddenCloseBtn {
-   self.closeBtn.hidden = YES;
-}
-
-- (void)hiddenCloseBtnAfterDelay {
-    [self performSelector:@selector(hiddenCloseBtn) withObject:nil afterDelay:5.0];
-}
-
-- (void)showCloseBtn {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    self.closeBtn.hidden = NO;
-    [self hiddenCloseBtnAfterDelay];
 }
 
 #pragma mark - gesture
 - (void)handlePanGestureRecognizer:(UIPanGestureRecognizer*)gestureRecognizer {
+    if (!self.fullscreen && !self.canMove) {
+        return;
+    }
     CGPoint p = [gestureRecognizer locationInView:self.superview];
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
-        self.closeBtn.hidden = NO;
         if (@available(iOS 11.0, *)) {
             CGRect safeRect = self.superview.safeAreaLayoutGuide.layoutFrame;
             if (self.fullscreen && safeRect.origin.y == 20.0) {
@@ -88,8 +67,6 @@
             rect.origin.y = self.rangeRect.origin.y + self.rangeRect.size.height - rect.size.height;
         }
         self.frame = rect;
-    } else if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        [self hiddenCloseBtnAfterDelay];
     }
     self.lastPoint = p;
 }

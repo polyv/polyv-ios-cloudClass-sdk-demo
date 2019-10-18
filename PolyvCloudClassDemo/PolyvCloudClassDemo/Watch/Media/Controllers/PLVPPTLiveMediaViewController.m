@@ -53,7 +53,7 @@
         
         ((PLVLivePlayerController *)self.player).cameraClosed = YES;
         if (!self.pptOnSecondaryView && !self.secondaryView.hidden) {//而iOS端，副屏为视频且已经打开，则自动关闭副屏
-            [self closeSecondaryView:self.secondaryView];
+            [self closeSecondaryView:self.skinView];
         }
     } else if ([json containsString:@"\"isCamClosed\":0"]) {//推流端打开了摄像头
         ((PLVLivePlayerController *)self.player).cameraClosed = NO;
@@ -73,44 +73,49 @@
     }
 }
 
-- (void)secondaryViewFollowKeyboardAnimation:(BOOL)flag {
-    if (flag) {
-        CGFloat safeAreaY = 20.0;
-        if (@available(iOS 11.0, *)) {
-            safeAreaY = self.view.superview.safeAreaLayoutGuide.layoutFrame.origin.y;
-        }
-        CGRect secondaryRect = self.secondaryView.frame;
-        secondaryRect = CGRectMake(self.view.frame.size.width - secondaryRect.size.width, safeAreaY, secondaryRect.size.width, secondaryRect.size.height);
-        self.secondaryView.frame = secondaryRect;
-    } else {
-        self.secondaryView.frame = self.originSecondaryFrame;
-    }
+- (void)loadPPTEnd {
+    self.linkMicVC.PPTVC = self.pptVC;
 }
 
-- (void)linkMicSwitchViewAction {
-    [self switchAction:NO];
+- (void)linkMicSwitchViewAction:(BOOL)manualControl {
+    [self switchAction:manualControl];
+}
+
+- (void)resetLinkMicTopControlFrame:(BOOL)close {
+    [self.linkMicVC resetLinkMicTopControlFrame:close];
 }
 
 #pragma mark - PLVBaseMediaViewController
+- (void)deviceOrientationBeignAnimation {
+    [self dealDeviceOrientationBeignAnimation];
+}
+
+- (void)deviceOrientationEndAnimation {
+     [self dealDeviceOrientationEndAnimation];
+}
+
 - (void)deviceOrientationDidChangeSubAnimation {
     [self dealDeviceOrientationDidChangeSubAnimation];
     
     if (self.skinView.fullscreen) {
         self.danmuInputView.frame = self.view.bounds;
     }
+    self.linkMicVC.view.hidden = self.skinView.fullscreen && self.linkMicVC.linkMicViewArray.count == 0;
     self.countdownTimeView.hidden = self.skinView.fullscreen;
 }
 
-- (CGFloat)getLinkMicHeight {
-    if (self.linkMicVC.linkMicType != PLVLinkMicTypeLive && self.linkMicVC.linkMicViewArray.count > 0) {
-        return self.linkMicVC.originSize.height;
+- (CGRect)getMainRect {
+    CGRect mainRect = [super getMainRect];
+    if (self.skinView.fullscreen && self.linkMicVC.linkMicViewArray.count > 0) {
+        mainRect.origin.x = self.linkMicVC.view.frame.origin.x + self.linkMicVC.view.frame.size.width;
+        mainRect.size.width = self.linkMicVC.controlView.frame.origin.x - mainRect.origin.x;
     }
-    return 0.0;
+    return mainRect;
 }
 
 - (void)loadPlayer {
     if (self.playAD) {
-        [self closeSecondaryView:self.secondaryView];
+        [self closeSecondaryView:self.skinView];
     }
     self.player = [[PLVLivePlayerController alloc] initWithChannelId:self.channelId userId:self.userId playAD:self.playAD displayView:self.secondaryView delegate:self];
 }
@@ -120,11 +125,10 @@
         PLVLinkMicView *linkMicView = [self.linkMicVC.linkMicViewArray objectAtIndex:0];
         self.pptOnSecondaryView = !self.pptOnSecondaryView;
         if (!self.pptOnSecondaryView) {
-            self.skinView.switchCameraBtn.hidden = YES;
             UIView *videoView = self.mainView.subviews[0];
             linkMicView.onBigView = NO;
-            linkMicView.backgroundColor = [UIColor whiteColor];
-            [linkMicView insertSubview:videoView belowSubview:linkMicView.nickNameLabel];
+            linkMicView.backgroundColor = linkMicView.videoView.hidden ? LinkMicViewBackgroundColor : [UIColor whiteColor];
+            [linkMicView insertSubview:videoView belowSubview:linkMicView.permissionImgView];
             [videoView setFrame:linkMicView.bounds];
             self.mainView.backgroundColor = [UIColor blackColor];
             [self.mainView addSubview:self.pptVC.view];
@@ -133,20 +137,23 @@
             if (manualControl) {
                 self.pptFlag = manualControl;
             }
-            if (linkMicView.switchCameraBtn) {
-                self.skinView.switchCameraBtn.hidden = NO;
-            }
             linkMicView.onBigView = YES;
             UIView *videoView = linkMicView.mainView;
-            self.mainView.backgroundColor = linkMicView.videoView.hidden ? BlueBackgroundColor : [UIColor blackColor];
+            self.mainView.backgroundColor = linkMicView.videoView.hidden ? LinkMicViewBackgroundColor : [UIColor blackColor];
             [self.mainView addSubview:videoView];
             [videoView setFrame:self.mainView.bounds];
             linkMicView.backgroundColor = [UIColor whiteColor];
-            [linkMicView insertSubview:self.pptVC.view belowSubview:linkMicView.nickNameLabel];
+            [linkMicView insertSubview:self.pptVC.view belowSubview:linkMicView.permissionImgView];
             self.pptVC.view.frame = linkMicView.bounds;
         }
     } else {
         [super dealSwitchAction:manualControl];
+    }
+}
+
+- (void)changeVideoAndPPTPosition:(BOOL)status {
+    if (status != self.pptOnSecondaryView) {
+        [super dealSwitchAction:NO];
     }
 }
 
@@ -172,7 +179,6 @@
         [videoView removeFromSuperview];
         [super dealSwitchAction:NO];
     }
-    self.skinView.switchCameraBtn.hidden = YES;
     self.secondaryView.alpha = 1.0;
     ((PLVLivePlayerController*)self.player).linkMic = NO;
     [self reOpenPlayerWithLineIndex:-1 codeRate:nil showHud:NO];
@@ -182,21 +188,37 @@
     [self.skinView linkMicStart:NO];
 }
 
+- (void)hiddenLinkMic {
+    if (self.linkMicVC.linkMicViewArray.count == 0 || self.linkMicVC.viewer) {
+        [self.linkMicVC hiddenLinkMic:YES];
+    }
+}
+
 #pragma mark - PLVPlayerControllerDelegate
+- (void)playerController:(PLVPlayerController *)playerController subPlaybackIsPreparedToPlay:(NSNotification *)notification {
+    [self hiddenLinkMic];
+    [self subPlaybackIsPreparedToPlay:notification];
+}
+
 - (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
+    [self.linkMicVC hiddenLinkMic:NO];
     [self clearCountdownTimer];
     [self mainPlaybackIsPreparedToPlay:notification];
 }
 
 #pragma mark - PLVLivePlayerControllerDelegate
 - (void)livePlayerController:(PLVLivePlayerController *)livePlayer streamState:(PLVLiveStreamState)streamState {
+    self.pptVC.pptPlayable = streamState == PLVLiveStreamStateLive;
     if (streamState == PLVLiveStreamStateNoStream) {//没直播流
+        [self hiddenLinkMic];
         self.skinView.controllView.hidden = YES;
         self.pptFlag = NO;
-        self.pptVC.pptPlayable = NO;
         if (!self.secondaryView.hidden) {//副屏已经打开，则自动关闭副屏
-            [self closeSecondaryView:self.secondaryView];
+            [self closeSecondaryView:self.skinView];
         }
+        self.linkMicVC.sessionId = @"";
+    } else if (self.linkMicVC.sessionId.length == 0) {
+        self.linkMicVC.sessionId = [self currentChannelSessionId];
     }
     
     if (self.curStreamState != streamState) {
@@ -204,6 +226,7 @@
             [self.delegate streamStateDidChange:self streamState:streamState];
         }
     }
+
     self.curStreamState = streamState;
 }
 

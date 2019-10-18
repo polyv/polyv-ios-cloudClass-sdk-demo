@@ -39,6 +39,8 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 @property (nonatomic, assign) CGRect originFrame;
 /// 是否可以旋屏
 @property (nonatomic, assign) BOOL canAutorotate;
+/// 单击手势
+@property (nonatomic,strong) UITapGestureRecognizer *tap;
 
 /// 登录用户名类型跑马灯显示内容
 @property (nonatomic, strong) NSString *nickName;
@@ -67,25 +69,38 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
  */
 - (void)clearResource;
 
+/// 添加单击手势
+- (void)addTapGestureRecognizer;
+
+/// 移除单击手势
+- (void)removeTapGestureRecognizer;
+
 #pragma mark - protected
 /// 加载皮肤
 - (void)loadSkinView:(PLVPlayerSkinViewType)skinType;
 
-/// 显示皮肤
-- (void)skinShowAnimaion;
-
 /// 隐藏皮肤
 - (void)skinHiddenAnimaion;
+
+/// 立刻显示返回按钮和全屏按钮
+- (void)backBtnShowNow;
+
+/// 显示皮肤
+- (void)skinShowAnimaion;
 
 /// 连麦时，由外层调用来改变frame
 - (void)changeFrame:(BOOL)fullscreen block:(void (^)(void))block;
 
 #pragma mark - protected - abstract
+/// 横竖屏旋转动画开始时，云课堂相关的副窗口需要做动画的逻辑在这里实现（普通直播不需要）
+- (void)deviceOrientationBeignAnimation;
+/// 横竖屏旋转动画结束时，云课堂相关的副窗口需要做动画的逻辑在这里实现（普通直播不需要）
+- (void)deviceOrientationEndAnimation;
 /// 横竖屏旋转动画时，云课堂相关的副窗口需要做动画的逻辑在这里实现（普通直播不需要）
 - (void)deviceOrientationDidChangeSubAnimation;
 
-/// 获取当前连麦窗口的高度（直播需要重写，回放不需要）
-- (CGFloat)getLinkMicHeight;
+/// 获取当前主窗口的Rect（直播需要重写，回放不需要）
+- (CGRect)getMainRect;
 
 /// 加载视频播放器
 - (void)loadPlayer;
@@ -95,6 +110,9 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 
 /// 设置跑马灯
 - (void)setupMarquee:(PLVLiveVideoChannel *)channel customNick:(NSString *)customNick;
+
+/// PLVBaseMediaViewController+PPT.m里loadPPT会回调这个函数
+- (void)loadPPTEnd;
 
 @end
 
@@ -110,16 +128,10 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 /// 发送一条评论
 - (void)sendText:(PLVBaseMediaViewController *)mediaVC text:(NSString *)text;
 
+/// 开启了画笔权限的连麦学员操作绘画后，把生成的笔触数据回调给Socket发送
+- (void)sendPaintInfo:(PLVBaseMediaViewController *)mediaVC jsonData:(NSString *)jsonData;
+
 /// 直播流状态改变
 - (void)streamStateDidChange:(PLVBaseMediaViewController *)mediaVC streamState:(PLVLiveStreamState)streamState;
-
-/// 播放器播放结束
-- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo;
-
-/// 播放器Seek完成
-- (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
-
-/// 播放器精准Seek完成
-- (void)playerAccurateSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
 
 @end

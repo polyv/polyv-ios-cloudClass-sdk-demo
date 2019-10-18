@@ -23,6 +23,7 @@
 @property (nonatomic, assign) BOOL skinAnimationing;//播放器皮肤显示隐藏动画的开关
 @property (nonatomic, assign) CGRect fullRect;// 横屏时frame的大小
 @property (nonatomic, strong) PLVVideoMarquee *videoMarquee; // 视频跑马灯
+@property (nonatomic, strong) UIButton *backBtn;
 @property (nonatomic, assign) BOOL iPad;
 
 @end
@@ -55,8 +56,7 @@
     [self.view addSubview:self.mainView];
     
     // 单击显示或隐藏皮肤
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(skinTapAction)];
-    [self.view addGestureRecognizer:tap];
+    [self addTapGestureRecognizer];
     
     // 1秒后才可以旋屏，防止横屏时点击登录按钮i进来，导致布局错乱
     __weak typeof(self) weakSelf = self;
@@ -65,6 +65,19 @@
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
         [[NSNotificationCenter defaultCenter] addObserver:weakSelf selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
     });
+}
+
+#pragma mark - addTapGestureRecognizer
+- (void)addTapGestureRecognizer {
+    [self removeTapGestureRecognizer];
+    self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(skinTapAction)];
+    [self.view addGestureRecognizer:self.tap];
+}
+
+#pragma mark - removeTapGestureRecognizer
+- (void)removeTapGestureRecognizer {
+    [self.view removeGestureRecognizer:self.tap];
+    self.tap = nil;
 }
 
 #pragma mark - public
@@ -91,11 +104,13 @@
     [self.view addSubview:self.moreView];
 }
 
-- (void)skinAlphaAnimaion:(CGFloat)alpha {
+- (void)skinAlphaAnimaion:(CGFloat)alpha duration:(CGFloat)duration {
     self.skinAnimationing = YES;
     __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.3 animations:^{
         weakSelf.skinView.alpha = alpha;
+        weakSelf.skinView.backBtn.alpha = alpha;
+        weakSelf.skinView.zoomScreenBtn.alpha = alpha;
     } completion:^(BOOL finished) {
         weakSelf.skinAnimationing = NO;
         weakSelf.skinShowed = (alpha == 1.0 ? YES : NO);
@@ -103,12 +118,19 @@
 }
 
 - (void)skinHiddenAnimaion {
-    [self skinAlphaAnimaion:0.0];
+    [self skinAlphaAnimaion:0.0 duration:0.3];
+}
+
+- (void)backBtnShowNow {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(skinHiddenAnimaion) object:nil];
+    [self skinAlphaAnimaion:0.0 duration:0.0];
+    self.skinView.backBtn.alpha = 1.0;
+    self.skinView.zoomScreenBtn.alpha = 1.0;
 }
 
 - (void)skinShowAnimaion {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(skinHiddenAnimaion) object:nil];
-    [self skinAlphaAnimaion:1.0];
+    [self skinAlphaAnimaion:1.0 duration:0.3];
     [self performSelector:@selector(skinHiddenAnimaion) withObject:nil afterDelay:3.0];
 }
 
@@ -133,20 +155,66 @@
 }
 
 #pragma mark - protected - abstract
+- (void)deviceOrientationBeignAnimation {
+//    在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 重写
+}
+
+- (void)deviceOrientationEndAnimation {
+//    在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 重写
+}
+
 - (void)deviceOrientationDidChangeSubAnimation {
 //    在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 、 PLVNormalLiveMediaViewController 重写
 }
 
-- (CGFloat)getLinkMicHeight {
-    return 0.0;
+- (CGRect)correctMainRect {
+    CGRect mainRect = self.view.bounds;
+    if (self.skinView.fullscreen) {
+        mainRect = CGRectMake(0.0, 0.0, mainRect.size.width, mainRect.size.height);
+        if (@available(iOS 11.0, *)) {
+            CGRect safeFrame = self.view.superview.safeAreaLayoutGuide.layoutFrame;
+            // 快速旋转时，safeAreaLayoutGuide 如果出现横竖屏错乱的情况，手动调整
+            if (safeFrame.origin.y > 0.0) {
+                safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
+            }
+            if (safeFrame.size.width < safeFrame.size.height) {
+                safeFrame.size = CGSizeMake(mainRect.size.width - safeFrame.origin.x * 2.0, safeFrame.size.width);
+            }
+            mainRect.origin.x = safeFrame.origin.x;
+            mainRect.size.width = safeFrame.size.width;
+        }
+    } else {
+        mainRect.origin.y = 20.0;
+        if (@available(iOS 11.0, *)) {
+            CGRect safeFrame = self.view.superview.safeAreaLayoutGuide.layoutFrame;
+            // 快速旋转时，safeAreaLayoutGuide 如果出现横竖屏错乱的情况，手动调整
+            if (safeFrame.origin.x > 0.0) {
+                safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
+            }
+            if (safeFrame.size.width > safeFrame.size.height) {
+                safeFrame.size = CGSizeMake(safeFrame.size.height, safeFrame.size.width);
+            }
+            mainRect.origin.y = safeFrame.origin.y;
+        }
+        mainRect.size.height -= mainRect.origin.y;
+    }
+    return mainRect;
+}
+
+- (CGRect)getMainRect {
+    return [self correctMainRect];
 }
 
 - (void)loadPlayer {
-    // 在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 重写
+//    在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 重写
 }
 
 - (void)switchAction:(BOOL)manualControl {
 //    在子类 PLVPPTLiveMediaViewController 、 PLVPPTVodMediaViewController 重写
+}
+
+- (void)loadPPTEnd {
+//    在子类 PLVPPTLiveMediaViewController 重写
 }
 
 #pragma mark - PLVPlayerSkinViewDelegate
@@ -228,44 +296,11 @@
         block();
     }
     
-    CGRect mainRect = self.view.bounds;
-    if (self.skinView.fullscreen) {
-        CGFloat linkMicHeight = [self getLinkMicHeight];
-        mainRect = CGRectMake(0.0, linkMicHeight, mainRect.size.width, mainRect.size.height - linkMicHeight);
-        if (@available(iOS 11.0, *)) {
-            CGRect safeFrame = self.view.superview.safeAreaLayoutGuide.layoutFrame;
-            // 快速旋转时，safeAreaLayoutGuide 如果出现横竖屏错乱的情况，手动调整
-            if (safeFrame.origin.y > 0.0) {
-                safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
-            }
-            if (safeFrame.size.width < safeFrame.size.height) {
-                safeFrame.size = CGSizeMake(mainRect.size.width - safeFrame.origin.x * 2.0, safeFrame.size.width);
-            }
-            mainRect.origin.x = safeFrame.origin.x;
-            mainRect.size.width = safeFrame.size.width;
-        }
-    } else {
-        mainRect.origin.y = 20.0;
-        if (@available(iOS 11.0, *)) {
-            CGRect safeFrame = self.view.superview.safeAreaLayoutGuide.layoutFrame;
-            // 快速旋转时，safeAreaLayoutGuide 如果出现横竖屏错乱的情况，手动调整
-            if (safeFrame.origin.x > 0.0) {
-                safeFrame.origin = CGPointMake(safeFrame.origin.y, safeFrame.origin.x);
-            }
-            if (safeFrame.size.width > safeFrame.size.height) {
-                safeFrame.size = CGSizeMake(safeFrame.size.height, safeFrame.size.width);
-            }
-            mainRect.origin.y = safeFrame.origin.y;
-        }
-        mainRect.size.height -= mainRect.origin.y;
-    }
+    CGRect mainRect = [self getMainRect];
     self.mainView.frame = mainRect;
     
-    CGRect skinRect = mainRect;
+    CGRect skinRect = [self correctMainRect];
     if (self.skinView.fullscreen) {
-        CGFloat linkMicHeight = [self getLinkMicHeight];
-        skinRect.origin.y = 0.0;
-        skinRect.size.height += linkMicHeight;
         if ((skinRect.origin.x == 44.0 || self.iPad)) {
             skinRect.size.height -= 20.0;
         }
@@ -286,6 +321,7 @@
         return;
     }
     
+    [self deviceOrientationBeignAnimation];
     __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         [weakSelf changeFrame:UIDeviceOrientationIsLandscape(orientation) block:^{
@@ -294,7 +330,9 @@
                 [weakSelf.delegate statusBarAppearanceNeedsUpdate:weakSelf];
             }
         }];
-    } completion:nil];
+    } completion:^(BOOL finished) {
+        [weakSelf deviceOrientationEndAnimation];
+    }];
 }
 
 #pragma mark - PLVPlayerControllerDelegate
@@ -308,23 +346,6 @@
 - (void)playerController:(PLVPlayerController *)playerController showMessage:(NSString *)message {
     if (self.skinView.type == PLVPlayerSkinViewTypeNormalLive || self.skinView.type == PLVPlayerSkinViewTypeNormalVod) {
         [self.skinView showMessage:message];
-    }
-}
-- (void)playerController:(PLVPlayerController *)playerController mainPlayerPlaybackDidFinish:(NSNotification *)notification {
-    if ([self.delegate respondsToSelector:@selector(player:playbackDidFinish:)]) {
-        [self.delegate player:self.player playbackDidFinish:notification.userInfo];
-    }
-}
-
-- (void)playerController:(PLVPlayerController *)playerController mainPlayerDidSeekComplete:(NSNotification *)notification {
-    if ([self.delegate respondsToSelector:@selector(playerDidSeekComplete:)]) {
-        [self.delegate playerDidSeekComplete:self.player];
-    }
-}
-
-- (void)playerController:(PLVPlayerController *)playerController mainPlayerAccurateSeekComplete:(NSNotification *)notification {
-    if ([self.delegate respondsToSelector:@selector(playerAccurateSeekComplete:)]) {
-        [self.delegate playerAccurateSeekComplete:self.player];
     }
 }
 
