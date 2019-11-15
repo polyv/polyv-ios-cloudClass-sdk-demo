@@ -1468,7 +1468,7 @@
 					"\"VideoToolbox\"",
 					"-w",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo.abn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
@@ -1536,7 +1536,7 @@
 					"\"VideoToolbox\"",
 					"-w",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo.abn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
