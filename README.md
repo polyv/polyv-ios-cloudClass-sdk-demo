@@ -100,9 +100,9 @@ polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含
 
 手机扫码安装，密码：polyv
 
-![POLYV 云课堂](https://www.pgyer.com/app/qrcode/pTnr)
+![POLYV 云课堂](https://www.pgyer.com/app/qrcode/zrbo)
 
-[下载地址](https://www.pgyer.com/pTnr)
+[下载地址](https://www.pgyer.com/zrbo)
 
 
 ***
