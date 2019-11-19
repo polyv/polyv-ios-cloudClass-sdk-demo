@@ -250,7 +250,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 //    liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
 
     if (self.enterSwitch.isOn) {
-        if (@available(iOS 13.0, *)) { liveVC.modalPresentationStyle = UIModalPresentationFullScreen; }
+        liveVC.modalPresentationStyle = UIModalPresentationFullScreen;
         [vc presentViewController:liveVC animated:YES completion:nil];
     } else {
         // 支持导航跳转，暂不支持系统导航栏控制（影响UI及退出等）
@@ -273,7 +273,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     vodVC.channelMenuInfo = channelMenuInfo;
     
     if (self.enterSwitch.isOn) {
-        if (@available(iOS 13.0, *)) { vodVC.modalPresentationStyle = UIModalPresentationFullScreen; }
+        vodVC.modalPresentationStyle = UIModalPresentationFullScreen;
         [vc presentViewController:vodVC animated:YES completion:nil];
     } else {
         // 支持导航跳转，暂不支持系统导航栏控制（影响UI及退出等）

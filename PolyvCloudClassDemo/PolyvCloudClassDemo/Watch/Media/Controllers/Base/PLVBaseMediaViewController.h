@@ -134,4 +134,13 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 /// 直播流状态改变
 - (void)streamStateDidChange:(PLVBaseMediaViewController *)mediaVC streamState:(PLVLiveStreamState)streamState;
 
+/// 播放器播放结束
+- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo;
+
+/// 播放器Seek完成
+- (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
+
+/// 播放器精准Seek完成
+- (void)playerAccurateSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
+
 @end

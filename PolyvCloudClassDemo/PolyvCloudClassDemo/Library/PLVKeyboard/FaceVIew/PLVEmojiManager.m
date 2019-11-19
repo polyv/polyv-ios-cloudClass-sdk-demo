@@ -76,6 +76,11 @@ CREATE_SHARED_MANAGER(PLVEmojiManager)
 
 - (NSMutableAttributedString *)convertTextEmotionToAttachment:(NSString *)text font:(UIFont *)font {
     NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName:font}];
+    return [self convertTextEmotionToAttachmentWithAttributedString:attributeString font:font];
+}
+
+- (NSMutableAttributedString *)convertTextEmotionToAttachmentWithAttributedString:(NSMutableAttributedString *)attributeString
+                                                                             font:(UIFont *)font {
     NSArray<NSTextCheckingResult *> *matchArray = [self.regularExpression matchesInString:attributeString.string options:kNilOptions range:NSMakeRange(0, attributeString.length)];
     NSUInteger offset = 0;
     for (NSTextCheckingResult *result in matchArray) {

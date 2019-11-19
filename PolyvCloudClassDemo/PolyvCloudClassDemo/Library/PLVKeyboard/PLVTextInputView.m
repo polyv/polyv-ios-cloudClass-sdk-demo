@@ -162,8 +162,15 @@
         [self.tapView addGestureRecognizer:tap];
         
         CGRect rect = CGRectMake(48.0, 6.5, self.bounds.size.width - 96.0, 37.0);
-        if (type == PLVTextInputViewTypePrivate) {
-            rect = CGRectMake(10.0, 6.5, self.bounds.size.width - 20.0, 37.0);
+        switch (type) {
+            case PLVTextInputViewTypePrivate:
+                rect = CGRectMake(10.0, 6.5, self.bounds.size.width - 20.0, 37.0);
+                break;
+            case PLVTextInputViewTypePlayback:
+                rect = CGRectMake(10.0, 6.5, self.bounds.size.width - 48.0, 37.0);
+                break;
+            default:
+                break;
         }
         self.textView = [[PLVTextView alloc] initWithFrame:rect];
         self.textView.delegate = self;
@@ -197,17 +204,25 @@
         self.lastTextViewHeight = ceilf([self.textView sizeThatFits:self.textView.frame.size].height);
         
         UIEdgeInsets emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 15.0);
-        if (type < PLVTextInputViewTypePrivate) {
-            self.userBtn = [self addButton:@"plv_input_user_normal.png" selectedImgName:@"plv_input_user_select.png" action:@selector(onlyTeacherAction:) inView:self];
-            [self remakeConstraints:self.userBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-            
-            self.flowerBtn = [self addButton:type == PLVTextInputViewTypeNormalPublic ? @"plv_btn_like.png" : @"plv_flower.png" selectedImgName:nil action:@selector(flowerAction:) inView:self];
-            [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-            
-            self.moreBtn = [self addButton:@"plv_more.png" selectedImgName:nil action:@selector(moreAction:) inView:self];
-            // self.moreBtn.hidden = YES;
-            
-            emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 53.0);
+        switch (type) {
+            case PLVTextInputViewTypeNormalPublic:
+            case PLVTextInputViewTypeCloudClassPublic: {
+                self.userBtn = [self addButton:@"plv_input_user_normal.png" selectedImgName:@"plv_input_user_select.png" action:@selector(onlyTeacherAction:) inView:self];
+                [self remakeConstraints:self.userBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+                
+                self.flowerBtn = [self addButton:type == PLVTextInputViewTypeNormalPublic ? @"plv_btn_like.png" : @"plv_flower.png" selectedImgName:nil action:@selector(flowerAction:) inView:self];
+                [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+                
+                self.moreBtn = [self addButton:@"plv_more.png" selectedImgName:nil action:@selector(moreAction:) inView:self];
+                // self.moreBtn.hidden = YES;
+                
+                emojiMagin = UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 53.0);
+            } break;
+            case PLVTextInputViewTypePlayback: {
+                self.moreBtn = [self addButton:@"plv_more.png" selectedImgName:nil action:@selector(moreAction:) inView:self];
+            } break;
+            default:
+                break;
         }
         
         self.emojiBtn = [self addButton:@"plv_emoji_off" selectedImgName:@"plv_emoji_on" action:@selector(emojiAction:) inView:self];
@@ -227,21 +242,48 @@
             self.faceView.delegate = self;
             self.moreView = [[PLVKeyboardMoreView alloc] initWithFrame:self.moreOriginRect];
             self.moreView.delegate = self;
-            self.moreView.viewerSendImgEnabled = self.enableMore;
+            switch (type) {
+                case PLVTextInputViewTypeNormalPublic:
+                case PLVTextInputViewTypeCloudClassPublic: {
+                    self.moreView.viewerSendImgEnabled = self.enableMore;
+                    self.moreView.enabelBulletin = YES;
+                } break;
+                case PLVTextInputViewTypePlayback:
+                    self.moreView.viewerSendImgEnabled = self.enableMore;
+                    self.moreView.enabelBulletin = NO;
+                default:
+                    break;
+            }
         });
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     
-    if (type < PLVTextInputViewTypePrivate) {
-        // 默认显示moreBtn
-        self.textView.frame = CGRectMake(48.0, 7.0, self.bounds.size.width - 134.0, 37.0);
-        [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 48.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-        self.moreBtn.hidden = NO;
-        self.moreView.viewerSendImgEnabled = self.enableMore;
-        [self remakeConstraints:self.moreBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-        [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 91.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+    switch (type) {
+        case PLVTextInputViewTypeNormalPublic:
+        case PLVTextInputViewTypeCloudClassPublic: {
+            // 默认显示moreBtn
+            self.textView.frame = CGRectMake(48.0, 7.0, self.bounds.size.width - 134.0, 37.0);
+            [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 48.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+            self.moreBtn.hidden = NO;
+            self.moreView.viewerSendImgEnabled = self.enableMore;
+            self.moreView.enabelBulletin = YES;
+            [self.moreView reloadDate];
+            [self remakeConstraints:self.moreBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+            [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 91.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+        } break;
+        case PLVTextInputViewTypePlayback: {
+            self.textView.frame = CGRectMake(20, 7.0, self.bounds.size.width - 68.0, 37.0);
+            self.moreBtn.hidden = NO;
+            self.moreView.viewerSendImgEnabled = self.enableMore;
+            self.moreView.enabelBulletin = NO;
+            [self.moreView reloadDate];
+            [self remakeConstraints:self.moreBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+            [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 53.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+        } break;
+        default:
+            break;
     }
 }
 

@@ -55,6 +55,7 @@
 @implementation PLVKeyboardMoreView
 
 #pragma mark - life cycle
+
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -78,8 +79,13 @@
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView*)collectionView {
-    if (!self.viewerSendImgEnabled) { return 1; }
-    return 3;
+    NSUInteger number = 0;
+    if (self.viewerSendImgEnabled)
+        number += 2;
+    if (self.enabelBulletin)
+        number += 1;
+
+    return number;
 }
 
 - (NSInteger)collectionView:(UICollectionView*)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -104,7 +110,7 @@
             [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
             [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
         }
-    }else{
+    } else if (self.enabelBulletin) {
         [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
         [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
         [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
@@ -151,10 +157,9 @@
 }
 
 #pragma mark - Public
-- (void)setViewerSendImgEnabled:(BOOL)viewerSendImgEnabled{
-    BOOL oriValue = _viewerSendImgEnabled;
-    _viewerSendImgEnabled = viewerSendImgEnabled;
-    if (oriValue != viewerSendImgEnabled) { [self.collectionView reloadData]; }
+
+- (void)reloadDate {
+    [self.collectionView reloadData];
 }
 
 @end

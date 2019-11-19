@@ -10,39 +10,9 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "PLVEmojiManager.h"
 #import "PCCUtils.h"
+#import "PLVChatTextView.h"
 
 #define DEFAULT_CELL_HEIGHT 44.0
-#define CHAT_TEXT_FONT [UIFont systemFontOfSize:14.0]
-
-#pragma mark - Private Classes
-
-@interface PLVCCLabel : UILabel
-
-@property (assign, nonatomic) UIEdgeInsets edgeInsets;
-
-@end
-
-@implementation PLVCCLabel
-
-// 修改绘制文字的区域，edgeInsets增加bounds
--(CGRect)textRectForBounds:(CGRect)bounds limitedToNumberOfLines:(NSInteger)numberOfLines {
-    // 注意传入的UIEdgeInsetsInsetRect(bounds, self.edgeInsets),bounds是真正的绘图区域
-    CGRect rect = [super textRectForBounds:UIEdgeInsetsInsetRect(bounds, self.edgeInsets) limitedToNumberOfLines:numberOfLines];
-    
-    // 根据edgeInsets，修改绘制文字的bounds
-    rect.origin.x -= self.edgeInsets.left;
-    rect.origin.y -= self.edgeInsets.top;
-    rect.size.width += self.edgeInsets.left + self.edgeInsets.right;
-    rect.size.height += self.edgeInsets.top + self.edgeInsets.bottom;
-    return rect;
-}
-
-- (void)drawTextInRect:(CGRect)rect {
-    // 令绘制区域为原始区域，增加的内边距区域不绘制
-    [super drawTextInRect:UIEdgeInsetsInsetRect(rect, self.edgeInsets)];
-}
-
-@end
 
 #pragma mark - Public Classes
 
@@ -107,9 +77,12 @@
 
 @end
 
-@interface PLVChatroomSpeakOwnCell ()
+@interface PLVChatroomSpeakOwnCell ()<
+UITextViewDelegate
+>
 
-@property (nonatomic, strong) PLVCCLabel *messageLB;
+@property (nonatomic, strong) PLVChatTextView *messageTextView;
+
 @end
 
 @implementation PLVChatroomSpeakOwnCell
@@ -117,24 +90,16 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        self.messageLB = [[PLVCCLabel alloc] init];
-        self.messageLB.numberOfLines = 0;
-        self.messageLB.textColor = [UIColor colorWithWhite:51.0 / 255.0 alpha:1.0];
-        self.messageLB.font = CHAT_TEXT_FONT;
-        self.messageLB.backgroundColor = UIColorFromRGB(0xafcbec);
-        self.messageLB.edgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
-        [self addSubview:self.messageLB];
+        self.messageTextView = [[PLVChatTextView alloc] initWithMine:YES];
+        [self addSubview:self.messageTextView];
     }
     return self;
 }
 
 - (void)setSpeakContent:(NSString *)speakContent {
     _speakContent = speakContent;
-    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
-    self.messageLB.attributedText = attributedStr;
-    CGSize newSize = [self.messageLB sizeThatFits:CGSizeMake(270, MAXFLOAT)];
-    [self drawCornerRadiusWithView:self.messageLB size:newSize roundingCorners:UIRectCornerTopLeft|UIRectCornerBottomLeft|UIRectCornerBottomRight];
-    [self.messageLB mas_remakeConstraints:^(MASConstraintMaker *make) {
+    CGSize newSize = [self.messageTextView setMessageContent:speakContent admin:NO];
+    [self.messageTextView mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.size.mas_equalTo(newSize);
         make.top.equalTo(self.mas_top).offset(10.0);
         make.right.equalTo(self.mas_right).offset(-10);
@@ -144,19 +109,21 @@
 }
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
-    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [PLVChatTextView attributedStringWithContent:content];
     // 30 = 10(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
     return [self autoCalculateSize:CGSizeMake(270, MAXFLOAT) attributedContent:attributedStr].height + 30.0;
 }
 
 @end
 
-@interface PLVChatroomSpeakOtherCell ()
+@interface PLVChatroomSpeakOtherCell ()<
+UITextViewDelegate
+>
 
 @property (nonatomic, strong) UIImageView *avatarView;
 @property (nonatomic, strong) UILabel *actorLB;
 @property (nonatomic, strong) UILabel *nickNameLB;
-@property (nonatomic, strong) PLVCCLabel *messageLB;
+@property (nonatomic, strong) PLVChatTextView *messageTextView;
 @end
 
 @implementation PLVChatroomSpeakOtherCell
@@ -188,13 +155,9 @@
         self.nickNameLB.font = [UIFont systemFontOfSize:11.0];
         [self addSubview:self.nickNameLB];
         
-        self.messageLB = [[PLVCCLabel alloc] init];
-        self.messageLB.numberOfLines = 0;
-        self.messageLB.font = CHAT_TEXT_FONT;
-        self.messageLB.textColor = UIColorFromRGB(0x546E7A);
-        self.messageLB.backgroundColor = [UIColor whiteColor];
-        self.messageLB.edgeInsets = UIEdgeInsetsMake(10, 10, 10, 10);
-        [self addSubview:self.messageLB];
+        self.messageTextView = [[PLVChatTextView alloc] initWithMine:NO];
+        self.messageTextView.delegate = self;
+        [self addSubview:self.messageTextView];
         
         [self.actorLB mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.avatarView.mas_top);
@@ -243,26 +206,16 @@
  NSAttributedString *attributedStr = [[NSAttributedString alloc] initWithData:[content dataUsingEncoding:NSUnicodeStringEncoding] options:@{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType } documentAttributes:nil error:nil];
  [attributedStr addAttribute:NSFontAttributeName value:contentLB.font range:NSMakeRange(0, attributedStr.length)];
  */
-- (void)setSpeakContent:(NSString *)speakContent {
+- (void)setSpeakContent:(NSString *)speakContent admin:(BOOL)admin {
     _speakContent = speakContent;
-    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:speakContent font:CHAT_TEXT_FONT];
-    self.messageLB.attributedText = attributedStr;
-    CGSize newSize = [self.messageLB sizeThatFits:CGSizeMake(260, MAXFLOAT)];
-    [self drawCornerRadiusWithView:self.messageLB size:newSize roundingCorners:UIRectCornerBottomLeft|UIRectCornerBottomRight|UIRectCornerTopRight];
-    [self.messageLB mas_remakeConstraints:^(MASConstraintMaker *make) {
+    CGSize newSize = [self.messageTextView setMessageContent:speakContent admin:admin];
+    [self.messageTextView mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.size.mas_equalTo(newSize);
         make.top.equalTo(self.nickNameLB.mas_bottom).offset(5);
         make.leading.equalTo(self.avatarView.mas_trailing).offset(10);
     }];
     
     self.height = newSize.height + 33; //10+18+5
-}
-
-- (void)setSpeakContentColor:(UIColor *)speakContentColor{
-    _speakContentColor = speakContentColor;
-    if (speakContentColor) {
-        _messageLB.textColor = speakContentColor;
-    }
 }
 
 - (void)setActorTextColor:(UIColor *)actorTextColor {
@@ -280,9 +233,39 @@
 }
 
 - (CGFloat)calculateCellHeightWithContent:(NSString *)content {
-    NSMutableAttributedString *attributedStr = [[PLVEmojiManager sharedManager] convertTextEmotionToAttachment:content font:CHAT_TEXT_FONT];
+    NSMutableAttributedString *attributedStr = [PLVChatTextView attributedStringWithContent:content];
     // +53 = 10+18+5(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
     return [self autoCalculateSize:CGSizeMake(260, MAXFLOAT) attributedContent:attributedStr].height + 53.0;
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+    if (URL) {
+        if (@available(iOS 10.0, *)) {
+            if (self.urlDelegate) {
+                [self.urlDelegate interactWithURL:URL];
+            }
+            return !self.urlDelegate;
+        } else {
+            if (self.urlDelegate) {
+                [self.urlDelegate interactWithURL:URL];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] openURL:URL];
+                });
+            }
+            return NO; // iOS 10 以下不响应长按时间
+        }
+    } else {
+        return NO;
+    }
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
+    if (@available(iOS 10.0, *)) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 @end

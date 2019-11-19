@@ -350,6 +350,23 @@
         [self.skinView showMessage:message];
     }
 }
+- (void)playerController:(PLVPlayerController *)playerController mainPlayerPlaybackDidFinish:(NSNotification *)notification {
+    if ([self.delegate respondsToSelector:@selector(player:playbackDidFinish:)]) {
+        [self.delegate player:self.player playbackDidFinish:notification.userInfo];
+    }
+}
+
+- (void)playerController:(PLVPlayerController *)playerController mainPlayerDidSeekComplete:(NSNotification *)notification {
+    if ([self.delegate respondsToSelector:@selector(playerDidSeekComplete:)]) {
+        [self.delegate playerDidSeekComplete:self.player];
+    }
+}
+
+- (void)playerController:(PLVPlayerController *)playerController mainPlayerAccurateSeekComplete:(NSNotification *)notification {
+    if ([self.delegate respondsToSelector:@selector(playerAccurateSeekComplete:)]) {
+        [self.delegate playerAccurateSeekComplete:self.player];
+    }
+}
 
 #pragma mark - 跑马灯
 - (void)setNickName:(NSString *)nickName {

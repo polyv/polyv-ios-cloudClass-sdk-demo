@@ -30,6 +30,7 @@
 @synthesize countdownTimer;
 @synthesize startTime;
 @synthesize curStreamState;
+@synthesize chaseFrame;
 
 #pragma mark - life cycle
 - (void)viewDidLoad {
@@ -38,6 +39,7 @@
     
     self.player = [[PLVLivePlayerController alloc] initWithChannelId:self.channelId userId:self.userId playAD:self.playAD displayView:self.mainView delegate:self];
     ((PLVLivePlayerController *)self.player).cameraClosed = NO;
+    [(PLVLivePlayerController *)self.player setChaseFrame:self.chaseFrame];
 }
 
 #pragma mark - PLVBaseMediaViewController

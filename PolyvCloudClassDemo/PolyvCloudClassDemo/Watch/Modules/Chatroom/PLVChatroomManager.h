@@ -15,13 +15,16 @@
 @interface PLVChatroomManager : NSObject
 
 /// 登录对象，用于聊天室登录，由用户初始化
-@property (nonatomic, strong) PLVSocketObject *loginUser;
+@property (nonatomic, strong) PLVSocketObject *loginUser __deprecated;
 
-/// 已登录用户，由socket回调设置（服务器返回信息生成，可能为nil）
+/// 登录聊天室用户对象
 @property (nonatomic, strong) PLVSocketObject *socketUser;
 
 /// 默认昵称，初始化的登录对象未设置昵称时为true
 @property (nonatomic, getter=isDefaultNick, readonly) BOOL defaultNick;
+
+/// 是否被禁言
+@property (nonatomic, getter=isBanned) BOOL banned;
 
 /**
  单例方法

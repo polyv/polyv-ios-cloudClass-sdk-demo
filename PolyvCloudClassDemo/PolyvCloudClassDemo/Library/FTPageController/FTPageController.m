@@ -42,21 +42,20 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 
 #pragma mark - Initialize
 
-- (instancetype)initWithTitles:(NSArray<NSString *> *)titles controllers:(NSArray<UIViewController *> *)controllers barHeight:(CGFloat)barHeight touchHeight:(CGFloat)touchHeight {
-    self = [super init];
-    if (self) {
-        self.barHeight = barHeight;
-        self.touchHeight = touchHeight;
-        _selectedIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-        self.titles = [[NSMutableArray alloc] initWithArray:titles];
-        self.controllers = [[NSMutableArray alloc] initWithArray:controllers];
-        
-        [self setupTitles];
-        [self setupPageController];
-        
-        [self.view bringSubviewToFront:self.topLineView];
-    }
-    return self;
+- (void)setTitles:(NSArray<NSString *> *)titles
+      controllers:(NSArray<UIViewController *> *)controllers
+        barHeight:(CGFloat)barHeight
+      touchHeight:(CGFloat)touchHeight {
+    self.barHeight = barHeight;
+    self.touchHeight = touchHeight;
+    _selectedIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+    self.titles = [[NSMutableArray alloc] initWithArray:titles];
+    self.controllers = [[NSMutableArray alloc] initWithArray:controllers];
+    
+    [self setupTitles];
+    [self setupPageController];
+    
+    [self.view bringSubviewToFront:self.topLineView];
 }
 
 - (void)changeFrame {
@@ -81,7 +80,7 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 -(void)setupTitles {
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.titleCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, self.touchHeight - 1.0, kWidth, self.barHeight - self.touchHeight) collectionViewLayout:layout];
+    self.titleCollectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, self.touchHeight, kWidth, self.barHeight - self.touchHeight) collectionViewLayout:layout];
     self.titleCollectionView.backgroundColor = [UIColor whiteColor];
     self.titleCollectionView.dataSource = self;
     self.titleCollectionView.delegate = self;
@@ -90,7 +89,8 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     self.titleCollectionView.showsVerticalScrollIndicator = NO;
     self.titleCollectionView.showsHorizontalScrollIndicator = NO;
     
-    [self.titleCollectionView registerClass:[FTTitleViewCell class] forCellWithReuseIdentifier:TitleCellIdentifier];
+    [self.titleCollectionView registerNib:[UINib nibWithNibName:@"FTTitleViewCell" bundle:nil] forCellWithReuseIdentifier:TitleCellIdentifier];
+    //[self.titleCollectionView registerClass:[FTTitleViewCell class] forCellWithReuseIdentifier:TitleCellIdentifier];
 
     if (self.touchHeight > 0.0) {
         [self addTouchView];
@@ -185,6 +185,19 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     }
 }
 
+- (void)scrollEnable:(BOOL)enable {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIScrollView *scrollView;
+        for(id subview in self.pageViewController.view.subviews) {
+            if([subview isKindOfClass:UIScrollView.class]) {
+                scrollView=subview;
+                break;
+            }
+        }
+        scrollView.scrollEnabled = enable;
+    });
+}
+
 #pragma mark - Life Cycle
 
 - (void)viewDidLoad {
@@ -223,9 +236,7 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *text = self.titles[indexPath.item];
-    CGFloat width = [text sizeWithAttributes:@{NSFontAttributeName : [UIFont systemFontOfSize:16.0]}].width;
-    return CGSizeMake(width + 32.0, CGRectGetHeight(collectionView.bounds));
+    return CGSizeMake([FTTitleViewCell cellWidth], collectionView.frame.size.height);
 }
 
 -(UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
@@ -249,6 +260,8 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
     [self.pageViewController setViewControllers:showController direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:^(BOOL finished) {
         //NSLog(@"setViewControllers finished."); // first low
     }];
+    
+    [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {

@@ -13,6 +13,7 @@
 @interface PLVChatroomModel ()
 
 @property (nonatomic, assign) BOOL teacher;
+@property (nonatomic, assign) BOOL guest;
 @property (nonatomic, strong) NSString *msgId;
 @property (nonatomic, assign) CGFloat cellHeight;
 @property (nonatomic, assign) PLVChatroomModelType type;
@@ -224,15 +225,11 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             [(PLVChatroomSpeakOtherCell *)cell setActor:self.actor];
             [(PLVChatroomSpeakOtherCell *)cell setAvatar:self.avatar];
             [(PLVChatroomSpeakOtherCell *)cell setNickName:self.nickName];
-            [(PLVChatroomSpeakOtherCell *)cell setSpeakContent:self.speakContent];
             [(PLVChatroomSpeakOtherCell *)cell setActorTextColor:self.actorTextColor];
             [(PLVChatroomSpeakOtherCell *)cell setActorBackgroundColor:self.actorBackgroundColor];
-            // 使用特殊字体颜色区分官方人员和学生
-            BOOL useSpecialColor = (self.userType == PLVChatroomUserTypeTeacher) || (self.userType == PLVChatroomUserTypeAssistant) || (self.userType == PLVChatroomUserTypeManager);
-            UIColor * specialColor = UIColorFromRGB(0x0092fa); // 若需自定义‘官方人员’字色，修改此处色值
-            UIColor * normalColor = UIColorFromRGB(0x546E7A); // 若需自定义‘学生’字色，修改此处色值
-            UIColor * speckContentColor = useSpecialColor ? specialColor : normalColor;
-            [(PLVChatroomSpeakOtherCell *)cell setSpeakContentColor:speckContentColor];
+            
+            BOOL useSpecialColor = (self.userType == PLVChatroomUserTypeTeacher) || (self.userType == PLVChatroomUserTypeAssistant) || (self.userType == PLVChatroomUserTypeManager || self.guest);
+            [(PLVChatroomSpeakOtherCell *)cell setSpeakContent:self.speakContent admin:useSpecialColor];
         } break;
         case PLVChatroomModelTypeImageSend: {
             if (!cell) {
@@ -339,6 +336,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
         self.userType = PLVChatroomUserTypeAssistant;
         self.teacher = YES;
         self.actor = @"助教";
+    } else if ([userType isEqualToString:@"guest"]) {
+        self.guest = YES;
     }
     
     // 自定义参数

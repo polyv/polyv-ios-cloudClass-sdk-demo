@@ -12,17 +12,19 @@
 #import "PLVPPTVodMediaViewController.h"
 #import "FTPageController.h"
 #import "PLVLiveInfoViewController.h"
+#import "PLVChatPlaybackController.h"
 
 #define PPTPlayerViewScale (9.0 / 16.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
 
-@interface PLVVodViewController () <PLVBaseMediaViewControllerDelegate>
+@interface PLVVodViewController () <PLVBaseMediaViewControllerDelegate, PLVChatPlaybackControllerDelegate>
 
 @property (nonatomic, strong) PLVBaseMediaViewController<PLVVodMediaProtocol> *mediaVC;
 @property (nonatomic, assign) CGFloat mediaViewControllerHeight;
 @property (nonatomic, assign) CGRect chatroomFrame;
 @property (nonatomic, strong) FTPageController *pageController;
 @property (nonatomic, strong) PLVLiveInfoViewController *liveInfoViewController;
+@property (nonatomic, strong) PLVChatPlaybackController *chatPlaybackCtl;
 
 @property (nonatomic, strong) NSTimer *pollingTimer;
 
@@ -65,7 +67,7 @@
     }
     self.mediaVC.player.pauseInBackground = YES; // 默认回后台暂停
     
-//    [self playerPolling];
+    self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(playerPolling) userInfo:nil repeats:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -85,12 +87,12 @@
 }
 
 - (void)playerPolling {
-    if (@available(iOS 10.0, *)) {
-        self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
-        }];
+    //NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
+    if (self.chatPlaybackCtl) {
+        [self.chatPlaybackCtl scrollToTime:self.mediaVC.player.currentPlaybackTime];
     }
 }
+
 - (void)loadChannelMenuInfos {
     if (self.channelMenuInfo) {
         [self setupChatroomItem];
@@ -124,9 +126,17 @@
         }
     }
     
+    self.chatPlaybackCtl = [[PLVChatPlaybackController alloc] initChatPlaybackControllerWithVid:[PLVLiveVideoConfig sharedInstance].vodId  frame:self.chatroomFrame];
+    self.chatPlaybackCtl.delegate = self;
+    [self.chatPlaybackCtl loadSubViews:self.view];
+    [self.chatPlaybackCtl configUserInfoWithNick:nil pic:nil userId:nil];
+    [titles addObject:@"聊天信息"];
+    [controllers addObject:self.chatPlaybackCtl];
+    
     if (titles.count>0 && controllers.count>0 && titles.count==controllers.count) {
-        self.pageController = [[FTPageController alloc] initWithTitles:titles controllers:controllers barHeight:barHeight touchHeight:0.0];
+        self.pageController = [[FTPageController alloc] init];
         self.pageController.view.frame = pageCtrlFrame;
+        [self.pageController setTitles:titles controllers:controllers barHeight:barHeight touchHeight:0.0];
         [self.view insertSubview:self.pageController.view belowSubview:self.mediaVC.view];  // 需要添加在播放器下面，使得播放器全屏的时候能盖住聊天室
         [self addChildViewController:self.pageController];
         [self.pageController cornerRadius:NO];
@@ -139,6 +149,19 @@
     self.liveInfoViewController.menu = descMenu;
     self.liveInfoViewController.vod = YES;
     self.liveInfoViewController.view.frame = self.chatroomFrame;
+}
+
+#pragma mark - <PLVChatPlaybackControllerDelegate>
+
+- (NSTimeInterval)currentPlaybackTime {
+    return self.mediaVC.player.currentPlaybackTime;
+}
+
+- (NSTimeInterval)videoDurationTime {
+    return self.mediaVC.player.duration;
+}
+
+- (void)playbackController:(PLVChatPlaybackController *)playbackController followKeyboardAnimation:(BOOL)flag {
 }
 
 #pragma mark - view controls
@@ -180,6 +203,16 @@
 
 - (void)statusBarAppearanceNeedsUpdate:(PLVBaseMediaViewController *)mediaVC {
     [self setNeedsStatusBarAppearanceUpdate];//横竖屏切换前，更新Status Bar的状态
+}
+
+- (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player {
+    if (self.chatPlaybackCtl) {
+        [self.chatPlaybackCtl seekToTime:player.currentPlaybackTime];
+    }
+}
+
+- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo {
+    NSLog(@"userInfo: %@",userInfo);
 }
 
 @end

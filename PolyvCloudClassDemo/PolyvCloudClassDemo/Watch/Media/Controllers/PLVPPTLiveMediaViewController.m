@@ -14,6 +14,8 @@
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
+@property (nonatomic, strong) NSTimer *timer;
+
 @end
 
 @implementation PLVPPTLiveMediaViewController
@@ -36,6 +38,7 @@
 @synthesize countdownTimer;
 @synthesize startTime;
 @synthesize curStreamState;
+@synthesize chaseFrame;
 
 #pragma mark - life cycle
 - (void)viewDidLoad {
@@ -65,11 +68,7 @@
     if (((PLVLivePlayerController *)self.player).linkMic) {
         [self.pptVC refreshPPT:json];
     } else {
-        NSTimeInterval delay = 5000.0;
-        __weak typeof(self) weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.pptVC refreshPPT:json];
-        });
+        [self.pptVC refreshPPT:json delay:5000];
     }
 }
 
@@ -118,6 +117,10 @@
         [self closeSecondaryView:self.skinView];
     }
     self.player = [[PLVLivePlayerController alloc] initWithChannelId:self.channelId userId:self.userId playAD:self.playAD displayView:self.secondaryView delegate:self];
+    [(PLVLivePlayerController *)self.player setChaseFrame:self.chaseFrame];
+    if (!self.timer) {
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTimeCheck) userInfo:nil repeats:YES];
+    }
 }
 
 - (void)switchAction:(BOOL)manualControl {
@@ -131,7 +134,7 @@
             [linkMicView insertSubview:videoView belowSubview:linkMicView.permissionImgView];
             [videoView setFrame:linkMicView.bounds];
             self.mainView.backgroundColor = [UIColor blackColor];
-            [self.mainView addSubview:self.pptVC.view];
+            [self.mainView insertSubview:self.pptVC.view atIndex:0];
             self.pptVC.view.frame = self.mainView.bounds;
         } else {
             if (manualControl) {
@@ -140,7 +143,7 @@
             linkMicView.onBigView = YES;
             UIView *videoView = linkMicView.mainView;
             self.mainView.backgroundColor = linkMicView.videoView.hidden ? LinkMicViewBackgroundColor : [UIColor blackColor];
-            [self.mainView addSubview:videoView];
+            [self.mainView insertSubview:videoView atIndex:0];
             [videoView setFrame:self.mainView.bounds];
             linkMicView.backgroundColor = [UIColor whiteColor];
             [linkMicView insertSubview:self.pptVC.view belowSubview:linkMicView.permissionImgView];
@@ -151,9 +154,31 @@
     }
 }
 
+- (void)clearResource {
+    [super clearResource];
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+
 - (void)changeVideoAndPPTPosition:(BOOL)status {
     if (status != self.pptOnSecondaryView) {
         [super dealSwitchAction:NO];
+    }
+}
+
+#pragma mark - Private
+
+- (void)onTimeCheck {
+    if (((PLVLivePlayerController *)self.player).linkMic) {
+        return; // 连麦 return
+    }
+    /// seiTime-videoCache,  -0.5取定时器1s中值
+    long diffTime = self.player.curFrameAgoraUserTC - self.player.videoCacheDuration - 0.5;
+    if (diffTime > 0) {
+        NSString *json = [NSString stringWithFormat:@"{\"time\":\"%ld\"}",diffTime];
+        [self.pptVC setSeiData:json];
     }
 }
 

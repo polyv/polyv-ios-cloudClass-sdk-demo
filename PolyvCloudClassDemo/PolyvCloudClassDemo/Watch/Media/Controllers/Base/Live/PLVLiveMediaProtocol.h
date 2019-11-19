@@ -38,6 +38,8 @@
 @property (nonatomic, strong) NSDate *startTime;
 /// 当前流状态
 @property (nonatomic, assign) PLVLiveStreamState curStreamState;
+/// 直播追帧，默认 NO
+@property (nonatomic, assign) BOOL chaseFrame;
 
 @optional
 /// 显示一条弹幕，该 message 由外层的键盘输入回调 或 Sockect IM 传递进来

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		002498EB237A91C8006D1E3E /* PLVChatTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 002498EA237A91C8006D1E3E /* PLVChatTextView.m */; };
 		2207EAF521AE32F40011B0EB /* PLVChatroomQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */; };
 		220CB18C21B8C95B0034C384 /* PLVTextInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16B21B8C95B0034C384 /* PLVTextInputView.m */; };
 		220CB18D21B8C95B0034C384 /* PLVEmojiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16D21B8C95B0034C384 /* PLVEmojiManager.m */; };
@@ -56,6 +57,9 @@
 		229F768F21ABA1600085F5DE /* PLVPlayerSkinView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766321ABA1600085F5DE /* PLVPlayerSkinView.m */; };
 		229F769021ABA1600085F5DE /* PLVBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766521ABA1600085F5DE /* PLVBrightnessView.m */; };
 		229F769121ABA1600085F5DE /* PLVMediaSecondaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 229F766821ABA1600085F5DE /* PLVMediaSecondaryView.m */; };
+		229F827321C79C6500446B9A /* PolyvBusinessSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */; };
+		229F827521C79C6500446B9A /* PolyvCloudClassSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */; };
+		229F827721C79C6500446B9A /* PolyvFoundationSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */; };
 		22AD6182218316A50053F496 /* plv_clear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22AD6181218316A50053F496 /* plv_clear@2x.png */; };
 		22B27D71219BC5F8003550EA /* plv_clear@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22B27D6F219BC5F8003550EA /* plv_clear@3x.png */; };
 		22B27D72219BC5F8003550EA /* plv_logo@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22B27D70219BC5F8003550EA /* plv_logo@3x.png */; };
@@ -139,14 +143,17 @@
 		22FB810C212AB55100B5CB53 /* ZJZDanMuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FB80EB212AB55100B5CB53 /* ZJZDanMuLabel.m */; };
 		298A8E4722B1430D00706456 /* plv_notice@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4522B1430D00706456 /* plv_notice@3x.png */; };
 		298A8E4822B1430D00706456 /* plv_notice@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4622B1430D00706456 /* plv_notice@2x.png */; };
+		4CB481B82946E1D1B6EB58F7 /* Pods_PolyvCloudClassDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E87262DCB249F10D8AC7A23 /* Pods_PolyvCloudClassDemo.framework */; };
 		632516CA22AE101E008636C6 /* PLVPlayerInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 632516C822AE101D008636C6 /* PLVPlayerInputView.m */; };
 		63589FF122BC79A9007D4151 /* dist in Resources */ = {isa = PBXBuildFile; fileRef = 63589FF022BC79A9007D4151 /* dist */; };
 		639EC8B822AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */; };
 		63E8C8D122A64B2B00CF5129 /* PLVPlayerSkinMoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */; };
+		6720F28122FBBF4D00EC249F /* FTTitleViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6720F28022FBBF4D00EC249F /* FTTitleViewCell.xib */; };
 		67219F4A217F3B4300756A54 /* plv_btn_download@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67219F48217F3B4300756A54 /* plv_btn_download@2x.png */; };
 		67219F4B217F3B4300756A54 /* plv_btn_download@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 67219F49217F3B4300756A54 /* plv_btn_download@3x.png */; };
 		672D7CEF212D7B1500974886 /* FTPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D7CEA212D7B1500974886 /* FTPageController.m */; };
 		672D7CF0212D7B1500974886 /* FTTitleViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D7CEC212D7B1500974886 /* FTTitleViewCell.m */; };
+		6734CB9522F17B2400F47191 /* PLVTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6734CB9422F17B2400F47191 /* PLVTableViewController.m */; };
 		673631EA21BF5D41006868DE /* plv_flower@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E421BF5D41006868DE /* plv_flower@3x.png */; };
 		673631EB21BF5D41006868DE /* plv_input_user_normal@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E521BF5D41006868DE /* plv_input_user_normal@3x.png */; };
 		673631EC21BF5D41006868DE /* plv_backspace@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 673631E621BF5D41006868DE /* plv_backspace@3x.png */; };
@@ -159,6 +166,8 @@
 		6740D66C2136A42D0076AF7D /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6662136A42D0076AF7D /* LICENSE */; };
 		6740D66D2136A42D0076AF7D /* README.mdown in Resources */ = {isa = PBXBuildFile; fileRef = 6740D6672136A42D0076AF7D /* README.mdown */; };
 		6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6740D66A2136A42D0076AF7D /* MarqueeLabel.m */; };
+		6746EFF422F1A60E005F07AA /* PLVChatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6746EFF322F1A60E005F07AA /* PLVChatModel.m */; };
+		6746EFF722F1A65D005F07AA /* PLVChatCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6746EFF622F1A65D005F07AA /* PLVChatCell.m */; };
 		6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */; };
 		677B4C7E21F1835A00E98E86 /* PLVChatroomCustomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 677B4C7D21F1835A00E98E86 /* PLVChatroomCustomModel.m */; };
 		677B4C8121F183C300E98E86 /* PLVChatroomCustomKouModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 677B4C8021F183C200E98E86 /* PLVChatroomCustomKouModel.m */; };
@@ -166,7 +175,11 @@
 		677B4C8721F1BDF300E98E86 /* plv_kou1_img@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */; };
 		677B4C8821F1BDF300E98E86 /* plv_kou2_img@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */; };
 		677B4C8921F1BDF300E98E86 /* plv_kou2_img@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */; };
-		711102FAFCF6DA1944A38DFC /* Pods_PolyvCloudClassDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8A0E43CDED52C9A0030B12 /* Pods_PolyvCloudClassDemo.framework */; };
+		679841F822F82D0700FEFD21 /* PLVChatPlaybackModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 679841F722F82D0700FEFD21 /* PLVChatPlaybackModel.m */; };
+		67E6E49322EFF245001E807B /* PLVChatPlaybackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 67E6E49222EFF245001E807B /* PLVChatPlaybackController.m */; };
+		67E6E49822EFF633001E807B /* PLVBaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 67E6E49722EFF633001E807B /* PLVBaseCell.m */; };
+		67E6E49B22EFF68A001E807B /* PLVCellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 67E6E49A22EFF68A001E807B /* PLVCellModel.m */; };
+		67F5C7AE22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F5C7AD22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m */; };
 		DA45A51522BB6B42004CFEB2 /* PLVLiveInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA45A51022BB6B41004CFEB2 /* PLVLiveInfoViewController.m */; };
 		DA45A52A22BC83EC004CFEB2 /* plv_img_watch@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA45A52422BC83EB004CFEB2 /* plv_img_watch@3x.png */; };
 		DA45A52B22BC83EC004CFEB2 /* plv_btn_publisher@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA45A52522BC83EB004CFEB2 /* plv_btn_publisher@3x.png */; };
@@ -179,6 +192,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		002498E9237A91C7006D1E3E /* PLVChatTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVChatTextView.h; sourceTree = "<group>"; };
+		002498EA237A91C8006D1E3E /* PLVChatTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVChatTextView.m; sourceTree = "<group>"; };
+		002F31B8237E467800FA5EE8 /* PLVChatroomDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomDefine.h; sourceTree = "<group>"; };
+		07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		2207EAF321AE32F40011B0EB /* PLVChatroomQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomQueue.h; sourceTree = "<group>"; };
 		2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatroomQueue.m; sourceTree = "<group>"; };
 		220CB16B21B8C95B0034C384 /* PLVTextInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVTextInputView.m; sourceTree = "<group>"; };
@@ -252,6 +269,9 @@
 		229F766621ABA1600085F5DE /* PLVPlayerSkinView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinView.h; sourceTree = "<group>"; };
 		229F766721ABA1600085F5DE /* PLVBrightnessView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVBrightnessView.h; sourceTree = "<group>"; };
 		229F766821ABA1600085F5DE /* PLVMediaSecondaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVMediaSecondaryView.m; sourceTree = "<group>"; };
+		229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvBusinessSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvCloudClassSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PolyvFoundationSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		22AD6181218316A50053F496 /* plv_clear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_clear@2x.png"; sourceTree = "<group>"; };
 		22B27D6F219BC5F8003550EA /* plv_clear@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_clear@3x.png"; sourceTree = "<group>"; };
 		22B27D70219BC5F8003550EA /* plv_logo@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_logo@3x.png"; sourceTree = "<group>"; };
@@ -359,6 +379,9 @@
 		22FB80EC212AB55100B5CB53 /* ZJZDanMu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZJZDanMu.h; sourceTree = "<group>"; };
 		298A8E4522B1430D00706456 /* plv_notice@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@3x.png"; sourceTree = "<group>"; };
 		298A8E4622B1430D00706456 /* plv_notice@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_notice@2x.png"; sourceTree = "<group>"; };
+		337B9B2EFB94B7084528F3CD /* Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-business-cloudClass-PolyvCloudClassDemo/Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		3E87262DCB249F10D8AC7A23 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4838A4655D4B6EA2685A4D5C /* Pods-common-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-PolyvCloudClassDemo/Pods-common-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		632516C822AE101D008636C6 /* PLVPlayerInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerInputView.m; sourceTree = "<group>"; };
 		632516C922AE101D008636C6 /* PLVPlayerInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVPlayerInputView.h; sourceTree = "<group>"; };
 		63589FF022BC79A9007D4151 /* dist */ = {isa = PBXFileReference; lastKnownFileType = folder; path = dist; sourceTree = "<group>"; };
@@ -366,13 +389,15 @@
 		639EC8B722AFBA1A00ED2FFD /* PLVPlayerSkinAudioModeView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinAudioModeView.m; sourceTree = "<group>"; };
 		63E8C8CF22A64B2B00CF5129 /* PLVPlayerSkinMoreView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPlayerSkinMoreView.h; sourceTree = "<group>"; };
 		63E8C8D022A64B2B00CF5129 /* PLVPlayerSkinMoreView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPlayerSkinMoreView.m; sourceTree = "<group>"; };
-		66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		6720F28022FBBF4D00EC249F /* FTTitleViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FTTitleViewCell.xib; sourceTree = "<group>"; };
 		67219F48217F3B4300756A54 /* plv_btn_download@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@2x.png"; sourceTree = "<group>"; };
 		67219F49217F3B4300756A54 /* plv_btn_download@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_download@3x.png"; sourceTree = "<group>"; };
 		672D7CE9212D7B1500974886 /* FTPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTPageController.h; sourceTree = "<group>"; };
 		672D7CEA212D7B1500974886 /* FTPageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTPageController.m; sourceTree = "<group>"; };
 		672D7CEC212D7B1500974886 /* FTTitleViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTTitleViewCell.m; sourceTree = "<group>"; };
 		672D7CED212D7B1500974886 /* FTTitleViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTTitleViewCell.h; sourceTree = "<group>"; };
+		6734CB9322F17B2400F47191 /* PLVTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVTableViewController.h; sourceTree = "<group>"; };
+		6734CB9422F17B2400F47191 /* PLVTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVTableViewController.m; sourceTree = "<group>"; };
 		673631E421BF5D41006868DE /* plv_flower@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_flower@3x.png"; sourceTree = "<group>"; };
 		673631E521BF5D41006868DE /* plv_input_user_normal@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_input_user_normal@3x.png"; sourceTree = "<group>"; };
 		673631E621BF5D41006868DE /* plv_backspace@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_backspace@3x.png"; sourceTree = "<group>"; };
@@ -388,6 +413,10 @@
 		6740D6672136A42D0076AF7D /* README.mdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.mdown; sourceTree = "<group>"; };
 		6740D66A2136A42D0076AF7D /* MarqueeLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MarqueeLabel.m; sourceTree = "<group>"; };
 		6740D66B2136A42D0076AF7D /* MarqueeLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarqueeLabel.h; sourceTree = "<group>"; };
+		6746EFF222F1A60E005F07AA /* PLVChatModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatModel.h; sourceTree = "<group>"; };
+		6746EFF322F1A60E005F07AA /* PLVChatModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatModel.m; sourceTree = "<group>"; };
+		6746EFF522F1A65D005F07AA /* PLVChatCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatCell.h; sourceTree = "<group>"; };
+		6746EFF622F1A65D005F07AA /* PLVChatCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatCell.m; sourceTree = "<group>"; };
 		6761E9EE218016F00026E8A6 /* PLVPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVPhotoBrowser.h; sourceTree = "<group>"; };
 		6761E9EF218016F00026E8A6 /* PLVPhotoBrowser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVPhotoBrowser.m; sourceTree = "<group>"; };
 		677B4C7C21F1835A00E98E86 /* PLVChatroomCustomModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomCustomModel.h; sourceTree = "<group>"; };
@@ -398,7 +427,19 @@
 		677B4C8321F1BDF200E98E86 /* plv_kou1_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou1_img@2x.png"; sourceTree = "<group>"; };
 		677B4C8421F1BDF200E98E86 /* plv_kou2_img@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@2x.png"; sourceTree = "<group>"; };
 		677B4C8521F1BDF300E98E86 /* plv_kou2_img@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_kou2_img@3x.png"; sourceTree = "<group>"; };
-		6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		679841F622F82D0700FEFD21 /* PLVChatPlaybackModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatPlaybackModel.h; sourceTree = "<group>"; };
+		679841F722F82D0700FEFD21 /* PLVChatPlaybackModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatPlaybackModel.m; sourceTree = "<group>"; };
+		67E6E49122EFF245001E807B /* PLVChatPlaybackController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatPlaybackController.h; sourceTree = "<group>"; };
+		67E6E49222EFF245001E807B /* PLVChatPlaybackController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVChatPlaybackController.m; sourceTree = "<group>"; };
+		67E6E49622EFF633001E807B /* PLVBaseCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVBaseCell.h; sourceTree = "<group>"; };
+		67E6E49722EFF633001E807B /* PLVBaseCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVBaseCell.m; sourceTree = "<group>"; };
+		67E6E49922EFF68A001E807B /* PLVCellModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVCellModel.h; sourceTree = "<group>"; };
+		67E6E49A22EFF68A001E807B /* PLVCellModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVCellModel.m; sourceTree = "<group>"; };
+		67F5C7AD22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PLVChatPlaybackController+DataProcessing.m"; sourceTree = "<group>"; };
+		7DE2F91846E9E5A421F4F06D /* Pods-common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-PolyvCloudClassDemo/Pods-common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		A3211725223B6ED7551DBB2E /* Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-business-cloudClass-PolyvCloudClassDemo/Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		B06169596654856DABAB8966 /* Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-sdk_common-PolyvCloudClassDemo/Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 		DA45A51022BB6B41004CFEB2 /* PLVLiveInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVLiveInfoViewController.m; sourceTree = "<group>"; };
 		DA45A51122BB6B41004CFEB2 /* PLVLiveInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVLiveInfoViewController.h; sourceTree = "<group>"; };
 		DA45A52422BC83EB004CFEB2 /* plv_img_watch@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_watch@3x.png"; sourceTree = "<group>"; };
@@ -409,7 +450,7 @@
 		DA45A52922BC83EC004CFEB2 /* plv_btn_praise@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_praise@2x.png"; sourceTree = "<group>"; };
 		DA45A53422BC8D15004CFEB2 /* plv_img_channel_default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_channel_default@2x.png"; sourceTree = "<group>"; };
 		DA45A53522BC8D15004CFEB2 /* plv_img_channel_default@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_img_channel_default@3x.png"; sourceTree = "<group>"; };
-		DA8A0E43CDED52C9A0030B12 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DFDCCFFD5A59384128F9572A /* Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-sdk_common-PolyvCloudClassDemo/Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -417,7 +458,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				711102FAFCF6DA1944A38DFC /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
+				229F827321C79C6500446B9A /* PolyvBusinessSDK.framework in Frameworks */,
+				229F827521C79C6500446B9A /* PolyvCloudClassSDK.framework in Frameworks */,
+				229F827721C79C6500446B9A /* PolyvFoundationSDK.framework in Frameworks */,
+				4CB481B82946E1D1B6EB58F7 /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -538,10 +582,9 @@
 		229F761A21ABA1600085F5DE /* Watch */ = {
 			isa = PBXGroup;
 			children = (
-				22F2005622E86724001B2B69 /* ppt */,
-				63589FF022BC79A9007D4151 /* dist */,
-				229F761D21ABA1600085F5DE /* Chatroom */,
+				67E6E48F22EFE296001E807B /* Resource */,
 				229F764621ABA1600085F5DE /* Media */,
+				67E6E48E22EFE236001E807B /* Modules */,
 				229F764521ABA1600085F5DE /* PLVLiveViewController.h */,
 				229F761C21ABA1600085F5DE /* PLVLiveViewController.m */,
 				229F761B21ABA1600085F5DE /* PLVVodViewController.h */,
@@ -553,7 +596,7 @@
 		229F761D21ABA1600085F5DE /* Chatroom */ = {
 			isa = PBXGroup;
 			children = (
-				DA45A50F22BB6B41004CFEB2 /* LiveInfo */,
+				002F31B8237E467800FA5EE8 /* PLVChatroomDefine.h */,
 				229F762421ABA1600085F5DE /* resource */,
 				229F762021ABA1600085F5DE /* Models */,
 				229F762921ABA1600085F5DE /* Cells */,
@@ -607,6 +650,8 @@
 		229F762921ABA1600085F5DE /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				002498E9237A91C7006D1E3E /* PLVChatTextView.h */,
+				002498EA237A91C8006D1E3E /* PLVChatTextView.m */,
 				229F762B21ABA1600085F5DE /* PLVChatroomCell.h */,
 				229F762A21ABA1600085F5DE /* PLVChatroomCell.m */,
 				22B906FB21F56F400086D05A /* PLVChatroomCustomKouCell.h */,
@@ -910,10 +955,22 @@
 		672D7CEB212D7B1500974886 /* views */ = {
 			isa = PBXGroup;
 			children = (
+				6720F28022FBBF4D00EC249F /* FTTitleViewCell.xib */,
 				672D7CED212D7B1500974886 /* FTTitleViewCell.h */,
 				672D7CEC212D7B1500974886 /* FTTitleViewCell.m */,
 			);
 			path = views;
+			sourceTree = "<group>";
+		};
+		6734CB9222F1799E00F47191 /* TableView */ = {
+			isa = PBXGroup;
+			children = (
+				67E6E49522EFF570001E807B /* Cells */,
+				67E6E49422EFF565001E807B /* Models */,
+				6734CB9322F17B2400F47191 /* PLVTableViewController.h */,
+				6734CB9422F17B2400F47191 /* PLVTableViewController.m */,
+			);
+			path = TableView;
 			sourceTree = "<group>";
 		};
 		6740D64421364A440076AF7D /* Utils */ = {
@@ -971,10 +1028,75 @@
 			path = resource;
 			sourceTree = "<group>";
 		};
+		679841F522F82CDF00FEFD21 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				679841F622F82D0700FEFD21 /* PLVChatPlaybackModel.h */,
+				679841F722F82D0700FEFD21 /* PLVChatPlaybackModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		67E6E48E22EFE236001E807B /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				6734CB9222F1799E00F47191 /* TableView */,
+				DA45A50F22BB6B41004CFEB2 /* LiveInfo */,
+				229F761D21ABA1600085F5DE /* Chatroom */,
+				67E6E49022EFE522001E807B /* ChatPlayback */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		67E6E48F22EFE296001E807B /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				63589FF022BC79A9007D4151 /* dist */,
+				22F2005622E86724001B2B69 /* ppt */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		67E6E49022EFE522001E807B /* ChatPlayback */ = {
+			isa = PBXGroup;
+			children = (
+				679841F522F82CDF00FEFD21 /* Model */,
+				67E6E49122EFF245001E807B /* PLVChatPlaybackController.h */,
+				67E6E49222EFF245001E807B /* PLVChatPlaybackController.m */,
+				67F5C7AD22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m */,
+			);
+			path = ChatPlayback;
+			sourceTree = "<group>";
+		};
+		67E6E49422EFF565001E807B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				67E6E49922EFF68A001E807B /* PLVCellModel.h */,
+				67E6E49A22EFF68A001E807B /* PLVCellModel.m */,
+				6746EFF222F1A60E005F07AA /* PLVChatModel.h */,
+				6746EFF322F1A60E005F07AA /* PLVChatModel.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		67E6E49522EFF570001E807B /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				67E6E49622EFF633001E807B /* PLVBaseCell.h */,
+				67E6E49722EFF633001E807B /* PLVBaseCell.m */,
+				6746EFF522F1A65D005F07AA /* PLVChatCell.h */,
+				6746EFF622F1A65D005F07AA /* PLVChatCell.m */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		8F0F50E05503F0F99A6A8D07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DA8A0E43CDED52C9A0030B12 /* Pods_PolyvCloudClassDemo.framework */,
+				229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */,
+				229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */,
+				229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */,
+				3E87262DCB249F10D8AC7A23 /* Pods_PolyvCloudClassDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -982,8 +1104,14 @@
 		AB0E412E19A1496BAD99BFDC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
-				6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */,
+				07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */,
+				C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */,
+				4838A4655D4B6EA2685A4D5C /* Pods-common-PolyvCloudClassDemo.debug.xcconfig */,
+				7DE2F91846E9E5A421F4F06D /* Pods-common-PolyvCloudClassDemo.release.xcconfig */,
+				DFDCCFFD5A59384128F9572A /* Pods-common-sdk_common-PolyvCloudClassDemo.debug.xcconfig */,
+				B06169596654856DABAB8966 /* Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig */,
+				337B9B2EFB94B7084528F3CD /* Pods-business-cloudClass-PolyvCloudClassDemo.debug.xcconfig */,
+				A3211725223B6ED7551DBB2E /* Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1097,6 +1225,7 @@
 				DA45A53722BC8D16004CFEB2 /* plv_img_channel_default@3x.png in Resources */,
 				6740D66D2136A42D0076AF7D /* README.mdown in Resources */,
 				677B4C8921F1BDF300E98E86 /* plv_kou2_img@3x.png in Resources */,
+				6720F28122FBBF4D00EC249F /* FTTitleViewCell.xib in Resources */,
 				22D9ABCE21B676FB003DFD42 /* plv_shoot_switchCamera@3x.png in Resources */,
 				22142F5C2113094200062C6E /* Assets.xcassets in Resources */,
 				22E2770622E02514000BE8FF /* plv_closeCamera@2x.png in Resources */,
@@ -1185,7 +1314,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Masonry/Masonry.framework",
-				"${PODS_ROOT}/PolyvIJKPlayer_Dylib/PolyvIJKMediaFramework.framework",
+				"${PODS_ROOT}/PolyvIJKPlayer_Cus/PolyvIJKMediaFramework.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
@@ -1232,6 +1361,7 @@
 				22B4087521B7BC030087DF92 /* AppDelegate.m in Sources */,
 				22B4087321B7BB6B0087DF92 /* PCCUtils.m in Sources */,
 				22D9ABBF21B66E34003DFD42 /* ZAlbumTableViewCell.m in Sources */,
+				67E6E49322EFF245001E807B /* PLVChatPlaybackController.m in Sources */,
 				22FB810C212AB55100B5CB53 /* ZJZDanMuLabel.m in Sources */,
 				2207EAF521AE32F40011B0EB /* PLVChatroomQueue.m in Sources */,
 				6761E9F0218016F00026E8A6 /* PLVPhotoBrowser.m in Sources */,
@@ -1248,6 +1378,7 @@
 				22D9ABB921B66E34003DFD42 /* ZPickerController.m in Sources */,
 				6740D66E2136A42D0076AF7D /* MarqueeLabel.m in Sources */,
 				220CB18D21B8C95B0034C384 /* PLVEmojiManager.m in Sources */,
+				67F5C7AE22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m in Sources */,
 				22D9ABBC21B66E34003DFD42 /* ZPreCollectionViewCell.m in Sources */,
 				677B4C8121F183C300E98E86 /* PLVChatroomCustomKouModel.m in Sources */,
 				229F769021ABA1600085F5DE /* PLVBrightnessView.m in Sources */,
@@ -1255,6 +1386,7 @@
 				22D9ABBE21B66E34003DFD42 /* ZPhotoCollectionFooterView.m in Sources */,
 				220CB18F21B8C95B0034C384 /* PLVFacialView.m in Sources */,
 				229F768F21ABA1600085F5DE /* PLVPlayerSkinView.m in Sources */,
+				6734CB9522F17B2400F47191 /* PLVTableViewController.m in Sources */,
 				229F769121ABA1600085F5DE /* PLVMediaSecondaryView.m in Sources */,
 				22D9ABB821B66E34003DFD42 /* PLVCameraViewController.m in Sources */,
 				22B4086B21B7A7160087DF92 /* PLVNormalVodMediaViewController.m in Sources */,
@@ -1264,16 +1396,22 @@
 				22D9ABB721B66E34003DFD42 /* ZViewController.m in Sources */,
 				229F766F21ABA1600085F5DE /* PLVChatroomManager.m in Sources */,
 				229F768821ABA1600085F5DE /* PLVNormalLiveMediaViewController.m in Sources */,
+				6746EFF722F1A65D005F07AA /* PLVChatCell.m in Sources */,
 				672D7CF0212D7B1500974886 /* FTTitleViewCell.m in Sources */,
+				6746EFF422F1A60E005F07AA /* PLVChatModel.m in Sources */,
 				220CB19121B8C95B0034C384 /* PLVKeyboardMoreView.m in Sources */,
+				67E6E49822EFF633001E807B /* PLVBaseCell.m in Sources */,
 				229F767F21ABA1600085F5DE /* PLVVodViewController.m in Sources */,
 				229F766921ABA1600085F5DE /* PLVLiveViewController.m in Sources */,
 				22B4087021B7A7F10087DF92 /* PLVBaseMediaViewController+Vod.m in Sources */,
 				DA45A51522BB6B42004CFEB2 /* PLVLiveInfoViewController.m in Sources */,
+				67E6E49B22EFF68A001E807B /* PLVCellModel.m in Sources */,
 				22D9ABB621B66E34003DFD42 /* ZAlbumInfo.m in Sources */,
 				22B4086821B76F010087DF92 /* ZNavigationController.m in Sources */,
+				679841F822F82D0700FEFD21 /* PLVChatPlaybackModel.m in Sources */,
 				22D9ABB521B66E34003DFD42 /* ZImageInfo.m in Sources */,
 				229F767021ABA1600085F5DE /* PLVChatroomCell.m in Sources */,
+				002498EB237A91C8006D1E3E /* PLVChatTextView.m in Sources */,
 				22FB810B212AB55100B5CB53 /* ZJZDanMu.m in Sources */,
 				632516CA22AE101E008636C6 /* PLVPlayerInputView.m in Sources */,
 				22CE3D0921AD4C57002B1CFB /* PLVBaseMediaViewController+Live.m in Sources */,
@@ -1411,7 +1549,7 @@
 		};
 		22142F662113094200062C6E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 66C34D6BE0AC4F66FDD0BC44 /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
+			baseConfigurationReference = 07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1432,7 +1570,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolyvCloudClassDemo",
 				);
-				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1471,14 +1608,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
 		22142F672113094200062C6E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6823894338F451335E2A4CC7 /* Pods-PolyvCloudClassDemo.release.xcconfig */;
+			baseConfigurationReference = C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1499,7 +1635,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/PolyvCloudClassDemo",
 				);
-				MARKETING_VERSION = 0.9.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1539,7 +1674,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

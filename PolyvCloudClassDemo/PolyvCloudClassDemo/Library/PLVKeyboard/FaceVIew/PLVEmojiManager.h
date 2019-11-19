@@ -55,4 +55,14 @@
  */
 - (NSMutableAttributedString *)convertTextEmotionToAttachment:(NSString *)text font:(UIFont *)font;
 
+/**
+将已进行过格式处理的 NSMutableAttributedString 类型的表情文本转为属性字符串
+
+@param attributeString 表情文本
+@param font 文本d大小
+@return 属性字符串
+*/
+- (NSMutableAttributedString *)convertTextEmotionToAttachmentWithAttributedString:(NSMutableAttributedString *)attributeString
+                                                                             font:(UIFont *)font;
+
 @end

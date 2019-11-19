@@ -28,13 +28,15 @@
 @property (nonatomic, assign) BOOL circulation;
 
 /**
- 通过标题及其控制器初始化分页控制器
+ 设置分页控制器
 
  @param titles 子控制器标题
  @param controllers 子控制器
- @return 分页控制
  */
-- (instancetype)initWithTitles:(NSArray<NSString *> *)titles controllers:(NSArray<UIViewController *> *)controllers barHeight:(CGFloat)barHeight touchHeight:(CGFloat)touchHeight;
+- (void)setTitles:(NSArray<NSString *> *)titles
+      controllers:(NSArray<UIViewController *> *)controllers
+        barHeight:(CGFloat)barHeight
+      touchHeight:(CGFloat)touchHeight;
 
 /**
  新增页
@@ -65,6 +67,8 @@
 
 /// 是否圆角
 - (void)cornerRadius:(BOOL)flag;
+
+- (void)scrollEnable:(BOOL)enable;
 
 @end
 

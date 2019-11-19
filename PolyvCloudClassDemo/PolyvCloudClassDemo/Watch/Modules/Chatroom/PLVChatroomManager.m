@@ -37,7 +37,7 @@ static PLVChatroomManager *manager = nil;
 }
 
 + (PLVChatroomModel *)modelWithHistoryMessageDict:(NSDictionary *)messageDict {
-    PLVChatroomModel *model;
+    PLVChatroomModel *model = nil;
     NSString *msgType = Fd_StringValueWithJsonValue(messageDict[@"msgType"]);
     NSString *msgSource = Fd_StringValueWithJsonValue(messageDict[@"msgSource"]);
     

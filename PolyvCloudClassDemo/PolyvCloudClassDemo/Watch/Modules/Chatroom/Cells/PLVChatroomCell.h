@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <Masonry/Masonry.h>
 #import "PLVPhotoBrowser.h"
+#import "PLVChatroomDefine.h"
 
 /// cell 类型
 typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
@@ -30,6 +31,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 
 /// 聊天室单元格基类
 @interface PLVChatroomCell : UITableViewCell
+
+@property (nonatomic, weak) id<PLVChatCellProtocol> urlDelegate;
 
 /// cell高度
 @property (nonatomic, readonly) CGFloat height;
@@ -79,6 +82,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 @property (nonatomic, strong) UIColor *actorTextColor;
 /// 头衔背景颜色
 @property (nonatomic, strong) UIColor *actorBackgroundColor;
+
+- (void)setSpeakContent:(NSString *)speakContent admin:(BOOL)admin;
 
 @end
 

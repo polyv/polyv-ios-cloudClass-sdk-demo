@@ -21,6 +21,7 @@
 #import "ZPickerController.h"
 #import "PLVCameraViewController.h"
 #import "PLVChatroomManager.h"
+#import "PLVChatroomDefine.h"
 
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
     PLVMarqueeViewTypeMarquee     = 1,// 跑马灯公告
@@ -64,7 +65,7 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 
 @end
 
-@interface PLVChatroomController () <UITableViewDelegate, UITableViewDataSource, PLVTextInputViewDelegate, PLVChatroomQueueDeleage, PLVChatroomImageSendCellDelegate, PLVCameraViewControllerDelegate, ZPickerControllerDelegate>
+@interface PLVChatroomController () <UITableViewDelegate, UITableViewDataSource, PLVTextInputViewDelegate, PLVChatroomQueueDeleage, PLVChatroomImageSendCellDelegate, PLVCameraViewControllerDelegate, ZPickerControllerDelegate, PLVChatCellProtocol>
 
 @property (nonatomic, assign) NSUInteger roomId;
 @property (nonatomic, assign) PLVTextInputViewType type;
@@ -332,12 +333,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } break;
         case PLVSocketChatRoomEventType_ADD_SHIELD: {
             if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
-                socketUser.banned = YES;
+                [PLVChatroomManager sharedManager].banned = YES;
             }
         } break;
         case PLVSocketChatRoomEventType_REMOVE_SHIELD: {
             if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
-                socketUser.banned = NO;
+                [PLVChatroomManager sharedManager].banned = NO;
             }
         } break;
         case PLVSocketChatRoomEventType_KICK: {
@@ -538,7 +539,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [PCCUtils showChatroomMessage:[NSString stringWithFormat:@"消息发送失败！%ld", (long)PLVChatroomErrorCodeRoomClose] addedToView:self.view];
             return NO;
         }
-        if (self.type < PLVTextInputViewTypePrivate && [PLVChatroomManager sharedManager].socketUser.isBanned) { // only log.
+        if (self.type < PLVTextInputViewTypePrivate && [PLVChatroomManager sharedManager].isBanned) { // only log.
             NSLog(@"消息发送失败！%ld", (long)PLVChatroomErrorCodeBanned);
             return YES;
         }
@@ -639,6 +640,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [self presentViewController:alertCtrl animated:YES completion:nil];
 }
 
+#pragma mark - PLVChatCellProtocol
+
+- (void)interactWithURL:(NSURL *)URL {
+}
+
 #pragma mark - UITableViewDataSource
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (self.type < PLVTextInputViewTypePrivate && self.showTeacherOnly) {
@@ -652,7 +658,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     if (self.type < PLVTextInputViewTypePrivate && self.showTeacherOnly) {
         if (indexPath.row < self.teacherData.count) {
             PLVChatroomModel *model = self.teacherData[indexPath.row];
-            return [model cellFromModelWithTableView:tableView];
+            PLVChatroomCell *cell = [model cellFromModelWithTableView:tableView];
+//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-nteractWithURL:'
+            return cell;
         }
     } else {
         if (indexPath.row < self.chatroomData.count) {
@@ -662,6 +670,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
                 PLVChatroomImageSendCell *sendCell = (PLVChatroomImageSendCell *)cell;
                 sendCell.delegate = self;
             }
+//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-nteractWithURL:'
             return cell;
         }
     }
@@ -840,7 +849,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     pickerVC.delegate = self;
     ZNavigationController *navigationController = [[ZNavigationController alloc] initWithRootViewController:pickerVC];
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    if (@available(iOS 13.0, *)) { navigationController.modalPresentationStyle = UIModalPresentationFullScreen; }
+    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     [(UIViewController *)self.delegate presentViewController:navigationController animated:YES completion:nil];
 }
 
@@ -849,7 +858,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
     cameraVC.delegate = self;
     [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    if (@available(iOS 13.0, *)) { cameraVC.modalPresentationStyle = UIModalPresentationFullScreen; }
+    cameraVC.modalPresentationStyle = UIModalPresentationFullScreen;
     [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
 }
 
