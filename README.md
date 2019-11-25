@@ -1,7 +1,8 @@
 # polyv-ios-cloudClass-sdk-demo
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v0.5.0-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
+[![GitHub release](https://img.shields.io/badge/release-v0.10.0-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
+
 #### polyvSDKCloudClass （以下称SDK）是什么？
 
 SDK是Polyv为开发者用户提供的云课堂观看端SDK ，是framework静态库。易于集成，内部包含`登录` `视频直播`  `视频回放`   `聊天`  `连麦` `ppt播放`等功能。首先需要在[链接到官网](www.polyv.net)注册账户并开通直播点播功能，然后集成SDK到你的项目中。
@@ -104,9 +105,12 @@ polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含
 
 [下载地址](https://www.pgyer.com/zrbo)
 
-
 ***
 #### 更多关于SDKdemo和SDK的详细介绍请看[Wiki](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo/wiki)。
+
+
+
+#### 历史版本  API
 
 PolyvCloudClassDemo 0.5.0版API文档请看[v0.5.0 API](http://repo.polyv.net/ios/documents/PolyvCloudClassDemo/0.5.0/index.html)
 
