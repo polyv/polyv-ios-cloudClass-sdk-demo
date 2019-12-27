@@ -188,7 +188,10 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     if (!self.liveSelectView.hidden) {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.appIDTF.text, self.userIDTF.text, self.appSecretTF.text] forKey:NSUserDefaultKey_LiveLoginInfo];
         
-        [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:@"" appId:self.appIDTF.text userId:self.userIDTF.text appSecret:self.appSecretTF.text completion:^{
+        [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:@"" appId:self.appIDTF.text userId:self.userIDTF.text appSecret:self.appSecretTF.text completion:^(NSDictionary * _Nonnull data) {
+            /// 设置聊天室相关的私有服务器的域名
+            [PLVLiveVideoConfig setPrivateDomainWithData:data];
+
             [PLVLiveVideoAPI liveStatus:weakSelf.channelIdTF.text completion:^(BOOL liveing, NSString *liveType) {
                 [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
                     [hud hideAnimated:YES];
@@ -209,7 +212,10 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     } else {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.userIDTF.text, self.appIDTF.text, self.vIdTF.text] forKey:NSUserDefaultKey_VodLoginInfo];
         
-        [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:@"" completion:^{
+        [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:@"" completion:^(NSDictionary * _Nonnull data) {
+            /// 设置聊天室相关的私有服务器的域名
+            [PLVLiveVideoConfig setPrivateDomainWithData:data];
+            
             [PLVLiveVideoAPI getVodType:self.vIdTF.text completion:^(BOOL vodType) {
                 [hud hideAnimated:YES];
                 [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {

@@ -13,7 +13,6 @@
 @interface PLVChatroomModel ()
 
 @property (nonatomic, assign) BOOL teacher;
-@property (nonatomic, assign) BOOL guest;
 @property (nonatomic, strong) NSString *msgId;
 @property (nonatomic, assign) CGFloat cellHeight;
 @property (nonatomic, assign) PLVChatroomModelType type;
@@ -227,9 +226,7 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             [(PLVChatroomSpeakOtherCell *)cell setNickName:self.nickName];
             [(PLVChatroomSpeakOtherCell *)cell setActorTextColor:self.actorTextColor];
             [(PLVChatroomSpeakOtherCell *)cell setActorBackgroundColor:self.actorBackgroundColor];
-            
-            BOOL useSpecialColor = (self.userType == PLVChatroomUserTypeTeacher) || (self.userType == PLVChatroomUserTypeAssistant) || (self.userType == PLVChatroomUserTypeManager || self.guest);
-            [(PLVChatroomSpeakOtherCell *)cell setSpeakContent:self.speakContent admin:useSpecialColor];
+            [(PLVChatroomSpeakOtherCell *)cell setSpeakContent:self.speakContent admin:self.isTeacher];
         } break;
         case PLVChatroomModelTypeImageSend: {
             if (!cell) {
@@ -337,7 +334,9 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
         self.teacher = YES;
         self.actor = @"助教";
     } else if ([userType isEqualToString:@"guest"]) {
-        self.guest = YES;
+        self.userType = PLVChatroomUserTypeGuest;
+        self.teacher = YES;
+        self.actor = @"嘉宾";
     }
     
     // 自定义参数
@@ -358,6 +357,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
     }else {
         self.avatar = avatar;
     }
+    // URL转码，头像地址中含有文字符问题
+    self.avatar = [self.avatar stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
 }
 
 @end

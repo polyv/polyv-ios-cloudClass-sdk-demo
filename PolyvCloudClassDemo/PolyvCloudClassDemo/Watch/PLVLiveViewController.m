@@ -223,6 +223,12 @@
                 [controllers addObject:self.privateChatroomViewController];
             }
         } else if (menu.name.length > 0) {
+            if (![@"text" isEqualToString:menu.menuType] &&
+                ![@"iframe" isEqualToString:menu.menuType] &&
+                ![@"tuwen" isEqualToString:menu.menuType]) {
+                continue;
+            }
+            
             [titles addObject:menu.name];
             
             PLVWebViewController *vctrl = [PLVWebViewController new];
@@ -402,7 +408,12 @@
             [PCCUtils showHUDWithTitle:@"聊天室Token获取失败！" detail:error.localizedDescription view:weakSelf.view];
         } else {
             // 初始化 socketIO 连接对象
-            weakSelf.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:data[@"token"] enableLog:NO];
+            NSString *socketServerUrl = nil;
+            PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
+            if (liveConfig.chatDomain) {
+                socketServerUrl = [NSString stringWithFormat:@"https://%@", liveConfig.chatDomain];
+            }
+            weakSelf.socketIO = [[PLVSocketIO alloc] initSocketIOWithConnectToken:data[@"token"] url:socketServerUrl enableLog:NO];
             weakSelf.socketIO.delegate = weakSelf;
             [weakSelf.socketIO connect];
             //weakSelf.socketIO.debugMode = YES;
@@ -442,24 +453,32 @@
     NSLog(@"%@--%@", NSStringFromSelector(_cmd), info);
     
     // 登录 Socket 服务器
-    [socketIO loginSocketServer:[PLVChatroomManager sharedManager].socketUser timeout:5.0 callback:^(NSArray *ackArray) {
+    __weak typeof(self)weakSelf = self;
+    [socketIO loginSocketServer:[PLVChatroomManager sharedManager].socketUser timeout:12.0 callback:^(NSArray *ackArray) {
         NSLog(@"login ackArray: %@",ackArray);
         if (ackArray) {
             NSString *ackStr = [NSString stringWithFormat:@"%@",ackArray.firstObject];
             if (ackStr && ackStr.length > 4) {
                 int status = [[ackStr substringToIndex:1] intValue];
                 if (status == 2) {
-                    self.loginSuccess = YES;
-                    [PCCUtils showChatroomMessage:@"登录成功" addedToView:self.pageController.view];
+                    weakSelf.loginSuccess = YES;
+                    [PCCUtils showChatroomMessage:@"登录成功" addedToView:weakSelf.pageController.view];
                     BOOL bannedStatus =  [[ackStr substringWithRange:NSMakeRange(4, 1)] boolValue];
                     [PLVChatroomManager sharedManager].banned = !bannedStatus;
                 } else {
-                    self.loginSuccess = NO;
-                    [PCCUtils showChatroomMessage:[@"登录失败：" stringByAppendingString:ackStr] addedToView:self.pageController.view];
+                    [weakSelf loginToSocketFailed:ackStr];
                 }
+            } else {
+                [weakSelf loginToSocketFailed:ackStr];
             }
         }
     }];
+}
+
+- (void)loginToSocketFailed:(NSString *)ackStr {
+    [self.socketIO disconnect];
+    self.loginSuccess = NO;
+    [PCCUtils showChatroomMessage:[@"登录失败：" stringByAppendingString:ackStr] addedToView:self.pageController.view];
 }
 
 #pragma mark Socket message

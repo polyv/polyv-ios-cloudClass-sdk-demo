@@ -61,6 +61,8 @@
         if ([self.avatar hasPrefix:@"//"]) {
             self.avatar = [@"https:" stringByAppendingString:self.avatar];
         }
+        // URL转码，头像地址中含有文字符问题
+        self.avatar = [self.avatar stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     }
     return self;
 }

@@ -46,10 +46,12 @@ typedef NS_ENUM(NSInteger, PLVChatroomUserType) {
     PLVChatroomUserTypeAssistant = 2,
     /// 管理员
     PLVChatroomUserTypeManager   = 3,
+    /// 嘉宾
+    PLVChatroomUserTypeGuest     = 4,
     /// 学生
-    PLVChatroomUserTypeStudent   = 4,
+    PLVChatroomUserTypeStudent   = 5,
     /// 云课堂学员
-    PLVChatroomUserTypeSlice     = 5,
+    PLVChatroomUserTypeSlice     = 6,
 };
 
 /// 聊天室Model
@@ -70,7 +72,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomUserType) {
 /// 以下为包含用户信息的属性
 /// 用户类型
 @property (nonatomic, readonly) PLVChatroomUserType userType;
-/// 身份用户，userType: Teacher、Assistant、Manager
+/// 身份用户，userType: Teacher、Assistant、Manager、Guest
 @property (nonatomic, getter=isTeacher, readonly) BOOL teacher;
 
 /// 发言内容，maybe nil.

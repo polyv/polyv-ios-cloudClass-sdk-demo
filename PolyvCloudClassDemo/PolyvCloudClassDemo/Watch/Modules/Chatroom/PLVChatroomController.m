@@ -99,8 +99,6 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 
 @end
 
-static NSMutableSet *forbiddenUsers;
-
 /// 生成一个teacher回答的伪数据
 PLVSocketChatRoomObject *createTeacherAnswerObject() {
     NSMutableDictionary *jsonDict = [NSMutableDictionary dictionaryWithObject:@"T_ANSWER" forKey:@"EVENT"];
@@ -112,15 +110,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 @implementation PLVChatroomController
-
-#pragma mark - Permission
-+ (BOOL)havePermissionToWatchLive:(NSUInteger)roomId {
-    if (forbiddenUsers && forbiddenUsers.count) {
-        return ![forbiddenUsers containsObject:@(roomId)];
-    } else {
-        return YES;
-    }
-}
 
 #pragma mark - Setter
 
@@ -179,12 +168,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.roomId = roomId;
         self.view.frame = frame;
         self.enableWelcome = YES;
-        self.scrollsToBottom = YES;
+        _scrollsToBottom = YES;
         self.moreMessageHistory = YES;
         self.allowToSpeakInTeacherMode = YES;
-        if (!forbiddenUsers) {
-            forbiddenUsers = [NSMutableSet set];
-        }
     }
     return self;
 }
@@ -295,8 +281,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     switch (object.eventType) {
         case PLVSocketChatRoomEventType_LOGIN: {
-            NSString *userId = object.jsonDict[PLVSocketIOChatRoom_LOGIN_userKey][PLVSocketIOChatRoomUserUserIdKey];
-            BOOL me = [Fd_StringValueWithJsonValue(userId) isEqualToString:socketUser.userId];
+            NSDictionary *user = PLV_SafeDictionaryForDictKey(object.jsonDict, @"user");
+            NSString *userId = PLV_SafeStringForDictKey(user, @"userId");;
+            BOOL me = [userId isEqualToString:socketUser.userId];
             [self.chatroomQueue addSocketChatRoomObject:object me:me];
             if (me && self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
                 [self.delegate chatroom:self userInfo:object.jsonDict];
@@ -313,9 +300,9 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self presentViewController:alertController animated:YES completion:nil];
         } break;
         case PLVSocketChatRoomEventType_SET_NICK: {
-            NSString *status = Fd_StringValueWithJsonValue(object.jsonDict[@"status"]);
+            NSString *status = PLV_SafeStringForDictKey(object.jsonDict, @"status");
             if ([status isEqualToString:@"success"]) {// success：广播消息
-                if ([Fd_StringValueWithJsonValue(object.jsonDict[@"userId"]) isEqualToString:socketUser.userId]) {
+                if ([PLV_SafeStringForDictKey(object.jsonDict, @"userId") isEqualToString:socketUser.userId]) {
                     [[PLVChatroomManager sharedManager] renameUserNick:object.jsonDict[@"nick"]];
                     [self showMessage:object.jsonDict[@"message"]];
                 }
@@ -332,19 +319,19 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             [self clearAllData];
         } break;
         case PLVSocketChatRoomEventType_ADD_SHIELD: {
-            if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
+            if ([PLV_SafeStringForDictKey(object.jsonDict, @"value") isEqualToString:socketUser.clientIp]) {
                 [PLVChatroomManager sharedManager].banned = YES;
             }
         } break;
         case PLVSocketChatRoomEventType_REMOVE_SHIELD: {
-            if ([Fd_StringValueWithJsonValue(object.jsonDict[@"value"]) isEqualToString:socketUser.clientIp]) {
+            if ([PLV_SafeStringForDictKey(object.jsonDict, @"value") isEqualToString:socketUser.clientIp]) {
                 [PLVChatroomManager sharedManager].banned = NO;
             }
         } break;
         case PLVSocketChatRoomEventType_KICK: {
-            NSString *userId = Fd_StringValueWithJsonValue(object.jsonDict[@"user"][@"userId"]);
+            NSDictionary *user = PLV_SafeDictionaryForDictKey(object.jsonDict, @"user");
+            NSString *userId = PLV_SafeStringForDictKey(user, @"userId");
             if ([userId isEqualToString:socketUser.userId]) {
-                [forbiddenUsers addObject:@(self.roomId)];
                 if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:didOpenError:)]) {
                     [self.delegate chatroom:self didOpenError:PLVChatroomErrorCodeBeKicked];
                 }
@@ -385,7 +372,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             }
         } break;
         case PLVSocketChatRoomEventType_LIKES: {
-            if (![Fd_StringValueWithJsonValue(object.jsonDict[@"userId"]) isEqualToString:socketUser.userId]) {
+            if (![PLV_SafeStringForDictKey(object.jsonDict, @"userId") isEqualToString:socketUser.userId]) {
                 [self handleLikeSocket:object];
             }
         } break;
@@ -395,7 +382,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } break;
     }
     if (object.eventType==PLVSocketChatRoomEventType_LOGIN || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
-        self.onlineCount = Fd_IntegerValueWithJsonValue(object.jsonDict[@"onlineUserNumber"]);
+        self.onlineCount = PLV_SafeIntegerForDictKey(object.jsonDict, @"onlineUserNumber");
         if (self.delegate && [self.delegate respondsToSelector:@selector(refreshLinkMicOnlineCount:number:)]) {
             [self.delegate refreshLinkMicOnlineCount:self number:self.onlineCount];
         }
@@ -501,7 +488,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     
     self.addNewModel = YES;
     if (model.localMessageModel) {
-        self.scrollsToBottom = YES;
+        _scrollsToBottom = YES;
         [self reloadTable];
     }
     
@@ -659,7 +646,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         if (indexPath.row < self.teacherData.count) {
             PLVChatroomModel *model = self.teacherData[indexPath.row];
             PLVChatroomCell *cell = [model cellFromModelWithTableView:tableView];
-//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-nteractWithURL:'
+//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-interactWithURL:'
             return cell;
         }
     } else {
@@ -670,7 +657,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
                 PLVChatroomImageSendCell *sendCell = (PLVChatroomImageSendCell *)cell;
                 sendCell.delegate = self;
             }
-//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-nteractWithURL:'
+//            cell.urlDelegate = self;// 设置 urlDelegate 之后，点击讲师消息中的链接将不会跳转外部浏览器，而是执行回调 '-interactWithURL:'
             return cell;
         }
     }
@@ -702,10 +689,10 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         CGFloat bottomOffset = contentHeight - contentOffsetY;
 
         if (bottomOffset < viewHeight + 1) { // tolerance
-            self.scrollsToBottom = YES;
+            _scrollsToBottom = YES;
             self.showLatestMessageBtn.hidden = YES;
         } else {
-            self.scrollsToBottom = NO;
+            _scrollsToBottom = NO;
         }
     }
 }
@@ -727,7 +714,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     if (self.addNewModel) {
         self.addNewModel = NO;
         [self.tableView reloadData];
-        if (self.scrollsToBottom) {
+        if (_scrollsToBottom) {
             [self scrollsToBottom:YES];
         } else if (self.type < PLVTextInputViewTypePrivate && !self.showTeacherOnly) {
             self.showLatestMessageBtn.hidden = NO;
@@ -807,7 +794,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     // TODO:发言时间间隔3s
     PLVChatroomModel *model;
     if (self.type < PLVTextInputViewTypePrivate) {
-        PLVSocketChatRoomObject *mySpeak = [PLVSocketChatRoomObject chatroomForSpeakWithContent:text loginUser:[PLVChatroomManager sharedManager].socketUser];
+        PLVSocketChatRoomObject *mySpeak = [PLVSocketChatRoomObject chatroomForSpeakWithContent:text sessionId:[self currentChannelSessionId] loginUser:[PLVChatroomManager sharedManager].socketUser];
         BOOL success = [self emitChatroomMessageWithObject:mySpeak];
         if (success)
             model = [PLVChatroomModel modelWithObject:mySpeak];
@@ -837,10 +824,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)textInputView:(PLVTextInputView *)inputView onlyTeacher:(BOOL)on {
-    [PCCUtils showChatroomMessage:on?@"只看讲师":@"查看所有人" addedToView:self.view];
+    [PCCUtils showChatroomMessage:on?@"只看讲师和我":@"查看所有人" addedToView:self.view];
     self.showTeacherOnly = on;
     [self.tableView reloadData];
-    [self scrollsToBottom:YES];
+    // Note: 此处需要关闭滚动最底的动画。iphoneXR iOS13.1.2在发布环境下无法滚动最底部(蒲公英包)，release包也无法复现。
+    [self scrollsToBottom:NO];
 }
 
 - (void)openAlbum:(PLVTextInputView *)inputView {
