@@ -36,6 +36,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 @property (nonatomic, weak) IBOutlet UIButton *loginBtn;
 
 @property (weak, nonatomic) IBOutlet UISwitch *enterSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *viewerSwitch;
 
 @end
 
@@ -249,6 +250,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVLiveViewController *liveVC = [PLVLiveViewController new];
     liveVC.liveType = [@"ppt" isEqualToString:liveType] ? PLVLiveViewControllerTypeCloudClass : PLVLiveViewControllerTypeLive;
     liveVC.playAD = !liveing;
+    liveVC.viewer = self.viewerSwitch.isOn;
     liveVC.channelMenuInfo = channelMenuInfo;
     
     // 抽奖功能必须固定唯一的 nickName 和 userId，如果忘了填写上次的中奖信息，有固定的 userId 还会再次弹出相关填写页面

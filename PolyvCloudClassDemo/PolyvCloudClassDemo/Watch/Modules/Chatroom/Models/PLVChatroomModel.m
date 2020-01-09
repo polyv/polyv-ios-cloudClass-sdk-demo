@@ -9,6 +9,7 @@
 #import "PLVChatroomModel.h"
 #import "PCCUtils.h"
 #import "PLVChatroomManager.h"
+#import <PolyvFoundationSDK/PLVFdUtil.h>
 
 @interface PLVChatroomModel ()
 
@@ -357,8 +358,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
     }else {
         self.avatar = avatar;
     }
-    // URL转码，头像地址中含有文字符问题
-    self.avatar = [self.avatar stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    // URL percent-Encoding，头像地址中含有中文字符问题
+    self.avatar = [PLVFdUtil stringBySafeAddingPercentEncoding:self.avatar];
 }
 
 @end

@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		002498EB237A91C8006D1E3E /* PLVChatTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 002498EA237A91C8006D1E3E /* PLVChatTextView.m */; };
+		0047213023BEF33200C108AA /* plv_icon_trophy@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0047212E23BEF33200C108AA /* plv_icon_trophy@2x.png */; };
+		0047213123BEF33200C108AA /* plv_icon_trophy@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0047212F23BEF33200C108AA /* plv_icon_trophy@3x.png */; };
+		0091361223BB3A550075BDD1 /* plv_btn_lookAtMe@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0091361023BB3A540075BDD1 /* plv_btn_lookAtMe@2x.png */; };
+		0091361323BB3A550075BDD1 /* plv_btn_lookAtMe@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0091361123BB3A550075BDD1 /* plv_btn_lookAtMe@3x.png */; };
 		2207EAF521AE32F40011B0EB /* PLVChatroomQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 2207EAF421AE32F40011B0EB /* PLVChatroomQueue.m */; };
 		220CB18C21B8C95B0034C384 /* PLVTextInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16B21B8C95B0034C384 /* PLVTextInputView.m */; };
 		220CB18D21B8C95B0034C384 /* PLVEmojiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 220CB16D21B8C95B0034C384 /* PLVEmojiManager.m */; };
@@ -195,6 +199,10 @@
 		002498E9237A91C7006D1E3E /* PLVChatTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVChatTextView.h; sourceTree = "<group>"; };
 		002498EA237A91C8006D1E3E /* PLVChatTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVChatTextView.m; sourceTree = "<group>"; };
 		002F31B8237E467800FA5EE8 /* PLVChatroomDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomDefine.h; sourceTree = "<group>"; };
+		0047212E23BEF33200C108AA /* plv_icon_trophy@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_icon_trophy@2x.png"; sourceTree = "<group>"; };
+		0047212F23BEF33200C108AA /* plv_icon_trophy@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_icon_trophy@3x.png"; sourceTree = "<group>"; };
+		0091361023BB3A540075BDD1 /* plv_btn_lookAtMe@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_lookAtMe@2x.png"; sourceTree = "<group>"; };
+		0091361123BB3A550075BDD1 /* plv_btn_lookAtMe@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plv_btn_lookAtMe@3x.png"; sourceTree = "<group>"; };
 		07E29607B5FE3094D8131647 /* Pods-PolyvCloudClassDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		10934D462E9837C862A078B0 /* Pods_business_cloudClass_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_business_cloudClass_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2207EAF321AE32F40011B0EB /* PLVChatroomQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PLVChatroomQueue.h; sourceTree = "<group>"; };
@@ -865,6 +873,10 @@
 		22E276E422E02514000BE8FF /* linkMic */ = {
 			isa = PBXGroup;
 			children = (
+				0047212E23BEF33200C108AA /* plv_icon_trophy@2x.png */,
+				0047212F23BEF33200C108AA /* plv_icon_trophy@3x.png */,
+				0091361023BB3A540075BDD1 /* plv_btn_lookAtMe@2x.png */,
+				0091361123BB3A550075BDD1 /* plv_btn_lookAtMe@3x.png */,
 				22E276EF22E02514000BE8FF /* plv_linkMic_camera_background@2x.png */,
 				22E276EB22E02514000BE8FF /* plv_linkMic_camera_background@3x.png */,
 				22E276E722E02514000BE8FF /* plv_linkMic1_disable@2x.png */,
@@ -1203,6 +1215,7 @@
 				22D9AB8721B66D13003DFD42 /* plv_resend@2x.png in Resources */,
 				673631F621BF5FF3006868DE /* plv_emoji_on@2x.png in Resources */,
 				22D9ABC521B66E34003DFD42 /* plv_btn_shoot@3x.png in Resources */,
+				0047213023BEF33200C108AA /* plv_icon_trophy@2x.png in Resources */,
 				220CB19421B8C95B0034C384 /* plv_like@2x.png in Resources */,
 				6740D66C2136A42D0076AF7D /* LICENSE in Resources */,
 				229F768321ABA1600085F5DE /* plv_skin_ppt_background@3x.png in Resources */,
@@ -1253,6 +1266,7 @@
 				22E2770E22E02514000BE8FF /* plv_erasered@2x.png in Resources */,
 				221AD3D0211A86C3000A423A /* Main.storyboard in Resources */,
 				220CB19721B8C95B0034C384 /* plv_keyboard@2x.png in Resources */,
+				0047213123BEF33200C108AA /* plv_icon_trophy@3x.png in Resources */,
 				22E2772122E02514000BE8FF /* plv_closeMicPhoned@2x.png in Resources */,
 				22D9ABC921B66E34003DFD42 /* plv_shoot_send@3x.png in Resources */,
 				DA45A52E22BC83EC004CFEB2 /* plv_btn_praise@3x.png in Resources */,
@@ -1263,6 +1277,7 @@
 				22E2772822E04901000BE8FF /* plv_pened@3x.png in Resources */,
 				677B4C8821F1BDF300E98E86 /* plv_kou2_img@2x.png in Resources */,
 				229F768521ABA1600085F5DE /* plv_skin_close@3x.png in Resources */,
+				0091361323BB3A550075BDD1 /* plv_btn_lookAtMe@3x.png in Resources */,
 				22D9ABC021B66E34003DFD42 /* back@2x.png in Resources */,
 				22E2770B22E02514000BE8FF /* plv_linkMic_camera_background@3x.png in Resources */,
 				22F2005722E86724001B2B69 /* ppt in Resources */,
@@ -1277,6 +1292,7 @@
 				22D9ABC421B66E34003DFD42 /* plv_shoot_cancel@3x.png in Resources */,
 				220CB19F21B8C95B0034C384 /* plv_shoot@2x.png in Resources */,
 				22E2771222E02514000BE8FF /* plv_switchCamera@3x.png in Resources */,
+				0091361223BB3A550075BDD1 /* plv_btn_lookAtMe@2x.png in Resources */,
 				2257802922F042D0008FDF7C /* plv_linkMic_permission@3x.png in Resources */,
 				677B4C8721F1BDF300E98E86 /* plv_kou1_img@2x.png in Resources */,
 				673631EB21BF5D41006868DE /* plv_input_user_normal@3x.png in Resources */,

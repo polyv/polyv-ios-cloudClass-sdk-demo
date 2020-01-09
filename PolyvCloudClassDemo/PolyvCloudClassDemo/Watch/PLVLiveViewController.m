@@ -18,6 +18,7 @@
 #import "PLVEmojiManager.h"
 #import "PLVLiveInfoViewController.h"
 #import <PolyvCloudClassSDK/PLVWebViewController.h>
+#import <PolyvFoundationSDK/PLVFdUtil.h>
 
 #define PPTPlayerViewScale (9.0 / 16.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
@@ -133,6 +134,8 @@
     self.linkMicVC = [[PLVLinkMicController alloc] init];
     self.linkMicVC.delegate = self;
     self.linkMicVC.login = [PLVChatroomManager sharedManager].socketUser;
+    self.linkMicVC.viewerSignalEnabled = [self.channelMenuInfo.viewerSignalEnabled isEqualToString:@"Y"];
+    self.linkMicVC.awardTrophyEnabled = [self.channelMenuInfo.awardTrophyEnabled isEqualToString:@"Y"];
     if (self.liveType == PLVLiveViewControllerTypeLive) {
         self.linkMicVC.linkMicType = PLVLinkMicTypeNormalLive;//开启视频连麦时，普通直播的连麦窗口是音频模式(旧版推流端)，或者视频模式（新版推流端，对齐云课堂的连麦方式）
     } else {
@@ -146,10 +149,11 @@
     self.mediaVC.userId = liveConfig.userId; //必须，不能为空
     self.mediaVC.nickName = loginUser.nickName;
     self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
-    self.mediaVC.view.frame = self.mediaVC.originFrame;
-    [self.view addSubview:self.mediaVC.view];
     //self.mediaVC.showDanmuOnPortrait = YES; // 竖屏显示弹幕按钮
     //self.mediaVC.chaseFrame = YES;  // 是否开启追帧
+    // !!!: mediaVC.chaseFrame 属性的设置需在 self.mediaVC.view.frame 设置之前
+    self.mediaVC.view.frame = self.mediaVC.originFrame;
+    [self.view addSubview:self.mediaVC.view];
     
     CGFloat secondaryWidth = (int)([UIScreen mainScreen].bounds.size.width / self.linkMicVC.colNum);
     CGFloat secondaryHeight = (int)(secondaryWidth * PPTPlayerViewScale);
@@ -336,6 +340,8 @@
     __weak typeof(self) weakSelf = self;
     [PLVLiveVideoAPI getChannelMenuInfos:self.channelId completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
         weakSelf.channelMenuInfo = channelMenuInfo;
+        weakSelf.linkMicVC.viewerSignalEnabled = [channelMenuInfo.viewerSignalEnabled isEqualToString:@"Y"];
+        weakSelf.linkMicVC.awardTrophyEnabled = [channelMenuInfo.awardTrophyEnabled isEqualToString:@"Y"];
         if (refresh) {
             for (PLVLiveVideoChannelMenu *menu in self.channelMenuInfo.channelMenus) {
                 if ([menu.menuType isEqualToString:@"desc"]) {
@@ -417,6 +423,8 @@
             weakSelf.socketIO.delegate = weakSelf;
             [weakSelf.socketIO connect];
             //weakSelf.socketIO.debugMode = YES;
+            
+            weakSelf.linkMicVC.viewer = weakSelf.viewer;
         }
         loading = NO;
     }];
@@ -454,7 +462,15 @@
     
     // 登录 Socket 服务器
     __weak typeof(self)weakSelf = self;
-    [socketIO loginSocketServer:[PLVChatroomManager sharedManager].socketUser timeout:12.0 callback:^(NSArray *ackArray) {
+    PLVSocketObject *loginObject = [PLVChatroomManager sharedManager].socketUser;
+  
+    // 奖杯功能请解开注释
+    NSMutableDictionary *muJsonDict = [[NSMutableDictionary alloc] initWithDictionary:loginObject.jsonDict];
+    muJsonDict[@"getCup"] = @(1);
+    loginObject.jsonDict = [muJsonDict copy];
+    // 奖杯功能代码到此截止
+    
+    [socketIO loginSocketServer:loginObject timeout:12.0 callback:^(NSArray *ackArray) {
         NSLog(@"login ackArray: %@",ackArray);
         if (ackArray) {
             NSString *ackStr = [NSString stringWithFormat:@"%@",ackArray.firstObject];
@@ -504,6 +520,17 @@
         [(PLVPPTLiveMediaViewController *)self.mediaVC refreshPPT:json];
     }
 }
+
+// 奖杯功能请解开注释
+- (void)socketIO:(PLVSocketIO *)socketIO didReceiveSendCupMessage:(NSDictionary *)jsonDict {
+    NSDictionary *owner = PLV_SafeDictionaryForDictKey(jsonDict, @"owner");
+    if (owner) {
+        NSString *userId = PLV_SafeStringForDictKey(owner, @"userId");
+        NSInteger cupNumber = PLV_SafeIntegerForDictKey(owner, @"num");
+        [self.linkMicVC updateUser:userId trophyNumber:cupNumber];
+    }
+}
+// 奖杯功能代码到此截止
 
 - (void)socketIO:(PLVSocketIO *)socketIO didReceiveTuwenMessage:(NSString *)json eventType:(NSString *)event {
     [self.tuwenWebViewController socketEvent:event data:json];
@@ -724,7 +751,7 @@
     NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     [data addEntriesFromDictionary:@{@"channelId" : [NSString stringWithFormat:@"%lu", (unsigned long)self.socketIO.roomId]}];
     [data addEntriesFromDictionary:dict];
-    [PLVLiveVideoAPI postLotteryWithData:data completion:^{} failure:^(NSError *error) {
+    [PLVLiveVideoAPI newPostLotteryWithData:data completion:^{} failure:^(NSError *error) {
         NSLog(@"抽奖信息提交失败: %@", error.description);
     }];
 }
@@ -845,6 +872,20 @@
         [self.mediaVC.skinView addPanGestureRecognizer];
     }
 }
+
+// “看我”功能请解开注释
+- (void)lookAtMeWithLinkMicController:(PLVLinkMicController *)lickMic {
+    NSString *event = @"LOOK_AT_ME";
+    NSMutableDictionary *jsonDict = [NSMutableDictionary dictionary];
+    jsonDict[@"EVENT"] = event;
+    jsonDict[@"userId"] = [PLVChatroomManager sharedManager].socketUser.userId;
+    
+    PLVSocketObject *socketObject = [[PLVSocketObject alloc] init];
+    socketObject.jsonDict = jsonDict;
+    socketObject.event = event;
+    [self.socketIO emitMessageWithSocketObject:socketObject];
+}
+// “看我”功能代码到此截止
 
 #pragma mark - FTPageControllerDelegate
 - (BOOL)canMoveChatroom:(FTPageController *)pageController move:(BOOL)move {
