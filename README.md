@@ -1,42 +1,51 @@
 # polyv-ios-cloudClass-sdk-demo
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v0.10.0-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
+[![GitHub release](https://img.shields.io/badge/release-v0.11.1-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
 
-#### polyvSDKCloudClass （以下称SDK）是什么？
+#### PolyvCloudClassSDK（以下称 SDK）是什么？
 
-SDK是Polyv为开发者用户提供的云课堂观看端SDK ，是framework静态库。易于集成，内部包含`登录` `视频直播`  `视频回放`   `聊天`  `连麦` `ppt播放`等功能。首先需要在[链接到官网](www.polyv.net)注册账户并开通直播点播功能，然后集成SDK到你的项目中。
-#### polyv-ios-cloudClass-sdk-demo（以下称**SDKdemo**）是什么？
-polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含了最新SDK的CocoaPods并且演示了如何在项目中集成SDK。
-***
-#### 运行环境
+SDK 是 Polyv 为开发者用户提供的云课堂观看端 SDK ，是 framework 静态库。易于集成，内部包含`登录` `视频直播`  `视频回放`   `聊天`  `连麦` `ppt播放`等功能。首先需要在[链接到官网](www.polyv.net)注册账户并开通直播点播功能，然后集成 SDK  到你的项目中。
+#### polyv-ios-cloudClass-sdk-demo（以下称**SDK demo**）是什么？
+polyv-ios-cloudClass-sdk-demo 是 SDK demo 示例的 Xcode 项目工程，其中包含了最新 SDK 的 CocoaPods 并且演示了如何在项目中集成 SDK。
+
+
+
+### 运行环境
+
 * iOS 9.0 及其以上
-* 搭载 iOS 系统的iPhone, iPad设备
-* XCode9.0及其以上
-***
-#### 支持功能
+* 搭载 iOS 系统的 iPhone, iPad 设备
+* Xcode 9.0 及其以上
+
+
+
+## 支持功能
 
 ### 登录
 
-#### 直播登录
+- 直播登录
 
-#### 回放登录
+- 回放登录
 
 ### 直播
+
 #### 普通功能
+
 - 播放，刷新
 - 视频弹幕
 - 视频码率切换
 - 横竖屏切换
 - 副窗口可随意拖动
 
-#### 暖场播放（无直播时播放）
+### 暖场播放（无直播时播放）
 
 #### 手势滑动
+
 - 屏幕播放区域右方是音量调节区域
 - 播放区域左方是亮度调节区域
 
-#### ppt，教师同时在线播放
+#### PPT，教师同时在线播放
+
 - 教师端，ppt显示切换
 - ppt的动态画笔功能
 - ppt、教师端的同步播放
@@ -68,7 +77,7 @@ polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含
 - 播放区域左方是亮度调节区域
 - 水平左右滑动seek进度播放
 
-#### ppt播放
+#### PPT 播放
 - 教师端，ppt显示切换
 - ppt、教师端的同步回放
 - ppt与视频播放的快进快退的同步
@@ -97,7 +106,9 @@ polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含
 - 可作答，并提交答案
 - 显示作答结果
 
-### 下载安装
+
+
+## 下载安装
 
 手机扫码安装，密码：polyv
 
@@ -106,7 +117,7 @@ polyv-ios-cloudClass-sdk-demo是SDKdemo示例的XCode项目工程，其中包含
 [下载地址](https://www.pgyer.com/zrbo)
 
 ***
-#### 更多关于SDKdemo和SDK的详细介绍请看[Wiki](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo/wiki)。
+#### 更多关于  SDK demo  和 SDK 的详细介绍请看 [Wiki](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo/wiki)。
 
 
 
