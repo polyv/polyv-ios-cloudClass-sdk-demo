@@ -14,6 +14,9 @@
 /// 必须，不能为空
 @property (nonatomic, strong) NSString *vodId;
 
+/// 点播列表
+@property (nonatomic, assign) BOOL vodList;
+
 /// optional, can be nil.
 @property (nonatomic, strong) NSString *channelId;
 /// optional, can be nil.

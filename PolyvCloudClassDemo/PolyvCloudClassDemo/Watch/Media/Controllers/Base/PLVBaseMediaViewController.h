@@ -137,6 +137,9 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 /// 播放器播放结束
 - (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo;
 
+/// 播放器加载失败
+- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player loadMainPlayerFailure:(NSString *)message;
+
 /// 播放器Seek完成
 - (void)playerDidSeekComplete:(PLVPlayerController<PLVPlayerControllerProtocol> *)player;
 

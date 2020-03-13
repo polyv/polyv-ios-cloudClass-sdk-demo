@@ -56,7 +56,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 /// 当前userId已在别处登录，确认后自动退出直播间
 - (void)reLogin:(PLVChatroomController *)chatroom;
 
-/// 刷新连麦窗口的当前在线人数
+/// 刷新连麦窗口的当前聊天室在线人数
 - (void)refreshLinkMicOnlineCount:(PLVChatroomController *)chatroom number:(NSUInteger)number;
 
 @end

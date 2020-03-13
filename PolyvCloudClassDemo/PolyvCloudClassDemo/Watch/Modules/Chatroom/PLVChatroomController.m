@@ -10,6 +10,7 @@
 #import <Masonry/Masonry.h>
 #import <SDWebImage/SDWebImageDownloader.h>
 #import <PolyvFoundationSDK/PLVFdUtil.h>
+#import <PolyvFoundationSDK/PLVDataUtil.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
 #import "PLVChatroomModel.h"
@@ -22,6 +23,8 @@
 #import "PLVCameraViewController.h"
 #import "PLVChatroomManager.h"
 #import "PLVChatroomDefine.h"
+#import "PLVGiveRewardView.h"
+#import "PLVRewardDisplayManager.h"
 
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
     PLVMarqueeViewTypeMarquee     = 1,// 跑马灯公告
@@ -65,7 +68,7 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 
 @end
 
-@interface PLVChatroomController () <UITableViewDelegate, UITableViewDataSource, PLVTextInputViewDelegate, PLVChatroomQueueDeleage, PLVChatroomImageSendCellDelegate, PLVCameraViewControllerDelegate, ZPickerControllerDelegate, PLVChatCellProtocol>
+@interface PLVChatroomController () <UITableViewDelegate, UITableViewDataSource, PLVTextInputViewDelegate, PLVChatroomQueueDeleage, PLVChatroomImageSendCellDelegate, PLVCameraViewControllerDelegate, ZPickerControllerDelegate, PLVChatCellProtocol, PLVGiveRewardViewDelegate>
 
 @property (nonatomic, assign) NSUInteger roomId;
 @property (nonatomic, assign) PLVTextInputViewType type;
@@ -97,6 +100,10 @@ typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
 
 @property (nonatomic, assign) BOOL enableWelcome; // 欢迎语开关
 
+@property (nonatomic, assign) BOOL rewardPointKnown;
+@property (nonatomic, strong) PLVGiveRewardView * rewardView;
+@property (nonatomic, strong) PLVRewardDisplayManager * rewardDisplayManager;
+
 @end
 
 /// 生成一个teacher回答的伪数据
@@ -118,6 +125,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     if (self.type != PLVTextInputViewTypePrivate) {
         _closed = ![switchInfo[@"chat"] boolValue];
         self.enableWelcome = [switchInfo[@"welcome"] boolValue]; // 欢迎语开关
+        BOOL sendFlowersEnabled = [switchInfo[@"sendFlowersEnabled"] boolValue]; // 送花按钮开关
+        self.chatInputView.hideFlowerButton = !sendFlowersEnabled;
         if ([switchInfo[@"viewerSendImgEnabled"] boolValue]) { // 图片开关
             [self.chatInputView loadViews:self.type enableMore:YES];
         }
@@ -143,6 +152,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(photoBrowserDidShowImageOnScreen) name:PLVPhotoBrowserDidShowImageOnScreenNotification object:nil];
+    
+    [self requestPointSetting];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -285,7 +296,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             NSString *userId = PLV_SafeStringForDictKey(user, @"userId");;
             BOOL me = [userId isEqualToString:socketUser.userId];
             [self.chatroomQueue addSocketChatRoomObject:object me:me];
-            if (me && self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
+            if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:userInfo:)]) {
                 [self.delegate chatroom:self userInfo:object.jsonDict];
             }
         } break;
@@ -375,6 +386,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
             if (![PLV_SafeStringForDictKey(object.jsonDict, @"userId") isEqualToString:socketUser.userId]) {
                 [self handleLikeSocket:object];
             }
+        } break;
+        case PLVSocketChatRoomEventType_REWARD: {
+            [self handleRewardSocket:object];
+            
+            PLVChatroomModel *model = [PLVChatroomModel modelWithObject:object];
+            [self addModel:model];
         } break;
         default: {
             PLVChatroomModel *model = [PLVChatroomModel modelWithObject:object];
@@ -568,6 +585,78 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+- (PLVGiveRewardView *)rewardView{
+    if (!_rewardView) {
+        _rewardView = [[PLVGiveRewardView alloc]init];
+        _rewardView.delegate = self;
+    }
+    return _rewardView;
+}
+
+- (PLVRewardDisplayManager *)rewardDisplayManager{
+    if (!_rewardDisplayManager) {
+        _rewardDisplayManager = [[PLVRewardDisplayManager alloc]init];
+        _rewardDisplayManager.superView = self.view;
+    }
+    return _rewardDisplayManager;
+}
+
+- (void)requestPointSetting{
+    __weak typeof(self)weakSelf = self;
+    [PLVLiveVideoAPI requestPointSettingWithChannelId:self.roomId completion:^(NSDictionary * resDict) {
+        NSDictionary * dataDict = (NSDictionary *)resDict[@"data"];
+        if (dataDict) {
+            NSString * pointUnit = dataDict[@"pointUnit"];
+            BOOL donatePointEnabled = [dataDict[@"donatePointEnabled"] boolValue];
+            BOOL channelDonatePointEnabled = [dataDict[@"channelDonatePointEnabled"] boolValue];
+            BOOL open = donatePointEnabled && channelDonatePointEnabled;
+            weakSelf.chatInputView.showGiftButton = open;
+            weakSelf.rewardView.pointUnit = pointUnit;
+            if (open) {
+                NSMutableArray * modelArray = [[NSMutableArray alloc]init];
+                NSArray * array = (NSArray *)dataDict[@"goods"];
+                int goodId = 0;
+                for (NSDictionary * goodsDict in array) {
+                    PLVRewardGoodsModel * model = [PLVRewardGoodsModel modelWithDictionary:goodsDict];
+                    if (model.goodEnabled) {
+                        goodId ++;
+                        model.goodId = goodId;
+                        [modelArray addObject:model];
+                    }
+                }
+                [weakSelf.rewardView refreshGoods:modelArray];
+            }
+        }
+    } failure:^(NSError * error) {
+    }];
+}
+
+- (void)requestUserPoint{
+    if (self.rewardPointKnown) { return; }
+    PLVSocketObject * user = [PLVChatroomManager sharedManager].socketUser;
+    __weak typeof(self)weakSelf = self;
+    [PLVLiveVideoAPI requestViewerPointWithViewerId:user.userId nickName:user.nickName channelId:self.roomId completion:^(NSString * pointString) {
+        weakSelf.rewardPointKnown = YES;
+        [weakSelf.rewardView refreshUserPoint:pointString];
+    } failure:^(NSError * error) {
+        NSString * desc = error.localizedDescription;
+        NSString * tips = [[desc componentsSeparatedByString:@","].firstObject componentsSeparatedByString:@":"].lastObject;
+        [PCCUtils showChatroomMessage:tips addedToView:weakSelf.chatInputView.tapSuperView];
+    }];
+}
+
+- (void)requestDonatePoint:(PLVRewardGoodsModel *)goodsModel num:(NSInteger)num{
+    __weak typeof(self)weakSelf = self;
+    PLVSocketObject * user = [PLVChatroomManager sharedManager].socketUser;
+    [PLVLiveVideoAPI requestViewerRewardPointWithViewerId:user.userId nickName:user.nickName avatar:user.avatar goodId:goodsModel.goodId goodNum:num channelId:weakSelf.roomId completion:^(NSString * remainingPoint) {
+        [weakSelf.rewardView refreshUserPoint:remainingPoint];
+    } failure:^(NSError * error) {
+        NSString * desc = error.localizedDescription;
+        NSString * tips = [[desc componentsSeparatedByString:@","].firstObject componentsSeparatedByString:@":"].lastObject;
+        [PCCUtils showChatroomMessage:tips addedToView:weakSelf.chatInputView.tapSuperView];
+    }];
+}
+
 #pragma mark Notifications
 - (void)photoBrowserDidShowImageOnScreen {
     [self tapChatInputView];
@@ -697,6 +786,11 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+#pragma mark - < PLVGiveRewardViewDelegate >
+- (void)plvGiveRewardView:(PLVGiveRewardView *)giveRewardView goodsModel:(PLVRewardGoodsModel *)goodsModel num:(NSInteger)num{
+    [self requestDonatePoint:goodsModel num:num];
+}
+
 #pragma mark - currentChannelSessionId
 - (NSString *)currentChannelSessionId {
     NSString *sessionId = @"";
@@ -768,6 +862,18 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
+// 处理打赏事件
+- (void)handleRewardSocket:(PLVSocketChatRoomObject *)object {
+    NSDictionary * contentDict = object.jsonDict[@"content"];
+    if ([contentDict isKindOfClass:NSDictionary.class]) {
+        NSInteger num = [[NSString stringWithFormat:@"%@",contentDict[@"goodNum"]] integerValue];
+        NSString * unick = [NSString stringWithFormat:@"%@",contentDict[@"unick"]];
+
+        PLVRewardGoodsModel * model = [PLVRewardGoodsModel modelWithSocketObject:object];
+        [self.rewardDisplayManager addGoodsShowWithModel:model goodsNum:num personName:unick];
+    }
+}
+
 #pragma mark - <PLVTextInputViewDelegate>
 - (BOOL)textInputViewShouldBeginEditing:(PLVTextInputView *)inputView {
     BOOL beginEditing = ![PLVChatroomManager sharedManager].defaultNick;
@@ -829,6 +935,16 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     [self.tableView reloadData];
     // Note: 此处需要关闭滚动最底的动画。iphoneXR iOS13.1.2在发布环境下无法滚动最底部(蒲公英包)，release包也无法复现。
     [self scrollsToBottom:NO];
+}
+
+- (void)textInputView:(PLVTextInputView *)inputView giftButtonClick:(BOOL)open{
+    PLVSocketObject * user = [PLVChatroomManager sharedManager].socketUser;
+    if (user && user.userId && [user.userId isKindOfClass:NSString.class] && user.userId.length > 0) {
+        [self requestUserPoint];
+        [self.rewardView showOnView:self.chatInputView.tapSuperView];
+    }else{
+        [PCCUtils showChatroomMessage:@"聊天室未登录" addedToView:self.view];
+    }
 }
 
 - (void)openAlbum:(PLVTextInputView *)inputView {

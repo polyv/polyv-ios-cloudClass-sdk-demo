@@ -22,6 +22,7 @@
 @synthesize vodId;
 @synthesize channelId;
 @synthesize userId;
+@synthesize vodList;
 
 #pragma mark - life cycle
 - (void)viewDidLoad {
@@ -40,7 +41,7 @@
         }];
     }
     
-    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.mainView delegate:self];
+    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId vodList:self.vodList displayView:self.mainView delegate:self];
 }
 
 #pragma mark - PLVBaseMediaViewController

@@ -26,14 +26,16 @@ typedef NS_ENUM(NSInteger, PLVChatroomModelType) {
     PLVChatroomModelTypeImageReceived  = 5,
     /// 送花消息类型
     PLVChatroomModelTypeFlower         = 6,
+    /// 打赏消息类型
+    PLVChatroomModelTypeReward         = 7,
     /// 点赞消息类型
-    PLVChatroomModelTypeLike           = 7,
+    PLVChatroomModelTypeLike           = 8,
     /// 系统消息类型
-    PLVChatroomModelTypeSystem         = 8,
+    PLVChatroomModelTypeSystem         = 9,
     /// 时间类型
-    PLVChatroomModelTypeTime           = 9,
+    PLVChatroomModelTypeTime           = 10,
     /// 自定义类型
-    PLVChatroomModelTypeCustom         = 10,
+    PLVChatroomModelTypeCustom         = 11,
 };
 
 /// 用户类型

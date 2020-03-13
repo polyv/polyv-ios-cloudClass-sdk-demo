@@ -7,9 +7,9 @@
 //
 
 #import <PolyvCloudClassSDK/PLVLiveVideoChannel.h>
-#import <PolyvCloudClassSDK/PLVLinkMicController.h>
 #import "ZJZDanMu.h"
 #import "PLVPlayerInputView.h"
+#import "PLVLinkMicController.h"
 
 /// 直播播放器基类协议（功能：1.弹幕；2.连麦窗口的交互）
 @protocol PLVLiveMediaProtocol <NSObject>

@@ -53,6 +53,12 @@ static PLVChatroomManager *manager = nil;
             NSDictionary *imageDict = @{@"EVENT":@"CHAT_IMG", @"values":@[messageDict[@"content"]], @"user":messageDict[@"user"]};
             PLVSocketChatRoomObject * chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:imageDict];
             model = [PLVChatroomModel modelWithObject:chatroomObject];
+        }else if([msgSource isEqualToString:@"reward"]){
+            NSDictionary * contentDict = messageDict[@"content"] ? messageDict[@"content"] : [[NSDictionary alloc]init];
+            NSString * roomId = [NSString stringWithFormat:@"%@",messageDict[@"user"][@"roomId"]];
+            NSDictionary *rewardDict = @{@"EVENT":@"REWARD", @"content": contentDict, @"roomId":roomId};
+            PLVSocketChatRoomObject *chatObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:rewardDict];
+            model = [PLVChatroomModel modelWithObject:chatObject];
         } // redpaper（红包）、get_redpaper（领红包）
     } else {
         NSDictionary *user = PLV_SafeDictionaryForDictKey(messageDict, @"user");

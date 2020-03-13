@@ -13,6 +13,7 @@
 #import "FTPageController.h"
 #import "PLVLiveInfoViewController.h"
 #import "PLVChatPlaybackController.h"
+#import "PCCUtils.h"
 
 #define PPTPlayerViewScale (9.0 / 16.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
@@ -42,9 +43,14 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     if (self.vodType == PLVVodViewControllerTypeCloudClass) {
+        if (self.vodList) {
+            NSLog(@"三分屏场景暂不支持使用点播列表播放!!!");
+            return;
+        }
         self.mediaVC = [[PLVPPTVodMediaViewController alloc] init];
     } else {
         self.mediaVC = [[PLVNormalVodMediaViewController alloc] init];
+        self.mediaVC.vodList = self.vodList; // 是否点播列表视频
     }
     self.mediaVC.delegate = self;
     
@@ -213,6 +219,10 @@
 
 - (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player playbackDidFinish:(NSDictionary *)userInfo {
     NSLog(@"userInfo: %@",userInfo);
+}
+
+- (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player loadMainPlayerFailure:(NSString *)message {
+    [PCCUtils showHUDWithTitle:message detail:nil view:self.view];
 }
 
 @end

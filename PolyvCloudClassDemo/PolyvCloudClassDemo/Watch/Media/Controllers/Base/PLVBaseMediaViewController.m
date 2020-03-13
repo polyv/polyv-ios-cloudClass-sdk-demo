@@ -50,7 +50,14 @@
     }
 
     CGRect mainRect = self.originFrame;
-    mainRect.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height;
+    
+    CGFloat statusBarY = [UIApplication sharedApplication].statusBarFrame.size.height;
+    if (@available(iOS 11.0, *)) {
+        CGFloat topY = (([[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom > 0.0) ? statusBarY : 20);
+        mainRect.origin.y = topY;
+    } else {
+        mainRect.origin.y = 20;
+    }
     mainRect.size.height -= mainRect.origin.y;
     self.mainView = [[UIView alloc] initWithFrame:mainRect];
     self.mainView.backgroundColor = BlueBackgroundColor;
@@ -348,6 +355,10 @@
 - (void)playerController:(PLVPlayerController *)playerController showMessage:(NSString *)message {
     if (self.skinView.type == PLVPlayerSkinViewTypeNormalLive || self.skinView.type == PLVPlayerSkinViewTypeNormalVod) {
         [self.skinView showMessage:message];
+    }else{
+        if (![message isEqualToString:@"当前频道还未开播"]) {
+            [self.skinView showMessage:message];
+        }
     }
 }
 - (void)playerController:(PLVPlayerController *)playerController mainPlayerPlaybackDidFinish:(NSNotification *)notification {
@@ -365,6 +376,12 @@
 - (void)playerController:(PLVPlayerController *)playerController mainPlayerAccurateSeekComplete:(NSNotification *)notification {
     if ([self.delegate respondsToSelector:@selector(playerAccurateSeekComplete:)]) {
         [self.delegate playerAccurateSeekComplete:self.player];
+    }
+}
+
+- (void)playerController:(PLVPlayerController *)playerController loadMainPlayerFailure:(NSString *)message {
+    if ([self.delegate respondsToSelector:@selector(player:loadMainPlayerFailure:)]) {
+        [self.delegate player:self.player loadMainPlayerFailure:message];
     }
 }
 

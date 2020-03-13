@@ -148,6 +148,20 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 
 @end
 
+/// 打赏的Cell
+@interface PLVChatroomRewardCell : PLVChatroomCell
+
+/// icon图片
+@property (nonatomic, strong) UIImageView *imgView;
+/// 图片链接
+@property (nonatomic, strong) NSString *imgUrl;
+/// 打赏语
+@property (nonatomic, strong) NSString *content;
+/// 打赏数量
+@property (nonatomic, assign) NSInteger goodNum;
+
+@end
+
 /// 系统信息的Cell
 @interface PLVChatroomSystemCell : PLVChatroomCell
 

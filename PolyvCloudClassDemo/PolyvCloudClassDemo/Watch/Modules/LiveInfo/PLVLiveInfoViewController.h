@@ -18,4 +18,10 @@
 
 - (void)refreshLiveInfo;
 
+/// 历史观看人数 label +1
+- (void)increaseWatchNumber;
+
+/// 更新历史观看人数 label
+- (void)updateWatchNumber:(NSInteger)watchNumber;
+
 @end

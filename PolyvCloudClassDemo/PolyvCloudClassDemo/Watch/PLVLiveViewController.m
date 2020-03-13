@@ -50,6 +50,9 @@
 @property (nonatomic, strong) NSTimer *pollingTimer;
 @property (nonatomic, assign) int reconnectCount;
 
+@property (nonatomic, strong) NSTimer *viewerTimer;
+@property (nonatomic, assign) NSInteger viewerNumber;
+
 @end
 
 @implementation PLVLiveViewController
@@ -481,6 +484,8 @@
                     [PCCUtils showChatroomMessage:@"登录成功" addedToView:weakSelf.pageController.view];
                     BOOL bannedStatus =  [[ackStr substringWithRange:NSMakeRange(4, 1)] boolValue];
                     [PLVChatroomManager sharedManager].banned = !bannedStatus;
+                    weakSelf.viewerNumber++;
+                    [weakSelf startViewerTimer];
                 } else {
                     [weakSelf loginToSocketFailed:ackStr];
                 }
@@ -639,10 +644,18 @@
 }
 
 - (void)chatroom:(PLVChatroomController *)chatroom userInfo:(NSDictionary *)userInfo {
-    [self.mediaVC setUserInfo:userInfo];
-    if (self.linkMicVC && self.linkMicVC.token.length > 0) {
-        [self.socketIO reJoinMic:self.linkMicVC.token];
+    NSDictionary *user = PLV_SafeDictionaryForDictKey(userInfo, @"user");
+    NSString *userId = PLV_SafeStringForDictKey(user, @"userId");
+    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+    BOOL me = [userId isEqualToString:socketUser.userId];
+    if (me) {
+        [self.mediaVC setUserInfo:userInfo];
+        if (self.linkMicVC && self.linkMicVC.token.length > 0) {
+            [self.socketIO reJoinMic:self.linkMicVC.token];
+        }
     }
+    
+    [self.liveInfoViewController increaseWatchNumber];
 }
 
 - (void)chatroom:(PLVChatroomController *)chatroom didSendSpeakContent:(NSString *)content {
@@ -799,7 +812,7 @@
 }
 
 - (void)resetChatroomFrame:(CGFloat)top {
-    if (self.fullSize.height - top >= self.pageController.barHeight) {
+    if (self.fullSize.height - top >= (self.pageController.barHeight - 20)) {
         CGRect pageCtrlFrame = CGRectMake(0, top, self.fullSize.width, self.fullSize.height - top);
         self.pageController.view.frame = pageCtrlFrame;
         [self.pageController changeFrame];
@@ -932,6 +945,29 @@
 
 - (void)clickTuwenImage:(BOOL)showImage {
     [self.pageController scrollEnable:!showImage];
+}
+
+#pragma mark - 观看热度相关
+
+- (void)startViewerTimer {
+    [self.viewerTimer invalidate];
+    self.viewerTimer = nil;
+    
+    self.viewerTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(sendViewerNumberIncrease) userInfo:nil repeats:NO];
+}
+
+- (void)sendViewerNumberIncrease {
+    NSInteger reportNumber = self.viewerNumber;
+    self.viewerNumber = 0;
+    
+    NSString *channelIdString = [NSString stringWithFormat:@"%zd", self.channelId];
+    __weak typeof(self) weakSelf = self;
+    [PLVLiveVideoAPI increaseViewerWithChannelId:channelIdString times:reportNumber completion:^(NSInteger viewers){
+        [weakSelf.liveInfoViewController updateWatchNumber:viewers];
+    } failure:^(NSError * _Nonnull error) {
+        weakSelf.viewerNumber += reportNumber;
+        [weakSelf startViewerTimer];
+    }];
 }
 
 @end

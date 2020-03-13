@@ -33,10 +33,12 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 @property (nonatomic, weak) IBOutlet UITextField *appSecretTF;
 @property (nonatomic, weak) IBOutlet UIView *appSecretLineView;
 @property (nonatomic, weak) IBOutlet UITextField *vIdTF;
+@property (nonatomic, weak) IBOutlet UIView *vidLineView;
 @property (nonatomic, weak) IBOutlet UIButton *loginBtn;
 
 @property (weak, nonatomic) IBOutlet UISwitch *enterSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *viewerSwitch;
+@property (weak, nonatomic) IBOutlet UILabel *viewerSwitchLabel;
 
 @end
 
@@ -177,8 +179,8 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 - (void)switchScenes:(BOOL)flag {
     self.liveSelectView.hidden = flag;
     self.vodSelectView.hidden = !flag;
-    self.appSecretTF.hidden = flag;
-    self.vIdTF.hidden = !flag;
+    self.vidLineView.hidden = self.vIdTF.hidden = !flag;
+    self.viewerSwitchLabel.text = flag ? @"点播列表" : @"特邀观众";
 }
 
 #pragma mark - network request
@@ -213,12 +215,17 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     } else {
         [[NSUserDefaults standardUserDefaults] setObject:@[self.channelIdTF.text, self.userIDTF.text, self.appIDTF.text, self.vIdTF.text] forKey:NSUserDefaultKey_VodLoginInfo];
         
-        [PLVLiveVideoAPI verifyPermissionWithChannelId:0 vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:@"" completion:^(NSDictionary * _Nonnull data) {
+        [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:self.vIdTF.text appId:self.appIDTF.text userId:self.userIDTF.text appSecret:@"" completion:^(NSDictionary * _Nonnull data) {
             /// 设置聊天室相关的私有服务器的域名
             [PLVLiveVideoConfig setPrivateDomainWithData:data];
             
             [PLVLiveVideoAPI getVodType:self.vIdTF.text completion:^(BOOL vodType) {
                 [hud hideAnimated:YES];
+                if (vodType && weakSelf.viewerSwitch.isOn) {
+                    [PCCUtils presentAlertViewController:@"" message:@"三分屏场景暂不支持使用点播列表播放" inViewController:weakSelf];
+                    return;
+                }
+                
                 [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
                     [hud hideAnimated:YES];
                     [weakSelf presentToVodViewControllerFromViewController:weakSelf vodType:vodType channelMenuInfo:channelMenuInfo];
@@ -279,6 +286,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     PLVVodViewController *vodVC = [PLVVodViewController new];
     vodVC.vodType = vodType ? PLVVodViewControllerTypeCloudClass : PLVVodViewControllerTypeLive;
     vodVC.channelMenuInfo = channelMenuInfo;
+    vodVC.vodList = self.viewerSwitch.isOn;
     
     if (self.enterSwitch.isOn) {
         vodVC.modalPresentationStyle = UIModalPresentationFullScreen;

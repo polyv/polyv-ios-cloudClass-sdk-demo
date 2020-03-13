@@ -30,6 +30,8 @@ static CGFloat kHeaderViewHeight = 100.0;
 
 @property (nonatomic, strong) WKWebView *webView;
 
+@property (nonatomic, assign) NSInteger watchNumber;
+
 @end
 
 @implementation PLVLiveInfoViewController
@@ -189,6 +191,13 @@ static CGFloat kHeaderViewHeight = 100.0;
     return _webView;
 }
 
+- (void)setWatchNumber:(NSInteger)watchNumber {
+    if (watchNumber < _watchNumber) {
+        return;
+    }
+    _watchNumber = watchNumber;
+}
+
 #pragma mark - Action
 
 - (void)likes:(id)sender {
@@ -196,10 +205,24 @@ static CGFloat kHeaderViewHeight = 100.0;
 }
 
 - (void)watches:(id)sender {
-    [self.watchesBtn setTitle:[NSString stringWithFormat:@"%ld", (long)self.channelMenuInfo.pageView.integerValue] forState:UIControlStateNormal];
+    [self.watchesBtn setTitle:[NSString stringWithFormat:@"%zd", self.watchNumber] forState:UIControlStateNormal];
 }
 
-#pragma mark - Private
+#pragma mark - Public
+
+- (void)increaseWatchNumber {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.watchNumber++;
+        [self.watchesBtn setTitle:[NSString stringWithFormat:@"%zd", self.watchNumber] forState:UIControlStateNormal];
+    });
+}
+
+- (void)updateWatchNumber:(NSInteger)watchNumber {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.watchNumber = watchNumber;
+        [self.watchesBtn setTitle:[NSString stringWithFormat:@"%zd", self.watchNumber] forState:UIControlStateNormal];
+    });
+}
 
 - (void)refreshLiveInfo{
     if (!self.menu || !self.channelMenuInfo) { return; }
@@ -218,10 +241,11 @@ static CGFloat kHeaderViewHeight = 100.0;
             [self.likesBtn setTitle:[NSString stringWithFormat:@" %ld", (long)self.channelMenuInfo.likes.integerValue] forState:UIControlStateNormal];
         }
         
-        if (self.channelMenuInfo.pageView.integerValue > 100000) {
-            [self.watchesBtn setTitle:[NSString stringWithFormat:@" %0.1fW", self.channelMenuInfo.pageView.integerValue / 10000.0] forState:UIControlStateNormal];
+        self.watchNumber = self.channelMenuInfo.pageView.integerValue;
+        if (self.watchNumber > 100000) {
+            [self.watchesBtn setTitle:[NSString stringWithFormat:@" %0.1fW", self.watchNumber / 10000.0] forState:UIControlStateNormal];
         } else {
-            [self.watchesBtn setTitle:[NSString stringWithFormat:@" %ld", (long)self.channelMenuInfo.pageView.integerValue] forState:UIControlStateNormal];
+            [self.watchesBtn setTitle:[NSString stringWithFormat:@" %zd", self.watchNumber] forState:UIControlStateNormal];
         }
         
         self.liveTimeLabel.text = self.channelMenuInfo.startTime != nil ? [NSString stringWithFormat:@"直播时间:%@", self.channelMenuInfo.startTime] : @"直播时间:无";
@@ -262,6 +286,8 @@ static CGFloat kHeaderViewHeight = 100.0;
         }
     }
 }
+
+#pragma mark - Private
 
 - (NSString *)html {
     /// 图片自适应设备宽，边距，禁用双指缩放

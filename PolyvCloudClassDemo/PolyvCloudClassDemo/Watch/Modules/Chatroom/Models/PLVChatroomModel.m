@@ -27,7 +27,7 @@
 @property (nonatomic, strong) NSString *nickName;
 @property (nonatomic, strong) NSString *actor;
 @property (nonatomic, strong) NSString *speakContent;
-// 头衔自定义颜色
+/// 头衔自定义颜色
 @property (nonatomic, strong) UIColor *actorTextColor;
 @property (nonatomic, strong) UIColor *actorBackgroundColor;
 
@@ -36,6 +36,9 @@
 @property (nonatomic, strong) NSString *imgId;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, assign) CGSize imageViewSize;
+
+/// 打赏信息
+@property (nonatomic, assign) NSInteger goodNum;
 
 @end
 
@@ -51,6 +54,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             return @"PLVChatroomModelTypeImageReceived";
         case PLVChatroomModelTypeFlower:
             return @"PLVChatroomModelTypeFlower";
+        case PLVChatroomModelTypeReward:
+            return @"PLVChatroomModelTypeReward";
         case PLVChatroomModelTypeLike:
             return @"PLVChatroomModelTypeLike";
         case PLVChatroomModelTypeSystem:
@@ -184,6 +189,20 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             NSString *nickName = [NSString stringWithFormat:@"%@",object.jsonDict[@"nick"]];
             model.content = [NSString stringWithFormat:@"%@ 赠送了 鲜花",nickName];
         } break;
+        case PLVSocketChatRoomEventType_REWARD: {
+            model.type = PLVChatroomModelTypeReward;
+            NSDictionary * contentDict = object.jsonDict[@"content"];
+            if ([contentDict isKindOfClass:NSDictionary.class]) {
+                NSInteger goodNum = [NSString stringWithFormat:@"%@",contentDict[@"goodNum"]].integerValue;
+                model.goodNum = goodNum;
+                NSString * rewardContent = [NSString stringWithFormat:@"%@",contentDict[@"rewardContent"]];
+                NSString * unick = [NSString stringWithFormat:@"%@",contentDict[@"unick"]];
+                model.content = [NSString stringWithFormat:@"%@ 赠送了 %@",unick,rewardContent];
+                NSString * goodImg = [NSString stringWithFormat:@"%@",contentDict[@"gimg"]];
+                if ([goodImg hasPrefix:@"//"]) { goodImg = [@"https:" stringByAppendingString:goodImg]; }
+                model.imgUrl = goodImg;
+            }
+        } break;
         default:
             model.type = PLVChatroomModelTypeNotDefine;
             break;
@@ -263,6 +282,14 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             }
             [(PLVChatroomFlowerCell *)cell setContent:self.content];
         } break;
+        case PLVChatroomModelTypeReward: {
+            if (!cell) {
+                cell = [[PLVChatroomRewardCell alloc] initWithReuseIdentifier:indentifier];
+            }
+            [(PLVChatroomRewardCell *)cell setContent:self.content];
+            [(PLVChatroomRewardCell *)cell setImgUrl:self.imgUrl];
+            [(PLVChatroomRewardCell *)cell setGoodNum:self.goodNum];
+        } break;
         case PLVChatroomModelTypeLike: {
             if (!cell) {
                 cell = [[PLVChatroomFlowerCell alloc] initWithReuseIdentifier:indentifier];
@@ -290,7 +317,9 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
 
 - (void)calculateImageViewSizeWithImageSize:(CGSize)size {
     CGFloat x = size.width / size.height;
-    if (x == 1) {   // 方图
+    if (isnan(x)){
+        self.imageViewSize = CGSizeMake(100, 100);
+    }else if (x == 1) {   // 方图
         if (size.width < 50) {
             self.imageViewSize = CGSizeMake(50, 50);
         }else if (size.width > 132) {

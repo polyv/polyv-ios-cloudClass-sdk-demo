@@ -725,6 +725,74 @@ UITextViewDelegate
 
 @end
 
+@interface PLVChatroomRewardCell ()
+
+@property (nonatomic, strong) UILabel *contentLB;
+@property (nonatomic, strong) UILabel *goodNumLB;
+
+@end
+
+@implementation PLVChatroomRewardCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.contentLB = [[UILabel alloc] init];
+        self.contentLB.backgroundColor = [UIColor clearColor];
+        self.contentLB.textColor = [UIColor colorWithWhite:135/255.0 alpha:1.0];
+        self.contentLB.font = [UIFont systemFontOfSize:12.0];
+        self.contentLB.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:self.contentLB];
+        
+        self.goodNumLB = [[UILabel alloc] init];
+        self.goodNumLB.backgroundColor = [UIColor clearColor];
+        self.goodNumLB.textColor = [UIColor colorWithWhite:135/255.0 alpha:1.0];
+        self.goodNumLB.font = [UIFont systemFontOfSize:12.0];
+        self.goodNumLB.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:self.goodNumLB];
+        
+        self.imgView = [[UIImageView alloc] init];
+        [self addSubview:self.imgView];
+        [self.imgView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.size.mas_equalTo(CGSizeMake(30, 30));
+            make.leading.equalTo(self.contentLB.mas_trailing);
+            make.centerY.equalTo(self.mas_centerY);
+        }];
+        
+        [self.goodNumLB mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.mas_equalTo(self.contentLB).offset(0);
+            make.left.mas_equalTo(self.imgView.mas_right).offset(2);
+        }];
+    }
+    return self;
+}
+
+- (void)setImgUrl:(NSString *)imgUrl{
+    if (imgUrl && [imgUrl isKindOfClass:NSString.class] && imgUrl.length > 0) {
+        _imgUrl = imgUrl;
+        [self.imgView sd_setImageWithURL:[NSURL URLWithString:imgUrl] placeholderImage:nil];
+    }
+}
+
+- (void)setContent:(NSString *)content {
+    _content = content;
+    self.contentLB.text = content;
+    [self.contentLB mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(17);
+        make.width.lessThanOrEqualTo(@(250));
+        make.centerY.equalTo(self.mas_centerY);
+        make.centerX.equalTo(self.mas_centerX).offset(-15);
+    }];
+}
+
+- (void)setGoodNum:(NSInteger)goodNum{
+    _goodNum = goodNum;
+    NSString * goodNumString = _goodNum > 1 ? [NSString stringWithFormat:@"x%ld",_goodNum] : @"";
+    self.goodNumLB.text = goodNumString;
+}
+
+@end
+
 @interface PLVChatroomSystemCell ()
 
 @property (nonatomic, strong) UILabel *contentLB;

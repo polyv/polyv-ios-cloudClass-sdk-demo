@@ -29,5 +29,6 @@
 - (void)openAlbum:(PLVKeyboardMoreView *)moreView;
 - (void)shoot:(PLVKeyboardMoreView *)moreView;
 - (void)readBulletin:(PLVKeyboardMoreView *)moreView;
+- (void)onlyTeacher:(PLVKeyboardMoreView *)moreView on:(BOOL)on;
 
 @end

@@ -127,6 +127,7 @@
 
 @property (nonatomic, assign) CGFloat bottomHeight;
 @property (nonatomic, assign) CGFloat lastTextViewHeight;
+@property (nonatomic, strong) UIButton *giftBtn;
 @property (nonatomic, strong) UIButton *userBtn;
 @property (nonatomic, strong) PLVTextView *textView;
 @property (nonatomic, strong) UIButton *emojiBtn;
@@ -207,9 +208,13 @@
         switch (type) {
             case PLVTextInputViewTypeNormalPublic:
             case PLVTextInputViewTypeCloudClassPublic: {
-                self.userBtn = [self addButton:@"plv_input_user_normal.png" selectedImgName:@"plv_input_user_select.png" action:@selector(onlyTeacherAction:) inView:self];
-                [self remakeConstraints:self.userBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-                
+                // 2019-12-05 积分打赏功能
+                //self.userBtn = [self addButton:@"plv_input_user_normal.png" selectedImgName:@"plv_input_user_select.png" action:@selector(onlyTeacherAction:) inView:self];
+                //[self remakeConstraints:self.userBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+                self.giftBtn = [self addButton:@"plv_btn_reward_openBtn@3x" selectedImgName:nil action:@selector(giftBtnAction:) inView:self];
+                [self remakeConstraints:self.giftBtn margin:UIEdgeInsetsMake(-1.0, 10.0, self.bottomHeight + 11.0, -1.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+                self.giftBtn.hidden = YES;
+
                 self.flowerBtn = [self addButton:type == PLVTextInputViewTypeNormalPublic ? @"plv_btn_like.png" : @"plv_flower.png" selectedImgName:nil action:@selector(flowerAction:) inView:self];
                 [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
                 
@@ -264,14 +269,14 @@
         case PLVTextInputViewTypeNormalPublic:
         case PLVTextInputViewTypeCloudClassPublic: {
             // 默认显示moreBtn
-            self.textView.frame = CGRectMake(48.0, 7.0, self.bounds.size.width - 134.0, 37.0);
+            [self layoutPublicTextView];
             [self remakeConstraints:self.flowerBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 48.0) size:CGSizeMake(28.0, 28.0) baseView:self];
+            self.flowerBtn.hidden = self.hideFlowerButton;
             self.moreBtn.hidden = NO;
             self.moreView.viewerSendImgEnabled = self.enableMore;
             self.moreView.enabelBulletin = YES;
             [self.moreView reloadDate];
             [self remakeConstraints:self.moreBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 10.0) size:CGSizeMake(28.0, 28.0) baseView:self];
-            [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, 91.0) size:CGSizeMake(28.0, 28.0) baseView:self];
         } break;
         case PLVTextInputViewTypePlayback: {
             self.textView.frame = CGRectMake(20, 7.0, self.bounds.size.width - 68.0, 37.0);
@@ -285,6 +290,8 @@
         default:
             break;
     }
+    
+    self.type = type;
 }
 
 - (void)tapAction {
@@ -306,6 +313,22 @@
         self.textView.inputView = [[UIView alloc] initWithFrame:CGRectZero];
         [self.textView reloadInputViews];
         [self.textView becomeFirstResponder];
+    }
+}
+
+- (void)setShowGiftButton:(BOOL)showGiftButton{
+    _showGiftButton = showGiftButton;
+    if (self.type < PLVTextInputViewTypePrivate) {
+        self.giftBtn.hidden = !_showGiftButton;
+        [self layoutPublicTextView];
+    }
+}
+
+- (void)setHideFlowerButton:(BOOL)hideFlowerButton{
+    _hideFlowerButton = hideFlowerButton;
+    if (self.type == PLVTextInputViewTypeCloudClassPublic) {
+        self.flowerBtn.hidden = _hideFlowerButton;
+        [self layoutPublicTextView];
     }
 }
 
@@ -372,6 +395,24 @@
             [self followKeyboardAnimation:@{UIKeyboardAnimationDurationUserInfoKey : @(0.3)} flag:NO];
         }
         [self placeholderTextView];
+    }
+}
+
+- (void)giftBtnAction:(UIButton *)button{
+    button.selected = !button.selected;
+
+    __weak typeof(self) weakSelf = self;
+    void (^actionDelegateCall)(void) = ^{
+        if ([weakSelf.delegate respondsToSelector:@selector(textInputView:giftButtonClick:)]) {
+            [weakSelf.delegate textInputView:weakSelf giftButtonClick:button.selected];
+        }
+    };
+    
+    if ([self.textView isFirstResponder]) {
+        [self tapAction];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.33 * NSEC_PER_SEC)), dispatch_get_main_queue(), actionDelegateCall);
+    }else{
+        actionDelegateCall();
     }
 }
 
@@ -500,6 +541,17 @@
     }
 }
 
+- (void)layoutPublicTextView{
+    CGFloat giftButtonW = (_showGiftButton ? (28.0 + 10.0) : 0.0);
+    CGFloat flowerButtonW = (_hideFlowerButton ? 0.0 : (28.0 + 10.0));
+    CGFloat textViewX = 10.0 + giftButtonW;
+    CGFloat textViewW = self.bounds.size.width - giftButtonW - flowerButtonW - 58;
+    self.textView.frame = CGRectMake(textViewX, 7.0, textViewW, 37.0);
+    
+    CGFloat emojiBtnR = 91.0 - (_hideFlowerButton ? (28.0 + 10.0) : 0.0);
+    [self remakeConstraints:self.emojiBtn margin:UIEdgeInsetsMake(-1.0, -1.0, self.bottomHeight + 11.0, emojiBtnR) size:CGSizeMake(28.0, 28.0) baseView:self];
+}
+
 #pragma mark - UIKeyboardNotification
 - (void)keyboardWillShow:(NSNotification *)notification {
     self.inputState = PLVTextInputViewStateSystem;
@@ -623,6 +675,19 @@
 - (void)readBulletin:(PLVKeyboardMoreView *)moreView{
     if (self.delegate && [self.delegate respondsToSelector:@selector(readBulletin:)]) {
         [self.delegate readBulletin:self];
+    }
+}
+
+- (void)onlyTeacher:(PLVKeyboardMoreView *)moreView on:(BOOL)on{
+    if (self.disableOtherButtonsInTeacherMode) {
+        self.textView.editable = !on;
+        self.emojiBtn.enabled = !on;
+        self.flowerBtn.enabled = !on;
+        self.moreBtn.enabled = !on;
+    }
+    [self tapAction];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textInputView:onlyTeacher:)]) {
+        [self.delegate textInputView:self onlyTeacher:on];
     }
 }
 

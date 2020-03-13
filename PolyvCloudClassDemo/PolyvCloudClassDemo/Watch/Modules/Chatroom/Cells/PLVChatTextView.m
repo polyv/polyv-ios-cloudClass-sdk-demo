@@ -106,9 +106,9 @@ static NSString *kFilterRegularExpression = @"((http[s]{0,1}://)?[a-zA-Z0-9\\.\\
 }
 
 - (BOOL)resignFirstResponder {
-    if (self.showingMenu || self.lastSelectedRange.location != self.selectedRange.location || self.lastSelectedRange.length != self.selectedRange.length) {
+    /*if (self.showingMenu || self.lastSelectedRange.location != self.selectedRange.location || self.lastSelectedRange.length != self.selectedRange.length) {
         return NO;
-    }
+    }*/
     [self removeObserver];
     return [super resignFirstResponder];
 }

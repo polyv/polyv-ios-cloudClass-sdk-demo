@@ -44,6 +44,12 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewState) {
 @property (nonatomic, assign) CGFloat originY;
 /// 连麦时，外层改变输入控件的frame时，需要判断输入控件是否是up的弹出状态
 @property (nonatomic, assign) BOOL up;
+/// 是否展示礼物打赏按钮，默认NO
+@property (nonatomic, assign) BOOL showGiftButton;
+/// 是否隐藏送花按钮，默认NO
+@property (nonatomic, assign) BOOL hideFlowerButton;
+/// 键盘类型
+@property (nonatomic, assign) PLVTextInputViewType type;
 
 /// 键盘状态
 @property (nonatomic, assign) PLVTextInputViewState inputState;
@@ -80,6 +86,7 @@ typedef NS_ENUM(NSInteger, PLVTextInputViewState) {
 - (void)textInputView:(PLVTextInputView *)inputView didSendText:(NSString *)text;
 - (void)sendFlower:(PLVTextInputView *)inputView;
 - (void)textInputView:(PLVTextInputView *)inputView onlyTeacher:(BOOL)on;
+- (void)textInputView:(PLVTextInputView *)inputView giftButtonClick:(BOOL)open;
 - (void)openAlbum:(PLVTextInputView *)inputView;
 - (void)shoot:(PLVTextInputView *)inputView;
 - (void)readBulletin:(PLVTextInputView *)inputView;

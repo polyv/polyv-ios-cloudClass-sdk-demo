@@ -25,4 +25,7 @@ typedef NS_ENUM(NSInteger, PLVVodViewControllerType) {
 /// 聊天室相关的Tab信息
 @property (nonatomic, strong) PLVLiveVideoChannelMenuInfo *channelMenuInfo;
 
+/// 点播列表
+@property (nonatomic, assign) BOOL vodList;
+
 @end

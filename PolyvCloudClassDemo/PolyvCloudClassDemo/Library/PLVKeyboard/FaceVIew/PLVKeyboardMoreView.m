@@ -49,6 +49,7 @@
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *flowLayout;
+@property (nonatomic, strong) UIButton * onlyTearchButton;
 
 @end
 
@@ -63,7 +64,12 @@
         self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
         self.flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         self.flowLayout.itemSize = CGSizeMake(CellWidth, CellHeight);
-        self.flowLayout.sectionInset = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+        
+        float totalWidth = CellWidth * 4;
+        float totalPadding = [UIScreen mainScreen].bounds.size.width - totalWidth;
+        float paddingScale = totalPadding / 159.0;
+        float padding = 15.9 * paddingScale;
+        self.flowLayout.sectionInset = UIEdgeInsetsMake(15.9, padding, 15.9, padding);
         self.collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:self.flowLayout];
         [self.collectionView registerClass:[PLVMoreCollectionViewCell class] forCellWithReuseIdentifier:PLVMoreCollectionViewCellIdentifier];
         self.collectionView.backgroundColor = [UIColor clearColor];
@@ -79,7 +85,7 @@
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView*)collectionView {
-    NSUInteger number = 0;
+    NSUInteger number = 1;
     if (self.viewerSendImgEnabled)
         number += 2;
     if (self.enabelBulletin)
@@ -109,11 +115,25 @@
             [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
             [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
             [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
+        }else if (index == 3) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_input_user_normal"] forState:UIControlStateNormal];
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_input_user_select"] forState:UIControlStateSelected];
+            [cell.moreBtn setTitle:@"只看讲师" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(onlyTeacher:) forControlEvents:UIControlEventTouchUpInside];
+            self.onlyTearchButton = cell.moreBtn;
         }
     } else if (self.enabelBulletin) {
-        [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
-        [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
-        [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
+        if (index == 0) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_notice.png"] forState:UIControlStateNormal];
+            [cell.moreBtn setTitle:@"公告" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(readBulletin:) forControlEvents:UIControlEventTouchUpInside];
+        }else if (index == 1) {
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_input_user_normal"] forState:UIControlStateNormal];
+            [cell.moreBtn setImage:[UIImage imageNamed:@"plv_input_user_select"] forState:UIControlStateSelected];
+            [cell.moreBtn setTitle:@"只看讲师" forState:UIControlStateNormal];
+            [cell.moreBtn addTarget:self action:@selector(onlyTeacher:) forControlEvents:UIControlEventTouchUpInside];
+            self.onlyTearchButton = cell.moreBtn;
+        }
     }
     
     [cell changeTitleStyle];
@@ -139,6 +159,13 @@
     }
 }
 
+- (IBAction)onlyTeacher:(id)sender {
+    self.onlyTearchButton.selected = !self.onlyTearchButton.selected;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(onlyTeacher:on:)]) {
+        [self.delegate onlyTeacher:self on:self.onlyTearchButton.selected];
+    }
+}
+
 #pragma mark - UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
     CGSize size = CGSizeMake(0.0, self.collectionView.bounds.size.height);
@@ -150,9 +177,6 @@
 
 - (CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
     CGSize size = CGSizeMake(0.0, self.collectionView.bounds.size.height);
-    if (section == 2) {
-        size = CGSizeMake(self.flowLayout.sectionInset.right, self.collectionView.bounds.size.height);
-    }
     return size;
 }
 
