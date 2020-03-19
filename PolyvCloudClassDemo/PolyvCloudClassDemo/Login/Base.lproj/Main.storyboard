@@ -236,6 +236,22 @@
                                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="url-GR-q9e">
+                                                <rect key="frame" x="229" y="533" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="videoDecodeSwitchChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="24i-kR-7Te"/>
+                                                </connections>
+                                            </switch>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="硬解码" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lc5-xr-Kih">
+                                                <rect key="frame" x="227.5" y="572" width="52" height="21"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="21" id="92A-s7-fAm"/>
+                                                    <constraint firstAttribute="width" constant="52" id="wcj-iS-Cey"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -248,6 +264,7 @@
                                             <constraint firstItem="k5E-xI-BDw" firstAttribute="top" secondItem="PR4-ke-cRc" secondAttribute="bottom" constant="20" id="K1m-Dh-2mi"/>
                                             <constraint firstItem="DP2-8E-X2O" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="M8H-Cz-ZNG"/>
                                             <constraint firstItem="6LZ-ku-nQB" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="80" id="NmQ-cm-NOO"/>
+                                            <constraint firstItem="Lc5-xr-Kih" firstAttribute="top" secondItem="url-GR-q9e" secondAttribute="bottom" constant="8" id="QGW-zW-SnE"/>
                                             <constraint firstItem="Ngg-NN-HcT" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="RBL-KR-uK0"/>
                                             <constraint firstItem="llh-1U-8Xo" firstAttribute="top" secondItem="xt2-nU-cVU" secondAttribute="bottom" constant="7" id="RPB-Zx-taM"/>
                                             <constraint firstItem="xt2-nU-cVU" firstAttribute="top" secondItem="k5E-xI-BDw" secondAttribute="bottom" constant="20" id="Rbh-NH-9no"/>
@@ -258,6 +275,7 @@
                                             <constraint firstAttribute="bottom" secondItem="ezz-dZ-a25" secondAttribute="bottom" constant="25" id="Vvj-mJ-daa"/>
                                             <constraint firstItem="Vch-OB-1bM" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="XCs-dA-XYJ"/>
                                             <constraint firstItem="llh-1U-8Xo" firstAttribute="leading" secondItem="MNF-eJ-4iP" secondAttribute="leading" constant="28" id="YOm-74-xB6"/>
+                                            <constraint firstItem="xMs-Dw-j1M" firstAttribute="leading" secondItem="url-GR-q9e" secondAttribute="trailing" constant="20" id="bRz-W4-89B"/>
                                             <constraint firstItem="fMz-7b-fO6" firstAttribute="top" secondItem="6LZ-ku-nQB" secondAttribute="bottom" constant="85" id="cCA-V9-l4Y"/>
                                             <constraint firstItem="h9j-C2-Cwd" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" priority="750" constant="220" id="cGf-N2-MRC"/>
                                             <constraint firstItem="LNC-XR-S40" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="310" id="caJ-Qz-s1P"/>
@@ -266,8 +284,10 @@
                                             <constraint firstItem="fMz-7b-fO6" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="60" id="fTa-my-t5w"/>
                                             <constraint firstItem="ON8-jM-RUn" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="265" id="gD7-Wc-nb5"/>
                                             <constraint firstItem="OhJ-oh-eQv" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="265" id="grP-Sv-qoR"/>
+                                            <constraint firstItem="Lc5-xr-Kih" firstAttribute="centerX" secondItem="url-GR-q9e" secondAttribute="centerX" id="h1k-V8-tZT"/>
                                             <constraint firstItem="vn2-VU-4Rn" firstAttribute="top" secondItem="MNF-eJ-4iP" secondAttribute="top" constant="355" id="iyE-kZ-ebb"/>
                                             <constraint firstItem="1TJ-Ay-ARX" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="j7P-re-aHz"/>
+                                            <constraint firstItem="xMs-Dw-j1M" firstAttribute="centerY" secondItem="url-GR-q9e" secondAttribute="centerY" id="jOG-Av-lBq"/>
                                             <constraint firstItem="xMs-Dw-j1M" firstAttribute="top" secondItem="k5E-xI-BDw" secondAttribute="bottom" constant="19" id="jjW-gn-nEO"/>
                                             <constraint firstItem="OhJ-oh-eQv" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" id="ksW-A1-KM4"/>
                                             <constraint firstItem="Kk4-Cj-MKy" firstAttribute="centerX" secondItem="MNF-eJ-4iP" secondAttribute="centerX" constant="-60" id="lL1-m0-Bjh"/>

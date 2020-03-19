@@ -90,6 +90,7 @@
 
 #pragma mark - public
 - (void)clearResource {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [self.player clearPlayersAndTimers];

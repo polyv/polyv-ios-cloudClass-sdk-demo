@@ -300,16 +300,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
                 [self.delegate chatroom:self userInfo:object.jsonDict];
             }
         } break;
-        case PLVSocketChatRoomEventType_RELOGIN: {
-            __weak typeof(self) weakSelf = self;
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"当前userId已在别处登录，点击确认后自动退出直播间" message:nil preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(reLogin:)]) {
-                    [weakSelf.delegate reLogin:weakSelf];
-                }
-            }]];
-            [self presentViewController:alertController animated:YES completion:nil];
-        } break;
         case PLVSocketChatRoomEventType_SET_NICK: {
             NSString *status = PLV_SafeStringForDictKey(object.jsonDict, @"status");
             if ([status isEqualToString:@"success"]) {// success：广播消息

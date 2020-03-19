@@ -114,6 +114,13 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     [self refreshLoginBtnUI];
 }
 
+- (IBAction)videoDecodeSwitchChanged:(UISwitch *)sender {
+    PLVLiveVideoConfig.sharedInstance.videoToolBox = sender.isOn;
+    
+    NSString *detail = @"硬解码效率更高，软解码兼容性更好。如果视频画面出现问题，如花屏、黑屏等可尝试切换软解码模式";
+    [PCCUtils showHUDWithTitle:sender.isOn ? @"硬解码" : @"软解码" detail:detail view:self.view];
+}
+
 #pragma mark - UI control
 - (void)refreshLoginBtnUI {
     if (!self.liveSelectView.hidden) {

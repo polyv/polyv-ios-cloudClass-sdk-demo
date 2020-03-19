@@ -410,7 +410,7 @@
             [weakSelf updateTrophyNumber:dict];
             BOOL added = [weakSelf updateCurrentLinkMicList:dict[@"joinList"] joinedOfUid:@(uid).stringValue];
             if (!added && count < 4) {
-                [self didJoinedOfUid:uid count:count + 1 after:after + 2.0];
+                [weakSelf didJoinedOfUid:uid count:count + 1 after:after + 2.0];
             }
         } failure:^(NSError *error) { }];
     });
@@ -1036,7 +1036,7 @@
         weakSelf.controlView.frame = [weakSelf makeControlRect];
         [weakSelf layoutControll];
     } completion:^(BOOL finished) {
-        weakSelf.liveInfoView.alpha = self.arrowBtn.selected ? 0.0 : 1.0;
+        weakSelf.liveInfoView.alpha = weakSelf.arrowBtn.selected ? 0.0 : 1.0;
     }];
 }
 
@@ -1276,7 +1276,7 @@
         [weakSelf updateTrophyNumber:dict];
         [weakSelf updateCurrentLinkMicList:dict[@"joinList"] joinedOfUid:nil];
         if (flag && weakSelf.teacherId > 0) {
-            [PLVLiveVideoAPI requestLinkMicStatusWithRoomId:self.login.roomId completion:^(NSString *status, NSString *type) {
+            [PLVLiveVideoAPI requestLinkMicStatusWithRoomId:weakSelf.login.roomId completion:^(NSString *status, NSString *type) {
                 [weakSelf updateRoomLinkMicStatus:status type:type source:NO];
             } failure:^(NSError *error) {}];
         }

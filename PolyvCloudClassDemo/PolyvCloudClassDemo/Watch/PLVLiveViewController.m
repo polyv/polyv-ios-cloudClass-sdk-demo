@@ -97,8 +97,9 @@
 
 - (void)playerPolling {
     if (@available(iOS 10.0, *)) {
+        __weak typeof(self) weakSelf = self;
         self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSLog(@"观看时长：%ld，停留时长：%ld", (long)self.mediaVC.player.watchDuration, (long)self.mediaVC.player.stayDuration);
+            NSLog(@"观看时长：%ld，停留时长：%ld", (long)weakSelf.mediaVC.player.watchDuration, (long)weakSelf.mediaVC.player.stayDuration);
         }];
     }
 }
@@ -346,7 +347,7 @@
         weakSelf.linkMicVC.viewerSignalEnabled = [channelMenuInfo.viewerSignalEnabled isEqualToString:@"Y"];
         weakSelf.linkMicVC.awardTrophyEnabled = [channelMenuInfo.awardTrophyEnabled isEqualToString:@"Y"];
         if (refresh) {
-            for (PLVLiveVideoChannelMenu *menu in self.channelMenuInfo.channelMenus) {
+            for (PLVLiveVideoChannelMenu *menu in weakSelf.channelMenuInfo.channelMenus) {
                 if ([menu.menuType isEqualToString:@"desc"]) {
                     [weakSelf refreshLiveInfoViewController:channelMenuInfo :menu];
                     break;
@@ -382,6 +383,10 @@
     if (self.pollingTimer) {
         [self.pollingTimer invalidate];
         self.pollingTimer = nil;
+    }
+    if (self.viewerTimer) {
+        [self.viewerTimer invalidate];
+        self.viewerTimer = nil;
     }
     if (self.navigationController) {
         [self.navigationController popViewControllerAnimated:YES];
@@ -505,7 +510,19 @@
 #pragma mark Socket message
 - (void)socketIO:(PLVSocketIO *)socketIO didReceivePublicChatMessage:(PLVSocketChatRoomObject *)chatObject {
 //    NSLog(@"%@--type:%lu, event:%@", NSStringFromSelector(_cmd), (unsigned long)chatObject.eventType, chatObject.event);
-    [self.publicChatroomViewController addNewChatroomObject:chatObject];
+    switch (chatObject.eventType) {
+        case PLVSocketChatRoomEventType_RELOGIN: {
+            __weak typeof(self) weakSelf = self;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"当前账号已在其他地方登录，您将被退出观看" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [weakSelf exitCurrentController];
+            }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        } break;
+        default:
+            [self.publicChatroomViewController addNewChatroomObject:chatObject];
+            break;
+    }
 }
 
 - (void)socketIO:(PLVSocketIO *)socketIO didReceivePrivateChatMessage:(PLVSocketChatRoomObject *)chatObject {
@@ -683,10 +700,6 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.33 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.triviaCardVC openLastBulletin];
     });
-}
-
-- (void)reLogin:(PLVChatroomController *)chatroom {
-    [self exitCurrentController];
 }
 
 - (void)refreshLinkMicOnlineCount:(PLVChatroomController *)chatroom number:(NSUInteger)number {
