@@ -147,6 +147,7 @@
 		22FB810C212AB55100B5CB53 /* ZJZDanMuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FB80EB212AB55100B5CB53 /* ZJZDanMuLabel.m */; };
 		298A8E4722B1430D00706456 /* plv_notice@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4522B1430D00706456 /* plv_notice@3x.png */; };
 		298A8E4822B1430D00706456 /* plv_notice@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 298A8E4622B1430D00706456 /* plv_notice@2x.png */; };
+		4AE384F11766CB219025CC54 /* Pods_PolyvCloudClassDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C57402F47BD51470320A527 /* Pods_PolyvCloudClassDemo.framework */; };
 		632516CA22AE101E008636C6 /* PLVPlayerInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = 632516C822AE101D008636C6 /* PLVPlayerInputView.m */; };
 		634DE7E1239FA1BF0050BFBF /* plv_btn_reward_openBtn@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 634DE7DF239FA1BE0050BFBF /* plv_btn_reward_openBtn@3x.png */; };
 		634DE7E2239FA1BF0050BFBF /* plv_btn_reward_openBtn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 634DE7E0239FA1BF0050BFBF /* plv_btn_reward_openBtn@2x.png */; };
@@ -208,7 +209,6 @@
 		DA45A52F22BC83EC004CFEB2 /* plv_btn_praise@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA45A52922BC83EC004CFEB2 /* plv_btn_praise@2x.png */; };
 		DA45A53622BC8D16004CFEB2 /* plv_img_channel_default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA45A53422BC8D15004CFEB2 /* plv_img_channel_default@2x.png */; };
 		DA45A53722BC8D16004CFEB2 /* plv_img_channel_default@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA45A53522BC8D15004CFEB2 /* plv_img_channel_default@3x.png */; };
-		E2837051BC674C59C8449336 /* Pods_PolyvCloudClassDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0D08B51D77150EB9BF4EA22 /* Pods_PolyvCloudClassDemo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -486,9 +486,9 @@
 		67E6E49A22EFF68A001E807B /* PLVCellModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PLVCellModel.m; sourceTree = "<group>"; };
 		67F5C7AD22F2C07600423360 /* PLVChatPlaybackController+DataProcessing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PLVChatPlaybackController+DataProcessing.m"; sourceTree = "<group>"; };
 		7DE2F91846E9E5A421F4F06D /* Pods-common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-PolyvCloudClassDemo/Pods-common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
+		9C57402F47BD51470320A527 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3211725223B6ED7551DBB2E /* Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-business-cloudClass-PolyvCloudClassDemo/Pods-business-cloudClass-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 		B06169596654856DABAB8966 /* Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-sdk_common-PolyvCloudClassDemo/Pods-common-sdk_common-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
-		B0D08B51D77150EB9BF4EA22 /* Pods_PolyvCloudClassDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PolyvCloudClassDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2716024BD92EBE895549D1E /* Pods-PolyvCloudClassDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PolyvCloudClassDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PolyvCloudClassDemo/Pods-PolyvCloudClassDemo.release.xcconfig"; sourceTree = "<group>"; };
 		DA45A51022BB6B41004CFEB2 /* PLVLiveInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PLVLiveInfoViewController.m; sourceTree = "<group>"; };
 		DA45A51122BB6B41004CFEB2 /* PLVLiveInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PLVLiveInfoViewController.h; sourceTree = "<group>"; };
@@ -511,7 +511,7 @@
 				229F827321C79C6500446B9A /* PolyvBusinessSDK.framework in Frameworks */,
 				229F827521C79C6500446B9A /* PolyvCloudClassSDK.framework in Frameworks */,
 				229F827721C79C6500446B9A /* PolyvFoundationSDK.framework in Frameworks */,
-				E2837051BC674C59C8449336 /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
+				4AE384F11766CB219025CC54 /* Pods_PolyvCloudClassDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1216,7 +1216,7 @@
 				229F827221C79C6500446B9A /* PolyvBusinessSDK.framework */,
 				229F827421C79C6500446B9A /* PolyvCloudClassSDK.framework */,
 				229F827621C79C6500446B9A /* PolyvFoundationSDK.framework */,
-				B0D08B51D77150EB9BF4EA22 /* Pods_PolyvCloudClassDemo.framework */,
+				9C57402F47BD51470320A527 /* Pods_PolyvCloudClassDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1745,7 +1745,7 @@
 					"\"VideoToolbox\"",
 					"-w",
 				);
-                PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1811,7 +1811,7 @@
 					"\"VideoToolbox\"",
 					"-w",
 				);
-                PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = polyv.PolyvCloudClassDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

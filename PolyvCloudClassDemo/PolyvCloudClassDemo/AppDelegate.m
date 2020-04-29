@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
+#import <PolyvCloudClassSDK/PLVWVodVideoConfig.h>
 
 @implementation AppDelegate
 
@@ -24,6 +25,10 @@
     
     // 配置统计后台参数：用户Id、用户昵称及自定义参数
     [PLVLiveVideoConfig setViewLogParam:nil param2:nil param4:nil param5:nil];
+    
+    // 配置点播统计后台参数
+    //[PLVWVodVideoConfig setViewLogViewerId:@"" viewerName:@""];
+    //[PLVWVodVideoConfig setViewLogParam:nil param3:nil param4:nil param5:nil];
     
     return YES;
 }
