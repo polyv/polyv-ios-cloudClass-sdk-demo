@@ -53,6 +53,7 @@
 @property (nonatomic, assign) BOOL liveInfoClose;
 @property (nonatomic, assign) BOOL liveInfoFlag;
 @property (nonatomic, assign) BOOL linkMicOpen;//讲师端是否开启了连麦
+@property (nonatomic, copy) void (^notSupportLinkMicEvent) (void);//更新notSupportLinkMic状态值需执行事件
 
 @property (nonatomic, strong) NSTimer *lookAtMeTimer;
 
@@ -92,7 +93,10 @@
     self.linkMicViewArray = [[NSMutableArray alloc] initWithCapacity:7];
     
     [self addLiveInfoView];
-    [self addControllView];
+    if (self.notSupportLinkMicEvent) {
+        self.notSupportLinkMicEvent();
+        self.notSupportLinkMicEvent = nil;
+    }
     
     self.scrollView = [[UIScrollView alloc] init];
     self.scrollView.autoresizingMask = UIViewAutoresizingNone;
@@ -302,11 +306,10 @@
 
 - (void)resetLinkMicTopControlFrame:(BOOL)close {
     self.secondaryClosed = close;
+    CGFloat x = self.secondaryClosed || self.linkMicType != PLVLinkMicTypeCloudClass ? 0.0 : self.originSize.width;
+    self.liveInfoView.frame = CGRectMake(x, 0.0, self.view.bounds.size.width - x, self.originSize.height);
+    [self refreshLiveInfoFlag:close];
     if (!self.fullscreen) {
-        CGFloat x = self.secondaryClosed || self.linkMicType != PLVLinkMicTypeCloudClass ? 0.0 : self.originSize.width;
-        self.liveInfoView.frame = CGRectMake(x, 0.0, self.view.bounds.size.width - x, self.originSize.height);
-        [self refreshLiveInfoFlag:close];
-        
         self.controlView.frame = [self makeControlRect];
         [self layoutControll];
         
@@ -349,6 +352,30 @@
     [self viewerHandle];
 }
 
+- (void)setNotSupportLinkMic:(BOOL)notSupportLinkMic{
+    _notSupportLinkMic = notSupportLinkMic;
+    if (!_notSupportLinkMic) { // 支持连麦功能
+        BOOL hadControlView = self.controlView ? YES : NO;
+        __weak typeof(self) weakSelf = self;
+        self.notSupportLinkMicEvent = ^{
+            if (!hadControlView) {
+                [weakSelf addControllView];
+                [weakSelf resetLinkMicTopControlFrame:weakSelf.secondaryClosed];
+            }
+        };
+        if (self.isViewLoaded) {
+            self.notSupportLinkMicEvent();
+            self.notSupportLinkMicEvent = nil;
+            if (!hadControlView && self.linkMicOpen && self.linkMicStatus == PLVLinkMicStatusNone) {
+                if (!self.arrowBtn.isSelected) {
+                    // 讲师打开举手连线且客户端隐藏举手按钮，此时弹出举手按钮（右滑）
+                    [self showControlView:nil];
+                }
+            }
+        }
+    }
+}
+
 #pragma mark - [ Private Methods ]
 - (void)viewerHandle {
     if (self.viewer) {
@@ -360,6 +387,8 @@
                         [weakSelf joinRTCChannel];
                     });
                 }];
+            }else if (self.linkMicManager.hadJoinedRTC == NO){
+                [self joinRTCChannel];
             }
         } else {
             if (self.linkMicManager != nil) {
@@ -707,6 +736,11 @@
 
 #pragma mark - [ Layout ]
 - (void)viewWillLayoutSubviews{
+    CGFloat x = self.secondaryClosed || self.linkMicType != PLVLinkMicTypeCloudClass ? 0.0 : self.originSize.width;
+    self.liveInfoView.frame = CGRectMake(x, 0.0, self.view.bounds.size.width - x, self.originSize.height);
+    
+    self.arrowBtn.frame = [self makeArrowRect];
+
     CGSize avatarSize = DeviceiPad ? CGSizeMake(60.0, 60.0) : CGSizeMake(40.0, 40.0);
     self.avatarImgView.frame = CGRectMake((self.liveInfoClose ? 32.0 : 15.0),
                                           (CGRectGetHeight(self.liveInfoView.frame)-avatarSize.height)/2,
@@ -753,22 +787,27 @@
         count--;
     }
     
+    CGFloat cameraBtnAlpha = 0.0;
+    CGFloat switchCameraBtnAlpha = 0.0;
     if (self.linkMicOnAudio) {
-        self.cameraBtn.alpha = 0.0;
+        cameraBtnAlpha = 0.0;
         count--;
-        self.switchCameraBtn.alpha = 0.0;
+        switchCameraBtnAlpha = 0.0;
         count--;
     } else {
-        self.cameraBtn.alpha = 1.0;
-        self.switchCameraBtn.alpha = 1.0;
+        cameraBtnAlpha = 1.0;
+        switchCameraBtnAlpha = 1.0;
     }
     
     if (self.viewer) {
         CGFloat alpha = self.viewerAllow ? 1 : 0;
-        self.cameraBtn.alpha = alpha;
-        self.switchCameraBtn.alpha = alpha;
+        cameraBtnAlpha = alpha;
+        switchCameraBtnAlpha = alpha;
         self.micPhoneBtn.alpha = alpha;
     }
+    
+    self.cameraBtn.alpha = cameraBtnAlpha;
+    self.switchCameraBtn.alpha = switchCameraBtnAlpha;
     
     CGFloat wh = 48.0;
     if ((self.fullscreen && self.view.bounds.size.height <= 320.0) || (!self.fullscreen && self.view.bounds.size.width <= 320.0)) {
@@ -798,9 +837,9 @@
         if (!self.viewer) {
             if (self.linkMicStatus != PLVLinkMicStatusJoin) {
                 self.controlView.alpha = 0.0;
-                CGRect linkMicRect = self.linkMicBtn.frame;
-                linkMicRect.origin.x = dx + self.controlView.frame.origin.x;
-                self.linkMicBtn.frame = linkMicRect;
+                CGFloat linkMicBtn_x = self.view.superview.bounds.size.width - 40.0 - 48.0;
+                CGFloat linkMicBtn_y = self.view.superview.bounds.size.height - 84.0 - 10.0 - 48.0;
+                self.linkMicBtn.frame = CGRectMake(linkMicBtn_x, linkMicBtn_y, 48.0, 48.0);
                 [self.view.superview insertSubview:self.linkMicBtn aboveSubview:self.view];
             } else {
                 self.controlView.alpha = 1.0;
@@ -1165,6 +1204,7 @@
         }
         
         NSDictionary *classStatus = userInfo[@"classStatus"];
+        NSNumber *voice = (NSNumber *)classStatus[@"voice"];
         if (classStatus != nil) {
             NSNumber *speaker = (NSNumber *)classStatus[@"speaker"];
             if (speaker != nil && speaker.integerValue == 1) {
@@ -1176,16 +1216,18 @@
             [self.viewerArray addObject:userId];
             
             if (classStatus != nil) {
-                NSNumber *voice = (NSNumber *)classStatus[@"voice"];
                 if (voice != nil && voice.integerValue == 1) {
                     [self.voiceArray addObject:userId];
                 }
             }
         } else if (![@"teacher" isEqualToString:userType] && ![userId isEqualToString:self.login.linkMicId]) {
             if (self.linkMicStatus == PLVLinkMicStatusJoin || (self.viewer && self.linkMicManager != nil)) {
-                [self addLinkMicView:userId.integerValue remote:YES atIndex:-1 linkMicList:linkMicList];
-                if ([userId isEqualToString:uid]) {
-                    added = YES;
+                BOOL guestOn = [userType isEqualToString:@"guest"] ? (voice.integerValue == 1) : YES;
+                if (guestOn) {
+                    [self addLinkMicView:userId.integerValue remote:YES atIndex:-1 linkMicList:linkMicList];
+                    if ([userId isEqualToString:uid]) {
+                        added = YES;
+                    }
                 }
             }
         }

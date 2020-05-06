@@ -453,7 +453,8 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     CGRect frame = self.view.frame;
     NSArray *colors = @[UIColorFromRGB(0x9D86D2), UIColorFromRGB(0xF25268), UIColorFromRGB(0x5890FF), UIColorFromRGB(0xFCBC71)];
     
-    CGFloat inputViewY = self.chatInputView.frame.origin.y;
+    //CGFloat inputViewY = self.chatInputView.frame.origin.y;
+    CGFloat inputViewY = CGRectGetMaxY(frame) - CGRectGetHeight(self.chatInputView.bounds);
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"plv_like.png"]];
     imageView.frame = CGRectMake(CGRectGetWidth(frame) - 50.0, inputViewY - 44.0, 40.0, 40.0);
     imageView.backgroundColor = colors[rand()%4];
@@ -915,6 +916,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         self.likeSoctetObjectBySelf.localMessage = YES;
     }
     if (self.likeSoctetObjectBySelf != nil) {
+        [self.chatInputView tapAction];
         [self handleLikeSocket:self.likeSoctetObjectBySelf];
     }
 }

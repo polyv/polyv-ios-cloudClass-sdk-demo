@@ -140,6 +140,7 @@
     self.linkMicVC.login = [PLVChatroomManager sharedManager].socketUser;
     self.linkMicVC.viewerSignalEnabled = [self.channelMenuInfo.viewerSignalEnabled isEqualToString:@"Y"];
     self.linkMicVC.awardTrophyEnabled = [self.channelMenuInfo.awardTrophyEnabled isEqualToString:@"Y"];
+    if (self.channelMenuInfo) { self.linkMicVC.notSupportLinkMic = (self.channelMenuInfo.rtcType.length == 0 || [self.channelMenuInfo.rtcType isEqualToString:@"urtc"]); }
     if (self.liveType == PLVLiveViewControllerTypeLive) {
         self.linkMicVC.linkMicType = PLVLinkMicTypeNormalLive;//开启视频连麦时，普通直播的连麦窗口是音频模式(旧版推流端)，或者视频模式（新版推流端，对齐云课堂的连麦方式）
     } else {
@@ -154,7 +155,7 @@
     self.mediaVC.nickName = loginUser.nickName;
     self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
     //self.mediaVC.showDanmuOnPortrait = YES; // 竖屏显示弹幕按钮
-    //self.mediaVC.chaseFrame = YES;  // 是否开启追帧
+    self.mediaVC.chaseFrame = self.chaseFrame;  // 是否开启追帧
     // !!!: mediaVC.chaseFrame 属性的设置需在 self.mediaVC.view.frame 设置之前
     self.mediaVC.view.frame = self.mediaVC.originFrame;
     [self.view addSubview:self.mediaVC.view];
@@ -310,13 +311,23 @@
 
 #pragma mark - view controls
 - (BOOL)shouldAutorotate {
-    return self.mediaVC != nil && self.mediaVC.canAutorotate && ![PLVLiveVideoConfig sharedInstance].unableRotate && ![PLVLiveVideoConfig sharedInstance].triviaCardUnableRotate;
+    return [self viewControllerCanRotate];
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     // 设备为iPhone时，不处理竖屏的UpsideDown方向
     BOOL iPhone = [@"iPhone" isEqualToString:[UIDevice currentDevice].model];
-    return iPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll;
+    UIInterfaceOrientationMask mask = iPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll;
+    if ([self viewControllerCanRotate]) {
+        mask = iPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll;
+    }else{
+        mask = UIInterfaceOrientationMaskPortrait;
+    }
+    return mask;
+}
+
+- (BOOL)viewControllerCanRotate{
+    return self.mediaVC != nil && self.mediaVC.canAutorotate && ![PLVLiveVideoConfig sharedInstance].unableRotate && ![PLVLiveVideoConfig sharedInstance].triviaCardUnableRotate;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -346,6 +357,7 @@
         weakSelf.channelMenuInfo = channelMenuInfo;
         weakSelf.linkMicVC.viewerSignalEnabled = [channelMenuInfo.viewerSignalEnabled isEqualToString:@"Y"];
         weakSelf.linkMicVC.awardTrophyEnabled = [channelMenuInfo.awardTrophyEnabled isEqualToString:@"Y"];
+        weakSelf.linkMicVC.notSupportLinkMic = (channelMenuInfo.rtcType.length == 0 || [channelMenuInfo.rtcType isEqualToString:@"urtc"]);;
         if (refresh) {
             for (PLVLiveVideoChannelMenu *menu in weakSelf.channelMenuInfo.channelMenus) {
                 if ([menu.menuType isEqualToString:@"desc"]) {
@@ -432,7 +444,11 @@
             [weakSelf.socketIO connect];
             //weakSelf.socketIO.debugMode = YES;
             
+            if ([weakSelf.mediaVC isKindOfClass:PLVPPTLiveMediaViewController.class]) {
+                ((PLVPPTLiveMediaViewController *)weakSelf.mediaVC).viewer = weakSelf.viewer;
+            }
             weakSelf.linkMicVC.viewer = weakSelf.viewer;
+            if (weakSelf.linkMicVC.viewer) { ((PLVLivePlayerController *)weakSelf.mediaVC.player).linkMic = YES; }
         }
         loading = NO;
     }];

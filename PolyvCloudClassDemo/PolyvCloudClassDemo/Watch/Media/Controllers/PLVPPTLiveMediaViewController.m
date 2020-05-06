@@ -14,8 +14,6 @@
 
 @property (nonatomic, strong) PLVPlayerController<PLVPlayerControllerProtocol> *player;//视频播放器
 
-@property (nonatomic, strong) NSTimer *timer;
-
 @end
 
 @implementation PLVPPTLiveMediaViewController
@@ -118,9 +116,6 @@
     }
     self.player = [[PLVLivePlayerController alloc] initWithChannelId:self.channelId userId:self.userId playAD:self.playAD displayView:self.secondaryView delegate:self];
     [(PLVLivePlayerController *)self.player setChaseFrame:self.chaseFrame];
-    if (!self.timer) {
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTimeCheck) userInfo:nil repeats:YES];
-    }
 }
 
 - (void)switchAction:(BOOL)manualControl {
@@ -156,29 +151,11 @@
 
 - (void)clearResource {
     [super clearResource];
-    if (self.timer) {
-        [self.timer invalidate];
-        self.timer = nil;
-    }
 }
 
 - (void)changeVideoAndPPTPosition:(BOOL)status {
     if (status != self.pptOnSecondaryView) {
         [super dealSwitchAction:NO];
-    }
-}
-
-#pragma mark - Private
-
-- (void)onTimeCheck {
-    if (((PLVLivePlayerController *)self.player).linkMic) {
-        return; // 连麦 return
-    }
-    /// seiTime-videoCache,  -0.5取定时器1s中值
-    long diffTime = self.player.curFrameAgoraUserTC - self.player.videoCacheDuration - 0.5;
-    if (diffTime > 0) {
-        NSString *json = [NSString stringWithFormat:@"{\"time\":\"%ld\"}",diffTime];
-        [self.pptVC setSeiData:json];
     }
 }
 
@@ -205,7 +182,8 @@
         [super dealSwitchAction:NO];
     }
     self.secondaryView.alpha = 1.0;
-    ((PLVLivePlayerController*)self.player).linkMic = NO;
+    
+    if (!self.viewer) { ((PLVLivePlayerController*)self.player).linkMic = NO; }
     [self reOpenPlayerWithLineIndex:-1 codeRate:nil showHud:NO];
     
     BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
@@ -231,9 +209,17 @@
     [self mainPlaybackIsPreparedToPlay:notification];
 }
 
+- (void)playerController:(PLVPlayerController *)playerController mainPlayerSeiDidChange:(long)timeStamp {
+    long newTimeStamp = timeStamp - playerController.videoCacheDuration;
+    if (newTimeStamp > 0) {
+        NSString *json = [NSString stringWithFormat:@"{\"time\":\"%ld\"}",newTimeStamp];
+        [self.pptVC setSeiData:json];
+    }
+}
+
 #pragma mark - PLVLivePlayerControllerDelegate
 - (void)livePlayerController:(PLVLivePlayerController *)livePlayer streamState:(PLVLiveStreamState)streamState {
-    self.pptVC.pptPlayable = streamState == PLVLiveStreamStateLive;
+    self.pptVC.pptPlayable = streamState > PLVLiveStreamStateNoStream;
     if (streamState == PLVLiveStreamStateNoStream) {//没直播流
         [self hiddenLinkMic];
         self.skinView.controllView.hidden = YES;
@@ -250,6 +236,7 @@
         if (self.delegate && [self.delegate respondsToSelector:@selector(streamStateDidChange:streamState:)]) {
             [self.delegate streamStateDidChange:self streamState:streamState];
         }
+        if (streamState == PLVLiveStreamStateLive && self.viewer) { [self.linkMicVC hiddenLinkMic:NO]; }
     }
 
     self.curStreamState = streamState;

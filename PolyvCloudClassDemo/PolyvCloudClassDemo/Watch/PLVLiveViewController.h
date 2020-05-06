@@ -35,4 +35,7 @@ typedef NS_ENUM(NSInteger, PLVLiveViewControllerType) {
 /// 聊天室自定义用户头像地址，不设置时使用默认地址（建议使用 HTTPS 协议地址）
 @property (nonatomic, strong) NSString *avatarUrl;
 
+// 追帧设置
+@property (nonatomic, assign) BOOL chaseFrame;
+
 @end

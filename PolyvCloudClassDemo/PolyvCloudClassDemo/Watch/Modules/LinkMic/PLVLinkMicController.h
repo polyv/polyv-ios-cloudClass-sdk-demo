@@ -66,6 +66,8 @@ typedef NS_ENUM(NSUInteger, PLVLinkMicStatus) {
 @property (nonatomic, weak) PLVPPTViewController *PPTVC;
 /// token不为空时，重连后要发送reJoinMic事件
 @property (nonatomic, strong) NSString *token;
+/// 是否不支持连麦
+@property (nonatomic, assign) BOOL notSupportLinkMic;
 
 /// 当前用户连麦状态
 @property (nonatomic, assign, readonly) PLVLinkMicStatus linkMicStatus;

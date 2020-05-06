@@ -254,6 +254,16 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 
 #pragma mark - present ViewController
 - (void)presentToLiveViewControllerFromViewController:(UIViewController *)vc liveing:(BOOL)liveing lievType:(NSString *)liveType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
+    if (self.viewerSwitch.isOn) {
+        if (!channelMenuInfo) {
+            [PCCUtils showHUDWithTitle:@"频道菜单获取失败，请稍后再试" detail:nil view:self.view];
+            return;
+        }else if (channelMenuInfo.rtcType.length == 0 || [channelMenuInfo.rtcType isEqualToString:@"urtc"]){
+            [PCCUtils showHUDWithTitle:@"特邀观众暂不支持该rtc类型" detail:nil view:self.view];
+            return;
+        }
+    }
+    
     //必需先设置 PLVLiveVideoConfig 单例里需要的信息，因为在后面的加载中需要使用
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     liveConfig.channelId = self.channelIdTF.text;
@@ -267,10 +277,17 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     liveVC.viewer = self.viewerSwitch.isOn;
     liveVC.channelMenuInfo = channelMenuInfo;
     
+    // 读取app配置信息
+    NSUserDefaults *userDefaults = NSUserDefaults.standardUserDefaults;
+    id chaseFrame = [userDefaults objectForKey:@"chaseFrame_enabled"];
+    if (chaseFrame) {
+        liveVC.chaseFrame = [chaseFrame boolValue];
+    }
+    
     // 抽奖功能必须固定唯一的 nickName 和 userId，如果忘了填写上次的中奖信息，有固定的 userId 还会再次弹出相关填写页面
 //    liveVC.nickName = @"iOS user"; // 设置登录聊天室的用户名
 //    liveVC.avatarUrl = @"https://"; // 设置自定义聊天室用户头像地址
-
+    
     if (self.enterSwitch.isOn) {
         liveVC.modalPresentationStyle = UIModalPresentationFullScreen;
         [vc presentViewController:liveVC animated:YES completion:nil];

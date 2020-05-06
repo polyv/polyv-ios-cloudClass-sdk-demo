@@ -204,6 +204,7 @@
             if (safeFrame.size.width > safeFrame.size.height) {
                 safeFrame.size = CGSizeMake(safeFrame.size.height, safeFrame.size.width);
             }
+            if (@available(iOS 13.0, *)) { safeFrame.origin.y = safeFrame.origin.y == 0.0 ? 20.0 : safeFrame.origin.y; }
             mainRect.origin.y = safeFrame.origin.y;
         }
         mainRect.size.height -= mainRect.origin.y;
@@ -252,7 +253,10 @@
         return;
     }
     
-    if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+    UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+    BOOL interfaceOrientationIsLandscape = (interfaceOrientation == UIDeviceOrientationLandscapeRight || interfaceOrientation == UIDeviceOrientationLandscapeLeft);
+    
+    if ((orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) && interfaceOrientationIsLandscape) {
         if(self.enableDanmuModule){
             // 若希望横屏时无弹幕按钮、无弹幕，可将此处改为closeDanmuModule
             [self openDanmuModule];
@@ -279,8 +283,11 @@
     
     // 若希望启用弹幕模块时，弹幕默认不自动开启，可将为0判断移除
     if (self.skinView.openDanmuByUser == 0 || self.skinView.openDanmuByUser == 1) {
+        UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+        BOOL interfaceOrientationIsLandscape = (interfaceOrientation == UIDeviceOrientationLandscapeRight || interfaceOrientation == UIDeviceOrientationLandscapeLeft);
+        
         self.skinView.danmuBtn.selected = YES;
-        [self.skinView showDanmuInputBtn:(self.skinView.danmuBtn.selected && ([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft || [UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight))]; // 竖屏时无弹幕输入框
+        [self.skinView showDanmuInputBtn:(self.skinView.danmuBtn.selected && ([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft || [UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight) && interfaceOrientationIsLandscape)]; // 竖屏时无弹幕输入框
         [self playerSkinView:nil switchDanmu:YES];
     }
 }
