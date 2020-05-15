@@ -387,7 +387,7 @@
                         [weakSelf joinRTCChannel];
                     });
                 }];
-            }else if (self.linkMicManager.hadJoinedRTC == NO){
+            }else if (self.linkMicManager.hadJoinedRTC == NO && self.linkMicStatus != PLVLinkMicStatusJoining){
                 [self joinRTCChannel];
             }
         } else {
@@ -416,6 +416,9 @@
     int code = [self.linkMicManager joinRtcChannelWithChannelId:@(self.login.roomId).stringValue userLinkMicId:self.login.linkMicId];
     if (code == 0) {
         self.linkMicStatus = PLVLinkMicStatusJoining;
+        [PLVLiveVideoAPI requestViewerIdLinkMicIdRelate:[NSString stringWithFormat:@"%lu",self.login.roomId] viewerId:self.login.userId linkMicId:self.login.linkMicId completion:nil failure:^(NSError * _Nonnull error) {
+            NSLog(@"PLVLinkMicController - id relate failed %@",error);
+        }];
     }else{
         self.linkMicBtn.enabled = YES;
         [self toastTitle:@"连麦提示：加入失败！" detail:[NSString stringWithFormat:@"Join channel failed: %d", code]];

@@ -135,4 +135,17 @@ static PCCUtils *chatroomHud = nil;
     [self changeDeviceOrientation:UIDeviceOrientationPortrait];
 }
 
+#pragma mark - Layout
++ (CGFloat)getStatusBarHeight{
+    CGFloat statusBarHeight;
+    if (@available(iOS 11.0, *)) {
+        CGFloat topY = (([[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom > 0.0) ? [[UIApplication sharedApplication] delegate].window.safeAreaInsets.top : 20);
+        statusBarHeight = topY;
+    } else {
+        statusBarHeight = 20;
+    }
+    return statusBarHeight;
+}
+
+
 @end

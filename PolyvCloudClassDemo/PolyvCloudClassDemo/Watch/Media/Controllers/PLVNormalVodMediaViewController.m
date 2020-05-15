@@ -75,7 +75,7 @@
 }
 
 - (void)changePlayerScreenBackgroundColor:(PLVPlayerController *)playerController {
-    self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : BlueBackgroundColor;
+    self.mainView.backgroundColor = playerController.showVideoView ? [UIColor blackColor] : BlueBackgroundColor;
 }
 
 @end

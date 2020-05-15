@@ -174,9 +174,9 @@
         return;
     }
     if (self.pptOnSecondaryView) {
-        self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : GrayBackgroundColor;
+        self.mainView.backgroundColor = playerController.showVideoView ? [UIColor blackColor] : GrayBackgroundColor;
     } else {
-        self.secondaryView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : [UIColor whiteColor];
+        self.secondaryView.backgroundColor = playerController.showVideoView ? [UIColor blackColor] : [UIColor whiteColor];
     }
     
     if ([playerController isKindOfClass:PLVLivePlayerController.class]) {

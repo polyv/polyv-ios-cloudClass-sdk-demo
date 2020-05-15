@@ -30,6 +30,15 @@
     //[PLVWVodVideoConfig setViewLogViewerId:@"" viewerName:@""];
     //[PLVWVodVideoConfig setViewLogParam:nil param3:nil param4:nil param5:nil];
     
+    /* 接收远程事件  ----- 关于后台音频被中断，之后暂停未自动恢复直播说明
+        一般的，后台音频（不支持混音）被其他App音频中断，结束后不会自动恢复；
+        添加该配置或remoteControl配置可以使后台直播在一些场景下中断后恢复直播，如打开一个临时视频观看；
+        一些情况无法恢复，如进入音乐类App（qq音乐），另外App中的音频配置和其他依赖库的音频配置也可能对中断产生影响；
+        处理：
+        无法中断后自动恢复音频的直播可以在进入App时重新加载直播，这种情况可以由程序处理，当然也可以交给用户处理（手动刷新下）
+     */
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
     return YES;
 }
 

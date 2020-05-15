@@ -148,7 +148,7 @@
 }
 
 - (void)changePlayerScreenBackgroundColor:(PLVPlayerController *)playerController {
-    self.mainView.backgroundColor = playerController.backgroundImgView.hidden ? [UIColor blackColor] : GrayBackgroundColor;
+    self.mainView.backgroundColor = playerController.showVideoView ? [UIColor blackColor] : GrayBackgroundColor;
     
     BOOL showAudioModeSwitch = ((PLVLivePlayerController*)self.player).supportAudioMode && self.player.playable;
     [self.moreView showAudioModeBtn:showAudioModeSwitch];

@@ -124,7 +124,7 @@
 
 - (void)addMediaViewController {
     self.mediaViewControllerHeight = (int)(self.view.bounds.size.width * (self.liveType == PLVLiveViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale));
-    self.mediaViewControllerHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
+    self.mediaViewControllerHeight += [PCCUtils getStatusBarHeight];
     
     PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
     PLVSocketObject *loginUser = [PLVChatroomManager sharedManager].socketUser;
@@ -805,8 +805,7 @@
 }
 
 - (PLVSocketTriviaCardObject *)createCardSocketObjectWithEvent:(NSString *)event dict:(NSDictionary *)dict{
-    NSString *nickName = self.socketIO.user.nickName;
-    NSDictionary *baseJSON = @{@"EVENT" : event, @"roomId" : [NSString stringWithFormat:@"%lu", (unsigned long)self.socketIO.roomId], @"nick" : nickName, @"userId" : self.socketIO.userId};
+    NSDictionary *baseJSON = @{@"EVENT" : event, @"roomId" : [NSString stringWithFormat:@"%lu", (unsigned long)self.socketIO.roomId], @"nick" : [NSString stringWithFormat:@"%@",self.socketIO.user.nickName], @"userId" : [NSString stringWithFormat:@"%@",self.socketIO.userId]};
     NSMutableDictionary *json = [[NSMutableDictionary alloc] init];
     [json addEntriesFromDictionary:baseJSON];
     [json addEntriesFromDictionary:dict];

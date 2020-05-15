@@ -7,6 +7,8 @@
 //
 
 #import "PLVBaseMediaViewController.h"
+
+#import "PCCUtils.h"
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import <PolyvCloudClassSDK/PLVVideoMarquee.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
@@ -50,14 +52,7 @@
     }
 
     CGRect mainRect = self.originFrame;
-    
-    CGFloat statusBarY = [UIApplication sharedApplication].statusBarFrame.size.height;
-    if (@available(iOS 11.0, *)) {
-        CGFloat topY = (([[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom > 0.0) ? statusBarY : 20);
-        mainRect.origin.y = topY;
-    } else {
-        mainRect.origin.y = 20;
-    }
+    mainRect.origin.y = [PCCUtils getStatusBarHeight];
     mainRect.size.height -= mainRect.origin.y;
     self.mainView = [[UIView alloc] initWithFrame:mainRect];
     self.mainView.backgroundColor = BlueBackgroundColor;

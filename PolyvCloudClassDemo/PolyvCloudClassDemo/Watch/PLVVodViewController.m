@@ -59,7 +59,7 @@
     self.mediaVC.channelId = liveConfig.channelId;
     self.mediaVC.userId = liveConfig.userId;
     
-    self.mediaViewControllerHeight = self.view.bounds.size.width * (self.vodType == PLVVodViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale) + [UIApplication sharedApplication].statusBarFrame.size.height;
+    self.mediaViewControllerHeight = self.view.bounds.size.width * (self.vodType == PLVVodViewControllerTypeCloudClass ? PPTPlayerViewScale : NormalPlayerViewScale) + [PCCUtils getStatusBarHeight];
     self.mediaVC.originFrame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.mediaViewControllerHeight);
     self.mediaVC.view.frame = self.mediaVC.originFrame;
     [self.view addSubview:self.mediaVC.view];

@@ -48,6 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 强制把设备UIDevice的方向设置为竖屏（在弹出，弹入相册，照相机，或退出直播时需要手动调用）
 + (void)deviceOnInterfaceOrientationMaskPortrait;
 
+#pragma mark - Layout
+/// 获取当前设备的状态栏高度
++ (CGFloat)getStatusBarHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END
