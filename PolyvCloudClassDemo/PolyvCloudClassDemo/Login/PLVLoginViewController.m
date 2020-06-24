@@ -201,15 +201,15 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
         [PLVLiveVideoAPI verifyPermissionWithChannelId:self.channelIdTF.text.integerValue vid:@"" appId:self.appIDTF.text userId:self.userIDTF.text appSecret:self.appSecretTF.text completion:^(NSDictionary * _Nonnull data) {
             /// 设置聊天室相关的私有服务器的域名
             [PLVLiveVideoConfig setPrivateDomainWithData:data];
-
-            [PLVLiveVideoAPI liveStatus:weakSelf.channelIdTF.text completion:^(BOOL liveing, NSString *liveType) {
+            
+            [PLVLiveVideoAPI liveStatus2:weakSelf.channelIdTF.text completion:^(NSString *liveType, PLVLiveStreamState liveState) {
                 [PLVLiveVideoAPI getChannelMenuInfos:weakSelf.channelIdTF.text.integerValue completion:^(PLVLiveVideoChannelMenuInfo *channelMenuInfo) {
                     [hud hideAnimated:YES];
-                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveing:liveing lievType:liveType channelMenuInfo:channelMenuInfo];
+                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveState:liveState lievType:liveType channelMenuInfo:channelMenuInfo];
                 } failure:^(NSError *error) {
                     NSLog(@"频道菜单获取失败！%@",error);
                     [hud hideAnimated:YES];
-                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveing:liveing lievType:liveType channelMenuInfo:nil];
+                    [weakSelf presentToLiveViewControllerFromViewController:weakSelf liveState:liveState lievType:liveType channelMenuInfo:nil];
                 }];
             } failure:^(NSError *error) {
                 [hud hideAnimated:YES];
@@ -253,7 +253,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
 }
 
 #pragma mark - present ViewController
-- (void)presentToLiveViewControllerFromViewController:(UIViewController *)vc liveing:(BOOL)liveing lievType:(NSString *)liveType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
+- (void)presentToLiveViewControllerFromViewController:(UIViewController *)vc liveState:(PLVLiveStreamState)liveState lievType:(NSString *)liveType channelMenuInfo:(PLVLiveVideoChannelMenuInfo *)channelMenuInfo {
     if (self.viewerSwitch.isOn) {
         if (!channelMenuInfo) {
             [PCCUtils showHUDWithTitle:@"频道菜单获取失败，请稍后再试" detail:nil view:self.view];
@@ -273,7 +273,7 @@ static NSString * const NSUserDefaultKey_LiveLoginInfo = @"liveLoginInfo";
     
     PLVLiveViewController *liveVC = [PLVLiveViewController new];
     liveVC.liveType = [@"ppt" isEqualToString:liveType] ? PLVLiveViewControllerTypeCloudClass : PLVLiveViewControllerTypeLive;
-    liveVC.playAD = !liveing;
+    liveVC.liveState = liveState;
     liveVC.viewer = self.viewerSwitch.isOn;
     liveVC.channelMenuInfo = channelMenuInfo;
     
