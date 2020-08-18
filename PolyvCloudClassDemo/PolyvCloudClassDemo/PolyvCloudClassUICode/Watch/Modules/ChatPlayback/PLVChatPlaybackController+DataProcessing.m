@@ -210,18 +210,21 @@
     if (!jsonDict || jsonDict.allKeys.count == 0) {
         return nil;
     }
-    NSString *type = [NSString stringWithFormat:@"%@",jsonDict[@"msgType"]];
+    NSString *type = [NSString stringWithFormat:@"%@", jsonDict[@"msgType"]];
     if (type) {
         PLVChatPlaybackModel *model = [[PLVChatPlaybackModel alloc] init];
         model.msgId = [jsonDict[@"id"] unsignedIntegerValue];
         model.time = [NSString stringWithFormat:@"%@", jsonDict[@"time"]];
+        //该消息的发送者
         model.user = [[PLVChatUser alloc] initWithUserInfo:jsonDict[@"user"]];
+        //当前登录的用户id
+        NSString *currentUserId = self.userInfo[@"userId"];
         if ([type isEqualToString:@"speak"]) {
-            model.type = PLVChatModelTypeOtherSpeak;
+            model.type = [model.user.userId isEqualToString:currentUserId] ? PLVChatModelTypeMySpeak : PLVChatModelTypeOtherSpeak;
             model.speakContent = jsonDict[@"msg"];
         } else if ([type isEqualToString:@"chatImg"]) {
-            model.type = PLVChatModelTypeOtherImage;
-            NSDictionary *content = jsonDict[@"content"];
+            model.type = [model.user.userId isEqualToString:currentUserId] ? PLVChatModelTypeMyImage : PLVChatModelTypeOtherImage;
+                NSDictionary * content = jsonDict[@"content"];
             if (content && [content isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *size = content[@"size"];
                 model.imageContent = [[PLVChatImageContent alloc] initWithImage:content[@"uploadImgUrl"] imgId:content[@"id"] size:CGSizeMake([size[@"width"] floatValue], [size[@"height"] floatValue])];

@@ -27,6 +27,22 @@ NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification = @"PLVPhotoBrow
 
 @implementation PLVPhotoBrowser
 
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
+    }
+    return self;
+}
+
+#pragma mark - Public
+
 - (void)scaleImageViewToFullScreen:(UIImageView *)imageView {
     self.image = imageView.image;
     if (!self.image) {
@@ -77,6 +93,14 @@ NSString *const PLVPhotoBrowserDidShowImageOnScreenNotification = @"PLVPhotoBrow
     [self.backgroundView addGestureRecognizer:pinchGesture];
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGseture:)];
     [self.backgroundView addGestureRecognizer:panGesture];
+}
+
+#pragma mark - Notification
+
+- (void)deviceOrientationDidChange {
+    if (self.backgroundView && self.backgroundView.superview) {
+        [self tapGesture:nil];
+    }
 }
 
 #pragma mark - Privates

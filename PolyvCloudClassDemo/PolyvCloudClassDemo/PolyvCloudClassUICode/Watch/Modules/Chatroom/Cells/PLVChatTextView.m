@@ -38,24 +38,41 @@ static NSString *kFilterRegularExpression = @"((http[s]{0,1}://)?[a-zA-Z0-9\\.\\
 @property (nonatomic, assign) BOOL showingMenu;
 @property (nonatomic, assign) NSRange lastSelectedRange;
 
+@property (nonatomic, assign) BOOL reply;
+
 @end
 
 @implementation PLVChatTextView
 
 #pragma mark - Life Cycle
 
+- (instancetype)initWithReply:(BOOL)reply {
+    return [self initWithMine:NO reply:YES];
+}
+
 - (instancetype)initWithMine:(BOOL)mine {
+   return [self initWithMine:mine reply:NO];
+}
+
+- (instancetype)initWithMine:(BOOL)mine reply:(BOOL)reply {
     self = [super init];
     if (self) {
         _mine = mine;
+        _reply = reply;
         
-        self.backgroundColor = [PCCUtils colorFromHexString:(mine ? kMyChatBackgroundColor : kOtherChatBackgroundColor)];
         self.editable = NO;
         self.scrollEnabled = NO;
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.textContainer.lineFragmentPadding = 0;
-        self.textContainerInset = UIEdgeInsetsMake(10, 10, 10, 10);
+        
+        if (reply) {
+            self.backgroundColor = [UIColor clearColor];
+            self.textContainerInset = UIEdgeInsetsMake(8, 8, 8, 8);
+        } else {
+            self.backgroundColor = [PCCUtils colorFromHexString:(mine ? kMyChatBackgroundColor : kOtherChatBackgroundColor)];
+            self.textContainerInset = UIEdgeInsetsMake(10, 10, 10, 10);
+        }
         
         self.normalAttributes = @{NSForegroundColorAttributeName:[PCCUtils colorFromHexString:kChatNormalTextColor],
                                            NSFontAttributeName:[UIFont systemFontOfSize:kChatTextViewFontSize]};
@@ -68,7 +85,7 @@ static NSString *kFilterRegularExpression = @"((http[s]{0,1}://)?[a-zA-Z0-9\\.\\
 }
 
 - (instancetype)init {
-    return [self initWithMine:NO];
+    return [self initWithMine:NO reply:NO];
 }
 
 #pragma mark - NSNotification
@@ -154,8 +171,9 @@ static NSString *kFilterRegularExpression = @"((http[s]{0,1}://)?[a-zA-Z0-9\\.\\
     CGSize newSize = [self sizeThatFits:CGSizeMake((self.mine ? kMyChatTextViewWidth : kOtherChatTextViewWidth), MAXFLOAT)];
     self.frame = CGRectMake(originRect.origin.x, originRect.origin.y, newSize.width, newSize.height);
     
-    // 绘制气泡圆角
-    [self drawCornerRadiusWithSize:newSize];
+    if (!self.reply) {// 绘制气泡圆角
+        [self drawCornerRadiusWithSize:newSize];
+    }
     
     return newSize;
 }

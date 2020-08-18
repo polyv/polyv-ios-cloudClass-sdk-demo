@@ -14,9 +14,6 @@
 /// 聊天室管理类
 @interface PLVChatroomManager : NSObject
 
-/// 登录对象，用于聊天室登录，由用户初始化
-@property (nonatomic, strong) PLVSocketObject *loginUser __deprecated;
-
 /// 登录聊天室用户对象
 @property (nonatomic, strong) PLVSocketObject *socketUser;
 

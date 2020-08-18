@@ -11,6 +11,8 @@
 #import "PLVEmojiManager.h"
 #import "PCCUtils.h"
 #import "PLVChatTextView.h"
+#import "PLVChatroomReplyBubble.h"
+#import "PLVChatroomModel.h"
 
 #define DEFAULT_CELL_HEIGHT 44.0
 
@@ -244,6 +246,185 @@ UITextViewDelegate
     NSMutableAttributedString *attributedStr = [PLVChatTextView attributedStringWithContent:content];
     // +53 = 10+18+5(顶部间隔)+10(PLVCRLabel上内边距)+10(PLVCRLabel上内边距)
     return [self autoCalculateSize:CGSizeMake(260, MAXFLOAT) attributedContent:attributedStr].height + 53.0;
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+    if (URL) {
+        if (@available(iOS 10.0, *)) {
+            if (self.urlDelegate) {
+                [self.urlDelegate interactWithURL:URL];
+            }
+            return !self.urlDelegate;
+        } else {
+            if (self.urlDelegate) {
+                [self.urlDelegate interactWithURL:URL];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] openURL:URL];
+                });
+            }
+            return NO; // iOS 10 以下不响应长按时间
+        }
+    } else {
+        return NO;
+    }
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
+    if (@available(iOS 10.0, *)) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+@end
+
+
+@interface PLVChatroomContentReplyCell ()<
+UITextViewDelegate
+>
+
+@property (nonatomic, strong) UIImageView *avatarView;
+@property (nonatomic, strong) UILabel *actorLB;
+@property (nonatomic, strong) UILabel *nickNameLB;
+@property (nonatomic, strong) PLVChatTextView *messageTextView;
+@property (nonatomic, strong) PLVChatroomReplyBubble *bubbleView;
+
+@end
+
+@implementation PLVChatroomContentReplyCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.avatarView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 35, 35)];
+        self.avatarView.layer.cornerRadius = 35.0/2;
+        self.avatarView.layer.masksToBounds = YES;
+        [self addSubview:self.avatarView];
+        
+        self.actorLB = [[UILabel alloc] init];
+        self.actorLB.layer.cornerRadius = 9.0;
+        self.actorLB.layer.masksToBounds = YES;
+        self.actorLB.textColor = [UIColor whiteColor];
+        if (@available(iOS 8.2, *)) {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0 weight:UIFontWeightMedium];
+        } else {
+            self.actorLB.font = [UIFont systemFontOfSize:10.0];
+        }
+        self.actorLB.backgroundColor = UIColorFromRGB(0x2196F3);
+        self.actorLB.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:self.actorLB];
+        
+        self.nickNameLB = [[UILabel alloc] init];
+        self.nickNameLB.backgroundColor = [UIColor clearColor];
+        self.nickNameLB.textColor = [UIColor colorWithWhite:135/255.0 alpha:1.0];
+        self.nickNameLB.font = [UIFont systemFontOfSize:11.0];
+        [self addSubview:self.nickNameLB];
+        
+        self.bubbleView = [[PLVChatroomReplyBubble alloc] init];
+        [self addSubview:self.bubbleView];
+        
+        self.messageTextView = [[PLVChatTextView alloc] initWithReply:YES];
+        self.messageTextView.delegate = self;
+        [self addSubview:self.messageTextView];
+        
+        [self.actorLB mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.avatarView.mas_top);
+            make.height.mas_equalTo(@(18));
+            make.leading.equalTo(self.avatarView.mas_trailing).offset(10);
+        }];
+        [self.nickNameLB mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.avatarView.mas_top);
+            make.height.mas_equalTo(@(18));
+            make.leading.equalTo(self.actorLB.mas_trailing).offset(5);
+        }];
+    }
+    return self;
+}
+
+- (void)setAvatar:(NSString *)avatar {
+    _avatar = avatar;
+    [_avatarView sd_setImageWithURL:[NSURL URLWithString:avatar] placeholderImage:[PCCUtils getChatroomImage:@"plv_img_default_avatar"]];
+}
+
+- (void)setActor:(NSString *)actor {
+    _actor = actor;
+    if (actor) {
+        _actorLB.text = actor;
+        CGSize size = [_actorLB sizeThatFits:CGSizeMake(MAXFLOAT, 18)];
+        [_actorLB mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.size.mas_equalTo(CGSizeMake(size.width+20, 18));
+            make.top.equalTo(self.avatarView.mas_top);
+            make.leading.equalTo(self.avatarView.mas_trailing).offset(10);
+        }];
+    }else {
+        [_actorLB mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.size.mas_equalTo(CGSizeZero);
+            make.top.equalTo(self.avatarView.mas_top);
+            make.leading.equalTo(self.avatarView.mas_trailing).offset(5);
+        }];
+    }
+}
+
+- (void)setNickName:(NSString *)nickName {
+    _nickName = nickName;
+    _nickNameLB.text = nickName;
+}
+
+- (void)setModel:(PLVChatroomModel *)model {
+    NSError * error;
+    NSAttributedString * speakContentTransferred = [[NSAttributedString alloc] initWithData:[model.speakContent dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:@(NSUTF8StringEncoding)} documentAttributes:nil error:&error];
+    if (error) {
+        NSLog(@"PLVChatroomCell - speak content transferred failed %@",error);
+        _speakContent = model.speakContent;
+    }else{
+        _speakContent = speakContentTransferred.string;
+    }
+    
+    CGSize newSize = [self.messageTextView setMessageContent:_speakContent admin:YES];
+    [self.messageTextView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(newSize);
+        make.bottom.mas_equalTo(0);
+        make.leading.equalTo(self.avatarView.mas_trailing).offset(10);
+    }];
+    
+    CGSize bubbleSize = [self bubbleSizeWithModel:model];
+    [self.bubbleView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(bubbleSize);
+        make.top.equalTo(self.nickNameLB.mas_bottom).offset(5);
+        make.leading.equalTo(self.avatarView.mas_trailing).offset(10);
+    }];
+    
+    [self.bubbleView setModel:model size:bubbleSize];
+    self.height = [self calculateCellHeightWithModel:model]; //10+18+5
+}
+
+- (void)setActorTextColor:(UIColor *)actorTextColor {
+    _actorTextColor = actorTextColor;
+    if (actorTextColor) {
+        _actorLB.textColor = actorTextColor;
+    }
+}
+
+- (void)setActorBackgroundColor:(UIColor *)actorBackgroundColor {
+    _actorBackgroundColor = actorBackgroundColor;
+    if (actorBackgroundColor) {
+        _actorLB.backgroundColor = actorBackgroundColor;
+    }
+}
+
+- (CGFloat)calculateCellHeightWithModel:(PLVChatroomModel *)model {
+    CGSize bubbleSize = [self bubbleSizeWithModel:model];
+    // 10+18+5(顶部间隔)
+    return bubbleSize.height + 33.0;
+}
+
+- (CGSize)bubbleSizeWithModel:(PLVChatroomModel *)model {
+    NSAttributedString *attributedStr = [PLVChatTextView attributedStringWithContent:model.speakContent];
+    CGRect rect = [attributedStr boundingRectWithSize:CGSizeMake(260, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil];
+    CGSize bubbleSize = [self.bubbleView bubbleSizeWithModel:model speakContentSize:rect.size];
+    return bubbleSize;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {

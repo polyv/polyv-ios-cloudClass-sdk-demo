@@ -26,6 +26,10 @@
 #import "PLVGiveRewardView.h"
 #import "PLVRewardDisplayManager.h"
 
+NSString *PLVChatroomSendTextMsgNotification = @"PLVChatroomSendTextMsgNotification";
+NSString *PLVChatroomSendImageMsgNotification = @"PLVChatroomSendImageMsgNotification";
+NSString *PLVChatroomSendCustomMsgNotification = @"PLVChatroomSendCustomMsgNotification";
+
 typedef NS_ENUM(NSInteger, PLVMarqueeViewType) {
     PLVMarqueeViewTypeMarquee     = 1,// 跑马灯公告
     PLVMarqueeViewTypeWelcome     = 2 // 欢迎语
@@ -152,6 +156,21 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(photoBrowserDidShowImageOnScreen) name:PLVPhotoBrowserDidShowImageOnScreenNotification object:nil];
+    
+    if (self.type < PLVTextInputViewTypePrivate) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sendTextMsgSuccess:)
+                                                     name:PLVChatroomSendTextMsgNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sendImageMsgSuccess:)
+                                                     name:PLVChatroomSendImageMsgNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sendCustomMessageSuccess:)
+                                                     name:PLVChatroomSendCustomMsgNotification
+                                                   object:nil];
+    }
     
     [self requestPointSetting];
 }
@@ -385,7 +404,12 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
         } break;
         default: {
             PLVChatroomModel *model = [PLVChatroomModel modelWithObject:object];
-            [self addModel:model];
+            //严禁词
+            if (model.type == PLVChatroomModelTypeProhibitedWord) {
+                [PCCUtils showChatroomMessage:[NSString stringWithFormat:@"%@", model.content] addedToView:self.view];
+            } else {
+                [self addModel:model];
+            }
         } break;
     }
     if (object.eventType==PLVSocketChatRoomEventType_LOGIN || object.eventType==PLVSocketChatRoomEventType_LOGOUT) {
@@ -396,10 +420,13 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }
 }
 
-- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine {
+- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine msgId:(NSString *)msgId {
     PLVChatroomCustomModel *customModel = [PLVChatroomManager modelWithCustomMessage:customeMessage mine:mine];
     if (customModel) {
         if (customModel.defined) {
+            if (PLV_SafeStringForValue(msgId)) {
+                customModel.msgId = msgId;
+            }
             [self addModel:customModel];
         } else {
             [PCCUtils showChatroomMessage:customModel.tip addedToView:self.view];
@@ -648,9 +675,50 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     }];
 }
 
-#pragma mark Notifications
+#pragma mark - Notifications
 - (void)photoBrowserDidShowImageOnScreen {
     [self tapChatInputView];
+}
+
+- (void)sendTextMsgSuccess:(NSNotification *)notif {
+    PLVChatroomModel *model = (PLVChatroomModel *)notif.object;
+    if (model) {
+        [self addModel:model];
+    }
+}
+
+- (void)sendImageMsgSuccess:(NSNotification *)notif {
+    NSDictionary *dict = (NSDictionary *)notif.userInfo;
+    if (!dict ||
+        !dict[@"imageId"] || ![dict[@"imageId"] isKindOfClass:[NSString class]] ||
+        !dict[@"msgId"] || ![dict[@"msgId"] isKindOfClass:[NSString class]]) {
+        return;
+    }
+    NSString *imageId = dict[@"imageId"];
+    NSString *msgId = dict[@"msgId"];
+    if (imageId.length == 0 || msgId.length == 0) {
+        return;
+    }
+    for (int i = 0; i < [self.chatroomData count]; i++) {
+        PLVChatroomModel *model = self.chatroomData[i];
+        if ([model.imgId isEqualToString:imageId]) {
+            model.msgId = msgId;
+        }
+    }
+    for (int i = 0; i < [self.teacherData count]; i++) {
+        PLVChatroomModel *model = self.teacherData[i];
+        if ([model.imgId isEqualToString:imageId]) {
+            model.msgId = msgId;
+        }
+    }
+}
+
+- (void)sendCustomMessageSuccess:(NSNotification *)notif {
+    NSDictionary *dict = (NSDictionary *)notif.userInfo;
+    NSString *object = (NSString *)notif.object;
+    
+    // 生成本地自定义消息数据
+    [self addCustomMessage:dict mine:YES msgId:object];
 }
 
 #pragma mark - Interaction
@@ -892,9 +960,7 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
     PLVChatroomModel *model;
     if (self.type < PLVTextInputViewTypePrivate) {
         PLVSocketChatRoomObject *mySpeak = [PLVSocketChatRoomObject chatroomForSpeakWithContent:text sessionId:[self currentChannelSessionId] loginUser:[PLVChatroomManager sharedManager].socketUser];
-        BOOL success = [self emitChatroomMessageWithObject:mySpeak];
-        if (success)
-            model = [PLVChatroomModel modelWithObject:mySpeak];
+        [self emitChatroomMessageWithObject:mySpeak];
     } else {
         PLVSocketChatRoomObject *question = [PLVSocketChatRoomObject chatRoomObjectForStudentQuestionEventTypeWithLoginObject:socketUser content:text];
         BOOL success = [self emitChatroomMessageWithObject:question];
@@ -969,10 +1035,6 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 
 #pragma mark Emit Custom Message
 - (void)emitCustomEvent:(NSString *)event emitMode:(int)emitMode data:(NSDictionary *)data tip:(NSString *)tip {
-    // 生成本地自定义消息数据
-    NSDictionary * customMessage = @{@"EVENT":event, @"version":@(1), @"data":data};
-    [self addCustomMessage:customMessage mine:YES];
-    
     if (self.delegate && [self.delegate respondsToSelector:@selector(chatroom:emitCustomEvent:emitMode:data:tip:)]) {
         [self.delegate chatroom:self emitCustomEvent:event emitMode:emitMode data:data tip:tip];
     }

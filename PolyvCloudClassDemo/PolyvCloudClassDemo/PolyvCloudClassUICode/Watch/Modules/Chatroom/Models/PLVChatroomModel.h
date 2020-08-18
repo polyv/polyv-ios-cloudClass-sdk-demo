@@ -36,6 +36,10 @@ typedef NS_ENUM(NSInteger, PLVChatroomModelType) {
     PLVChatroomModelTypeTime           = 10,
     /// 自定义类型
     PLVChatroomModelTypeCustom         = 11,
+    /// 严禁词消息类型
+    PLVChatroomModelTypeProhibitedWord = 12,
+    /// 文本回复他人
+    PLVChatroomModelTypeContentReply          = 13,
 };
 
 /// 用户类型
@@ -69,7 +73,7 @@ typedef NS_ENUM(NSInteger, PLVChatroomUserType) {
 @property (nonatomic, assign) BOOL localMessageModel;
 
 /// 消息唯一 id，maybe nil.
-@property (nonatomic, strong, readonly) NSString *msgId;
+@property (nonatomic, strong) NSString *msgId;
 
 /// 以下为包含用户信息的属性
 /// 用户类型
@@ -94,6 +98,21 @@ typedef NS_ENUM(NSInteger, PLVChatroomUserType) {
 @property (nonatomic, assign) BOOL uploadFail;
 /// 上传图片鉴黄失败的标志位
 @property (nonatomic, assign) BOOL checkFail;
+/// 提示信息
+@property (nonatomic, strong) NSString *content;
+
+
+/// 被回复的用户昵称
+@property (nonatomic, strong, readonly) NSString *quoteUserNickName;
+/// 被回复的文本消息
+@property (nonatomic, strong, readonly) NSString *quoteSpeakContent;
+/// 被回复的图片 url
+@property (nonatomic, strong, readonly) NSString *quoteImageUrl;
+/// 被回复的图片宽
+@property (nonatomic, assign, readonly) CGFloat quoteImageWidth;
+/// 被回复的图片高
+@property (nonatomic, assign, readonly) CGFloat quoteImageHeight;
+
 
 /*
  初始化

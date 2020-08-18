@@ -51,6 +51,7 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 @property (nonatomic, strong) MPVolumeView *volumeView;
 @property (nonatomic, assign) BOOL timelabelSizeToFited;
 
+@property (nonatomic, assign) float sliderLong;
 @end
 
 @implementation PLVPlayerSkinView
@@ -179,11 +180,11 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     
 //    self.zoomScreenBtn = [self addButton:@"plv_skin_fullscreen" selectedImgName:nil title:nil fontSize:17.0 action:@selector(zoomScreenBtnAction:) inView:self.superview];
     self.zoomScreenBtn = [self addButton:nil selectedImgName:nil title:nil fontSize:17.0 action:@selector(zoomScreenBtnAction:) inView:self.superview];
-    UIView *backView1 = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 44.0, 44.0)];
+    UIView *backView1 = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 32.0, 32.0)];
     backView1.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
     backView1.userInteractionEnabled = NO;
     UIImageView *maskView1 = [[UIImageView alloc] initWithImage:[PCCUtils getPlayerSkinImage:@"plv_skin_fullscreen"]];
-    maskView1.frame = CGRectMake(0.0, 0.0, 44.0, 44.0);
+    maskView1.frame = CGRectMake(0.0, 0.0, 32.0, 32.0);
     backView1.maskView = maskView1;
     [self.zoomScreenBtn addSubview:backView1];
     
@@ -197,20 +198,24 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
         self.showInputBtn.hidden = YES;
         self.showInputBtn.userInteractionEnabled = NO;
     } else {
-        self.currentPlayTimeLabel = [self addLabel:@"00:00" textAlignment:NSTextAlignmentRight];
-        self.blankLabel = [self addLabel:@"/" textAlignment:NSTextAlignmentCenter];
-        self.durationLabel = [self addLabel:@"00:00" textAlignment:NSTextAlignmentLeft];
+        self.currentPlayTimeLabel = [self addLabel:@"00:00" fontSize:11.0 textAlignment:NSTextAlignmentRight inView:self.controllView];
+        self.blankLabel = [self addLabel:@"/" fontSize:11.0 textAlignment:NSTextAlignmentCenter inView:self.controllView];
+        self.durationLabel = [self addLabel:@"00:00" fontSize:11.0 textAlignment:NSTextAlignmentLeft inView:self.controllView];
         
         self.sliderBackgroundView = [[UIView alloc] init];
-        self.sliderBackgroundView.backgroundColor = [UIColor blackColor];
+        self.sliderBackgroundView.backgroundColor = [UIColor colorWithWhite:1 alpha:0.3];
+        self.sliderBackgroundView.layer.masksToBounds = YES;
+        self.sliderBackgroundView.layer.cornerRadius = 2;
         [self.controllView addSubview:self.sliderBackgroundView];
         
         self.progressBar = [[UIView alloc] init];
-        self.progressBar.backgroundColor = [UIColor colorWithRed:163.0 / 255.0 green:220.0 / 255.0 blue:1.0 alpha:1.0];
+        self.progressBar.backgroundColor = [UIColor colorWithWhite:1 alpha:0.6];
+        self.progressBar.layer.masksToBounds = YES;
+        self.progressBar.layer.cornerRadius = 2;
         [self.controllView addSubview:self.progressBar];
         
         self.slider = [[UISlider alloc] init];
-        self.slider.minimumTrackTintColor = [UIColor colorWithRed:43.0 / 255.0 green:159.0 / 255.0 blue:252.0 / 255.0 alpha:1.0];
+        self.slider.minimumTrackTintColor = [UIColor colorWithRed:48.0 / 255.0 green:130.0 / 255.0 blue:254.0 / 255.0 alpha:1.0];
         self.slider.maximumTrackTintColor = [UIColor clearColor];
         [self.slider setThumbImage:[PCCUtils getPlayerSkinImage:@"plv_skin_playSlider"] forState:UIControlStateNormal];
         [self.slider addTarget:self action:@selector(sliderTouchDownAction:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDownRepeat | UIControlEventTouchDragInside | UIControlEventTouchDragOutside | UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
@@ -244,52 +249,46 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
     UIEdgeInsets backMargin = UIEdgeInsetsMake(0.0, lrPadding, -1.0, -1.0);
     UIEdgeInsets moreMargin = UIEdgeInsetsMake(0.0, -1.0, -1.0, lrPadding);
-    UIEdgeInsets mainMargin = UIEdgeInsetsMake(-1.0, lrPadding, 0.0, -1.0);
-    UIEdgeInsets refreshMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 1, 0.0, -1.0); // 从左开始数第二
+    UIEdgeInsets mainMargin = UIEdgeInsetsMake(-1.0, 4, 4, -1.0);
+    UIEdgeInsets refreshMargin = UIEdgeInsetsMake(-1.0, 4 + 40 * 1, lrPadding, -1.0); // 从左开始数第二
 
-    UIEdgeInsets danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2); // 从右开始倒数第三
-    UIEdgeInsets closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1); // 从右开始倒数第二
-    UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding);
+    UIEdgeInsets danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 2); // 从右开始倒数第三
+    UIEdgeInsets closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 1); // 从右开始倒数第二
+    UIEdgeInsets zoomScreenMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding);
     self.zoomScreenBtn.hidden = NO;
     
-    UIEdgeInsets showDanmuMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 2 + 35.0, 6.0, lrPadding + btnPadding * 2 + 35.0);
+    UIEdgeInsets showDanmuMargin = UIEdgeInsetsMake(-1.0, lrPadding + btnPadding * 2 + 35.0, lrPadding, lrPadding + btnPadding * 2 + 35.0);
     
     if (self.type == PLVPlayerSkinViewTypeNormalLive || self.type == PLVPlayerSkinViewTypeCloudClassLive) {
         if (self.fullscreen) {
             backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
             moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding);
             if (self.type == PLVPlayerSkinViewTypeNormalLive) {
-                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding);
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding);
             } else {
-                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 1);
             }
         } else {
-            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 1);
             if (self.type == PLVPlayerSkinViewTypeNormalLive) {
-                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding);
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32);
             } else {
-                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 2);
+                danmuMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 2);
             }
         }
     } else {
-        UIEdgeInsets sliderBackgroundMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, 0.0);
-        UIEdgeInsets progressMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, -1.0);
-        UIEdgeInsets sliderMargin = UIEdgeInsetsMake(-1.0, 0.0, 31.0, 0.0);
         
         if (self.fullscreen) {
             backMargin = UIEdgeInsetsMake(10.0, 10.0, -1.0, -1.0);
             moreMargin = UIEdgeInsetsMake(10.0, -1.0, -1.0, lrPadding);
             self.zoomScreenBtn.hidden = YES;
-            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 0);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 0);
         } else {
-            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, 0.0, lrPadding + btnPadding * 1);
+            closeSecondaryMargin = UIEdgeInsetsMake(-1.0, -1.0, lrPadding, lrPadding + 32 * 1);
         }
         
-        [self remakeConstraints:self.sliderBackgroundView margin:sliderBackgroundMargin size:CGSizeMake(-1.0, 2.0) baseView:self.controllView];
-        [self remakeConstraints:self.progressBar margin:progressMargin size:CGSizeMake(0.0, 2.0) baseView:self.controllView];
-        [self remakeConstraints:self.slider margin:sliderMargin size:CGSizeMake(-1.0, 30.0) baseView:self.controllView];
         [self timelabelSizeToFit];
     }
     
@@ -297,11 +296,11 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     [self remakeConstraints:self.bottomBgImgV margin:bottomBgImgVMargin size:CGSizeMake(-1.0, self.fullscreen ? 84.0 : 64.0) baseView:self.controllView];
     [self remakeConstraints:self.backBtn margin:backMargin size:CGSizeMake(44.0, 44.0) baseView:self];
     [self remakeConstraints:self.moreBtn margin:moreMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.mainBtn margin:mainMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.refreshBtn margin:refreshMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.danmuBtn margin:danmuMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.closeSecondaryBtn margin:closeSecondaryMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
-    [self remakeConstraints:self.zoomScreenBtn margin:zoomScreenMargin size:CGSizeMake(44.0, 44.0) baseView:self.controllView];
+    [self remakeConstraints:self.mainBtn margin:mainMargin size:CGSizeMake(40.0, 40.0) baseView:self.controllView];
+    [self remakeConstraints:self.refreshBtn margin:refreshMargin size:CGSizeMake(32.0, 32.0) baseView:self.controllView];
+    [self remakeConstraints:self.danmuBtn margin:danmuMargin size:CGSizeMake(32.0, 32.0) baseView:self.controllView];
+    [self remakeConstraints:self.closeSecondaryBtn margin:closeSecondaryMargin size:CGSizeMake(32.0, 32.0) baseView:self.controllView];
+    [self remakeConstraints:self.zoomScreenBtn margin:zoomScreenMargin size:CGSizeMake(32.0, 32.0) baseView:self.controllView];
     [self remakeConstraints:self.showInputBtn margin:showDanmuMargin size:CGSizeMake(-1.0, 32.0) baseView:self.controllView];
     
     if (self.popView != nil && !self.popView.hidden) {
@@ -356,12 +355,10 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
 
 #pragma mark - 点播独有方法
 - (void)updateDowloadProgress:(CGFloat)dowloadProgress playedProgress:(CGFloat)playedProgress currentPlaybackTime:(NSString *)currentPlaybackTime duration:(NSString *)duration {
-    UIEdgeInsets progressMargin = UIEdgeInsetsMake(-1.0, 0.0, 44.0, -1.0);
-    CGFloat w = self.bounds.size.width * dowloadProgress;
-    if (@available(iOS 11.0, *)) {
-        w = self.safeAreaLayoutGuide.layoutFrame.size.width * dowloadProgress;
-    }
-    [self remakeConstraints:self.progressBar margin:progressMargin size:CGSizeMake(w, 2.0) baseView:self];
+    CGFloat w = self.sliderLong * dowloadProgress;
+    [self.progressBar mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(w, 2));
+    }];
     if (!self.sliderDragging) {
         self.slider.value = playedProgress;
         self.currentPlayTimeLabel.text = currentPlaybackTime;
@@ -630,13 +627,34 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
             size = [self.currentPlayTimeLabel.text sizeWithAttributes:@{NSFontAttributeName : self.currentPlayTimeLabel.font}];
         }
         
-        CGFloat w = (int)size.width + 8.0;
-        UIEdgeInsets currentPlayTimeMargin = UIEdgeInsetsMake(-1.0, 44.0, 0.0, -1.0);
-        UIEdgeInsets blankMargin = UIEdgeInsetsMake(-1.0, 44.0 + w, 0.0, -1.0);
-        UIEdgeInsets durationMargin = UIEdgeInsetsMake(-1.0, 54.0 + w, 0.0, -1.0);
-        [self remakeConstraints:self.currentPlayTimeLabel margin:currentPlayTimeMargin size:CGSizeMake(w, 44.0) baseView:self.controllView];
-        [self remakeConstraints:self.blankLabel margin:blankMargin size:CGSizeMake(10.0, 44.0) baseView:self.controllView];
-        [self remakeConstraints:self.durationLabel margin:durationMargin size:CGSizeMake(w, 44.0) baseView:self.controllView];
+        CGFloat w = (int)size.width + 3.0;
+        UIEdgeInsets currentPlayTimeMargin = UIEdgeInsetsMake(-1.0, 44.0, 18, -1.0);
+        UIEdgeInsets blankMargin = UIEdgeInsetsMake(-1.0, 44.0 + w, 18, -1.0);
+        UIEdgeInsets durationMargin = UIEdgeInsetsMake(-1.0, 54.0 + w, 18, -1.0);
+        [self remakeConstraints:self.currentPlayTimeLabel margin:currentPlayTimeMargin size:CGSizeMake(w, 12.0) baseView:self.controllView];
+        [self remakeConstraints:self.blankLabel margin:blankMargin size:CGSizeMake(10.0, 12.0) baseView:self.controllView];
+        [self remakeConstraints:self.durationLabel margin:durationMargin size:CGSizeMake(w, 12.0) baseView:self.controllView];
+        
+        CGFloat leftPad = 44 + w + 10 + w + 3;
+        CGFloat rightPad = 8 + (self.fullscreen ? 0 : 32) + (self.closeSecondaryBtn.hidden ? 0 : 32) + 4;
+        self.sliderLong = self.bounds.size.width - leftPad - rightPad;
+        [self.slider mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(32);
+            make.left.equalTo(self.controllView.mas_left).offset(leftPad);
+            make.right.equalTo(self.controllView.mas_right).offset(-rightPad);
+            make.bottom.mas_equalTo(-8);
+        }];
+        [self.sliderBackgroundView mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.controllView.mas_left).offset(leftPad);
+            make.right.equalTo(self.controllView.mas_right).offset(-rightPad);
+            make.height.mas_equalTo(2);
+            make.bottom.mas_equalTo(-8-14);
+        }];
+        [self.progressBar mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.controllView.mas_left).offset(leftPad);
+            make.size.mas_equalTo(CGSizeMake(0, 2));
+            make.bottom.mas_equalTo(-8-14);
+        }];
     }
 }
 

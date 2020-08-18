@@ -11,6 +11,8 @@
 #import "PLVPhotoBrowser.h"
 #import "PLVChatroomDefine.h"
 
+@class PLVChatroomModel;
+
 /// cell 类型
 typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
     /// 自己发言
@@ -27,6 +29,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
     PLVChatroomCellTypeSystem,
     /// 时间标签
     PLVChatroomCellTypeTime,
+    /// 文本回复
+    PLVChatroomCellTypeContentReply,
 };
 
 /// 聊天室单元格基类
@@ -84,6 +88,28 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 @property (nonatomic, strong) UIColor *actorBackgroundColor;
 
 - (void)setSpeakContent:(NSString *)speakContent admin:(BOOL)admin;
+
+@end
+
+/// 文本回复他人发言的Cell
+@interface PLVChatroomContentReplyCell : PLVChatroomCell
+
+/// 发言者的头像URL
+@property (nonatomic, strong) NSString *avatar;
+/// 发言者的头衔
+@property (nonatomic, strong) NSString *actor;
+/// 发言者的昵称
+@property (nonatomic, strong) NSString *nickName;
+/// 发言者的发言内容
+@property (nonatomic, strong) NSString *speakContent;
+/// 头衔字体颜色
+@property (nonatomic, strong) UIColor *actorTextColor;
+/// 头衔背景颜色
+@property (nonatomic, strong) UIColor *actorBackgroundColor;
+
+- (void)setModel:(PLVChatroomModel *)model;
+
+- (CGFloat)calculateCellHeightWithModel:(PLVChatroomModel *)model;
 
 @end
 

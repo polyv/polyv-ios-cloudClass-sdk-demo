@@ -64,6 +64,7 @@
     }
     
     if (zjzDML != nil) {
+        zjzDML.startTime = [NSDate date];
         [zjzDML makeup:content dmlOriginY:bestChannel * KZJZDMHEIGHT + 5 superFrame:self.currentFrame style:ZJZDMLRoll];
     } else {
         zjzDML = [ZJZDanMuLabel dmInitDML:content dmlOriginY:bestChannel * KZJZDMHEIGHT + 5 superFrame:self.currentFrame style:ZJZDMLRoll];

@@ -11,6 +11,10 @@
 #import <PolyvBusinessSDK/PLVSocketObject.h>
 #import "PLVTextInputView.h"
 
+extern NSString *PLVChatroomSendTextMsgNotification;
+extern NSString *PLVChatroomSendImageMsgNotification;
+extern NSString *PLVChatroomSendCustomMsgNotification;
+
 /// 聊天室错误码
 typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
     /// 无访问权限
@@ -131,8 +135,9 @@ typedef NS_ENUM(NSInteger, PLVChatroomErrorCode) {
 
  @param customeMessage 自定义消息内容
  @param mine 自己消息类型
+ @param msgId 消息id
  */
-- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine;
+- (void)addCustomMessage:(NSDictionary *)customeMessage mine:(BOOL)mine msgId:(NSString *)msgId;
 
 /**
  发送一条自己文字评论

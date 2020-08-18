@@ -14,12 +14,9 @@
 @interface PLVChatroomModel ()
 
 @property (nonatomic, assign) BOOL teacher;
-@property (nonatomic, strong) NSString *msgId;
 @property (nonatomic, assign) CGFloat cellHeight;
 @property (nonatomic, assign) PLVChatroomModelType type;
 @property (nonatomic, assign) PLVChatroomUserType userType;
-
-@property (nonatomic, strong) NSString *content;
 
 @property (nonatomic, strong) NSString *userId;
 
@@ -39,6 +36,13 @@
 
 /// 打赏信息
 @property (nonatomic, assign) NSInteger goodNum;
+
+/// 回复相关字段
+@property (nonatomic, strong) NSString *quoteUserNickName;
+@property (nonatomic, strong) NSString *quoteSpeakContent;
+@property (nonatomic, strong) NSString *quoteImageUrl;
+@property (nonatomic, assign) CGFloat quoteImageWidth;
+@property (nonatomic, assign) CGFloat quoteImageHeight;
 
 @end
 
@@ -62,6 +66,8 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             return @"PLVChatroomModelTypeSystem";
         case PLVChatroomModelTypeTime:
             return @"PLVChatroomModelTypeTime";
+        case PLVChatroomModelTypeContentReply:
+            return @"PLVChatroomModelTypeContentReply";
         default:
             return @"PLVChatroomModelTypeNotDefine";
     }
@@ -84,6 +90,13 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                     speakOtherCell = [PLVChatroomSpeakOtherCell new];
                 }
                 _cellHeight = [speakOtherCell calculateCellHeightWithContent:self.speakContent];
+            } break;
+            case PLVChatroomModelTypeContentReply: {
+                static PLVChatroomContentReplyCell *replyCell = nil;
+                if (replyCell == nil) {
+                    replyCell = [PLVChatroomContentReplyCell new];
+                }
+                _cellHeight = [replyCell calculateCellHeightWithModel:self];
             } break;
             case PLVChatroomModelTypeImageSend: {
                 PLVChatroomImageSendCell *cell = [PLVChatroomImageSendCell new];
@@ -124,20 +137,34 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                     if ([status isEqualToString:@"censor"]) { // 聊天室审核
                     }else if ([status isEqualToString:@"error"]) { // 严禁词
                         //model.type = PLVChatroomModelTypeSystem;
-                        model.type = PLVChatroomModelTypeNotDefine; // 严禁词不提示用户
+                        model.type = PLVChatroomModelTypeProhibitedWord; //严禁词类型
                         model.content = object.jsonDict[@"message"];
                     }
                 }else if (user) { // 用户发言信息
-                    model.type = PLVChatroomModelTypeSpeakOther;
                     model.msgId = object.jsonDict[@"id"];
                     model.speakContent = speakValues.firstObject;
                     [model handleUserInfomationWithUserInfo:user];
                     
-                    // 过滤掉自己的消息（开启聊天室审核后，服务器会广播所有审核后的消息，包含自己发送的消息）
-                    PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
-                    if (socketUser) {
-                        if ([model.userId isEqualToString:socketUser.userId]) {
-                            model.type = PLVChatroomModelTypeSpeakOwnCensor;
+                    if (PLV_SafeDictionaryForDictKey(object.jsonDict, @"quote")) {
+                        model.type = PLVChatroomModelTypeContentReply;
+                        NSDictionary *quote = PLV_SafeDictionaryForDictKey(object.jsonDict, @"quote");
+                        model.quoteUserNickName = quote[@"nick"];
+                        model.quoteSpeakContent = quote[@"content"];
+                        NSDictionary *imageDict = PLV_SafeDictionaryForDictKey(quote, @"image");
+                        if (imageDict) {
+                            model.quoteImageUrl = PLV_SafeStringForDictKey(imageDict, @"url");
+                            model.quoteImageWidth = PLV_SafeFloatForDictKey(imageDict, @"width");
+                            model.quoteImageHeight = PLV_SafeFloatForDictKey(imageDict, @"height");
+                        }
+                    } else {
+                        model.type = PLVChatroomModelTypeSpeakOther;
+                        
+                        // 过滤掉自己的消息（开启聊天室审核后，服务器会广播所有审核后的消息，包含自己发送的消息）
+                        PLVSocketObject *socketUser = [PLVChatroomManager sharedManager].socketUser;
+                        if (socketUser) {
+                            if ([model.userId isEqualToString:socketUser.userId]) {
+                                model.type = PLVChatroomModelTypeSpeakOwnCensor;
+                            }
                         }
                     }
                 }
@@ -302,6 +329,17 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
                 cell = [[PLVChatroomSystemCell alloc] initWithReuseIdentifier:indentifier];
             }
             [(PLVChatroomSystemCell *)cell setContent:self.content];
+        } break;
+        case PLVChatroomModelTypeContentReply: {
+            if (!cell) {
+                cell = [[PLVChatroomContentReplyCell alloc] initWithReuseIdentifier:indentifier];
+            }
+            [(PLVChatroomContentReplyCell *)cell setActor:self.actor];
+            [(PLVChatroomContentReplyCell *)cell setAvatar:self.avatar];
+            [(PLVChatroomContentReplyCell *)cell setNickName:self.nickName];
+            [(PLVChatroomContentReplyCell *)cell setActorTextColor:self.actorTextColor];
+            [(PLVChatroomContentReplyCell *)cell setActorBackgroundColor:self.actorBackgroundColor];
+            [(PLVChatroomContentReplyCell *)cell setModel:self];
         } break;
         default: {
             if (!cell)

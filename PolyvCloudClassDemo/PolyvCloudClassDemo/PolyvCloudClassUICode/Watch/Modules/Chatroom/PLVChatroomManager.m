@@ -21,17 +21,17 @@ static PLVChatroomManager *manager = nil;
     return manager;
 }
 
-- (void)setLoginUser:(PLVSocketObject *)loginUser {
-    _loginUser = loginUser;
-    _defaultNick = loginUser.defaultUser;
+- (void)setSocketUser:(PLVSocketObject *)socketUser{
+    _socketUser = socketUser;
+    _defaultNick = socketUser.defaultUser;
+    
 }
 
 #pragma mark - Public
 
 - (void)renameUserNick:(NSString *)newName {
-    if (self.loginUser) {
+    if (self.socketUser) {
         _defaultNick = NO;
-        [self.loginUser renameNickname:newName];
         [self.socketUser renameNickname:newName];
     }
 }
@@ -67,7 +67,11 @@ static PLVChatroomManager *manager = nil;
             // uid = 1，打赏消息；uid = 2，自定义消息
         }else { // 发言消息
             NSDictionary *speakDict = @{@"EVENT" : @"SPEAK", @"id" : messageDict[@"id"], @"values" : @[messageDict[@"content"]], @"user" : messageDict[@"user"]};
-            PLVSocketChatRoomObject * chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:speakDict];
+            NSMutableDictionary *muDict = [[NSMutableDictionary alloc] initWithDictionary:speakDict];
+            if (PLV_SafeDictionaryForDictKey(messageDict, @"quote")) {
+                muDict[@"quote"] = PLV_SafeDictionaryForDictKey(messageDict, @"quote");
+            }
+            PLVSocketChatRoomObject * chatroomObject = [PLVSocketChatRoomObject socketObjectWithJsonDict:[muDict copy]];
             model = [PLVChatroomModel modelWithObject:chatroomObject];
         }
     }
