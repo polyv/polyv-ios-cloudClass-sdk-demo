@@ -9,6 +9,6 @@ target 'PolyvCloudClassDemo' do
   pod 'SDWebImage', '4.4.0'
   
   # Pods for PolyvCloudClassDemo
-  pod 'PolyvCloudClassSDK', '~> 0.15.3' # polyv 云课堂 SDK
+  pod 'PolyvCloudClassSDK', '~> 0.15.4' # polyv 云课堂 SDK
 
 end
