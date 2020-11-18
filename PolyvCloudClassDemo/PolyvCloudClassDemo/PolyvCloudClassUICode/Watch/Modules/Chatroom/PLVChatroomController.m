@@ -25,6 +25,8 @@
 #import "PLVChatroomDefine.h"
 #import "PLVGiveRewardView.h"
 #import "PLVRewardDisplayManager.h"
+#import "MyTool.h"
+#import <PolyvFoundationSDK/PLVAuthorizationManager.h>
 
 NSString *PLVChatroomSendTextMsgNotification = @"PLVChatroomSendTextMsgNotification";
 NSString *PLVChatroomSendImageMsgNotification = @"PLVChatroomSendImageMsgNotification";
@@ -470,6 +472,20 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 #pragma mark - Private methods
+
+- (void)presentAlertController:(NSString *)message {
+    [MyTool presentAlertController:message inViewController:self];
+}
+
+- (void)openCamera {
+    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
+    PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
+    cameraVC.delegate = self;
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    cameraVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
+}
+
 - (void)tapChatInputView {
     if (self.chatInputView) {
         [self.chatInputView tapAction];
@@ -1016,12 +1032,29 @@ PLVSocketChatRoomObject *createTeacherAnswerObject() {
 }
 
 - (void)shoot:(PLVTextInputView *)inputView {
-    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
-    PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
-    cameraVC.delegate = self;
-    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    cameraVC.modalPresentationStyle = UIModalPresentationFullScreen;
-    [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
+    __weak typeof(self) weakSelf = self;
+    PLVAuthorizationStatus status = [PLVAuthorizationManager authorizationStatusWithType:PLVAuthorizationTypeMediaVideo];
+    switch (status) {
+        case PLVAuthorizationStatusAuthorized: {
+            [weakSelf openCamera];
+        } break;
+        case PLVAuthorizationStatusDenied:
+        case PLVAuthorizationStatusRestricted:
+        {
+            [weakSelf performSelector:@selector(presentAlertController:) withObject:@"你没开通访问相机的权限，如要开通，请移步到:设置->隐私->相机 开启" afterDelay:0.1];
+        } break;
+        case PLVAuthorizationStatusNotDetermined: {
+            [PLVAuthorizationManager requestAuthorizationWithType:PLVAuthorizationTypeMediaVideo completion:^(BOOL granted) {
+                if (granted) {
+                    [weakSelf openCamera];
+                }else {
+                    [weakSelf performSelector:@selector(presentAlertController:) withObject:@"你没开通访问相机的权限，如要开通，请移步到:设置->隐私->相机 开启" afterDelay:0.1];
+                }
+            }];
+        } break;
+        default:
+            break;
+    }
 }
 
 - (void)readBulletin:(PLVTextInputView *)inputView{

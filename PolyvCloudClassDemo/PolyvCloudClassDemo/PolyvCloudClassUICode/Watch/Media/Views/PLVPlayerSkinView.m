@@ -329,8 +329,12 @@ typedef NS_ENUM(NSInteger, PLVPlayerSkinViewPanType) {
     messageLabel.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.65];
     messageLabel.clipsToBounds = YES;
     messageLabel.layer.cornerRadius = 16.0;
+    messageLabel.minimumScaleFactor = 0.6;
+    messageLabel.adjustsFontSizeToFitWidth = YES;
     UIEdgeInsets messageMargin = UIEdgeInsetsMake(-1.0, 10.0, 44.0, -1.0);
-    CGSize size = [messageLabel sizeThatFits:CGSizeMake(1000.0, 32.0)];
+    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 10 * 2 - 32.0;
+    CGSize size = [messageLabel sizeThatFits:CGSizeMake(maxWidth, 32.0)];
+    size.width = size.width > maxWidth ? maxWidth : size.width;
     [self remakeConstraints:messageLabel margin:messageMargin size:CGSizeMake(size.width + 32.0, 32.0) baseView:self.superview];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [messageLabel removeFromSuperview];

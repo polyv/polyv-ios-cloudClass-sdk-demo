@@ -12,6 +12,7 @@
 #import <PolyvCloudClassSDK/PLVLiveVideoConfig.h>
 #import <PolyvCloudClassSDK/PLVVideoMarquee.h>
 #import <PolyvCloudClassSDK/PLVLiveVideoAPI.h>
+#import <PolyvFoundationSDK/PolyvFoundationSDK.h>
 
 #define CloudClassBaseMediaErrorDomain @"net.polyv.cloudClassBaseMediaError"
 
@@ -359,11 +360,22 @@
 }
 
 - (void)playerController:(PLVPlayerController *)playerController showMessage:(NSString *)message {
+    NSString * errorCode;
+    NSString * errorMsg;
+    if ([playerController isKindOfClass:[PLVLivePlayerController class]]) {
+        NSDictionary * restrictInfo = ((PLVLivePlayerController *)playerController).channel.restrictInfo;
+        errorCode = restrictInfo[@"errorCode"];
+        errorMsg = restrictInfo[@"errorMsg"];
+    }
+    errorCode = [PLVFdUtil checkStringUseable:errorCode] ? [NSString stringWithFormat:@" %@",errorCode] : @"";
+    errorMsg = [PLVFdUtil checkStringUseable:errorMsg] ? [NSString stringWithFormat:@" %@",errorMsg] : @"";
+
+    /// 可通过判断message具体内容，或errorCode的具体内容，来选择某种类型的报错是否显示
     if (self.skinView.type == PLVPlayerSkinViewTypeNormalLive || self.skinView.type == PLVPlayerSkinViewTypeNormalVod) {
-        [self.skinView showMessage:message];
+        [self.skinView showMessage:[NSString stringWithFormat:@"%@%@%@",message,errorCode,errorMsg]];
     }else{
         if (![message isEqualToString:@"当前频道还未开播"]) {
-            [self.skinView showMessage:message];
+            [self.skinView showMessage:[NSString stringWithFormat:@"%@%@%@",message,errorCode,errorMsg]];
         }
     }
 }
@@ -459,7 +471,7 @@
         } break;
         case PLVLiveMarqueeTypeURL: {
             if (channel.marquee) {
-                [PLVLiveVideoAPI loadCustomMarquee:[NSURL URLWithString:channel.marquee] withChannelId:channel.channelId.unsignedIntegerValue userId:channel.userId completion:^(BOOL valid, NSDictionary *marqueeDict) {
+                [PLVLiveVideoAPI loadCustomMarquee:[NSURL URLWithString:channel.marquee] withChannelId:channel.channelId.unsignedIntegerValue userId:channel.userId code:@"" completion:^(BOOL valid, NSDictionary *marqueeDict) {
                     if (valid) {
                         completion([PLVMarqueeModel marqueeModelWithMarqueeDict:marqueeDict], nil);
                     } else {

@@ -309,8 +309,10 @@ static NSString *TitleCellIdentifier = @"PageTitleCell";
 -(void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     if (completed) {
         NSUInteger index = [self indexOfViewController:previousViewControllers.firstObject];
-        [self deselectTitle:index];
-        [self selectedTitle:self.nextIndex];
+        if (index != self.nextIndex) {
+            [self deselectTitle:index];
+            [self selectedTitle:self.nextIndex];
+        }
     }
 }
 

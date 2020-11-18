@@ -110,6 +110,10 @@
 #pragma mark - private
 - (void)loadPPT {
     self.pptVC = [[PLVPPTViewController alloc] init];
+    // 此处定义需要设置的PPT占位图、宽度和背景色
+//    self.pptVC.pptBackgroundImgUrl = @"";
+//    self.pptVC.pptBackgroundImgWidth = @"100px";
+//    self.pptVC.pptBackgroundColor = @"rgba(0,0,0,0)";
     self.pptVC.delegate = self;
     self.pptVC.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     UIView *displayView = self.pptOnSecondaryView ? self.secondaryView : self.mainView;

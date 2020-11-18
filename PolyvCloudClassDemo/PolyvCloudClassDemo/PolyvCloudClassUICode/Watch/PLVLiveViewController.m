@@ -546,6 +546,7 @@
 //    NSLog(@"%@--type:%lu, event:%@", NSStringFromSelector(_cmd), (unsigned long)chatObject.eventType, chatObject.event);
     switch (chatObject.eventType) {
         case PLVSocketChatRoomEventType_RELOGIN: {
+            [self.mediaVC clearResource];
             __weak typeof(self) weakSelf = self;
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"当前账号已在其他地方登录，您将被退出观看" message:nil preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

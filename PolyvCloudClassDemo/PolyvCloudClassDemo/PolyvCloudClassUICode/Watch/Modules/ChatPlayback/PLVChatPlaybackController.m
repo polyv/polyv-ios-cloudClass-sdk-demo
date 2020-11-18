@@ -16,6 +16,8 @@
 #import "ZPickerController.h"
 #import "PLVCameraViewController.h"
 #import "PLVChatPlaybackModel.h"
+#import "MyTool.h"
+#import <PolyvFoundationSDK/PLVAuthorizationManager.h>
 
 @interface PLVChatPlaybackController () <PLVTextInputViewDelegate,PLVCameraViewControllerDelegate, ZPickerControllerDelegate>
 
@@ -124,6 +126,19 @@
     }
 }
 
+- (void)presentAlertController:(NSString *)message {
+    [MyTool presentAlertController:message inViewController:self];
+}
+
+- (void)openCamera {
+    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
+    PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
+    cameraVC.delegate = self;
+    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
+    cameraVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
+}
+
 #pragma mark - <PLVTextInputViewDelegate>
 
 - (void)textInputView:(PLVTextInputView *)inputView followKeyboardAnimation:(BOOL)flag {
@@ -153,11 +168,29 @@
 }
 
 - (void)shoot:(PLVTextInputView *)inputView {
-    [PLVLiveVideoConfig sharedInstance].unableRotate = YES;
-    PLVCameraViewController *cameraVC = [[PLVCameraViewController alloc] init];
-    cameraVC.delegate = self;
-    [PCCUtils deviceOnInterfaceOrientationMaskPortrait];
-    [(UIViewController *)self.delegate presentViewController:cameraVC animated:YES completion:nil];
+    __weak typeof(self) weakSelf = self;
+    PLVAuthorizationStatus status = [PLVAuthorizationManager authorizationStatusWithType:PLVAuthorizationTypeMediaVideo];
+    switch (status) {
+        case PLVAuthorizationStatusAuthorized: {
+            [weakSelf openCamera];
+        } break;
+        case PLVAuthorizationStatusDenied:
+        case PLVAuthorizationStatusRestricted:
+        {
+            [weakSelf performSelector:@selector(presentAlertController:) withObject:@"你没开通访问相机的权限，如要开通，请移步到:设置->隐私->相机 开启" afterDelay:0.1];
+        } break;
+        case PLVAuthorizationStatusNotDetermined: {
+            [PLVAuthorizationManager requestAuthorizationWithType:PLVAuthorizationTypeMediaVideo completion:^(BOOL granted) {
+                if (granted) {
+                    [weakSelf openCamera];
+                }else {
+                    [weakSelf performSelector:@selector(presentAlertController:) withObject:@"你没开通访问相机的权限，如要开通，请移步到:设置->隐私->相机 开启" afterDelay:0.1];
+                }
+            }];
+        } break;
+        default:
+            break;
+    }
 }
 
 #pragma mark - <PLVCameraViewControllerDelegate>

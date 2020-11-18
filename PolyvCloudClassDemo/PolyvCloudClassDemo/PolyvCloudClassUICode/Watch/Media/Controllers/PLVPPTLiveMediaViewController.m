@@ -52,7 +52,10 @@
             [self switchAction:NO];
         }
         
-        ((PLVLivePlayerController *)self.player).cameraClosed = YES;
+        if (((PLVLivePlayerController *)self.player).playing) {
+            //若正在直播中，收到则关闭；若不在直播中，则等待上课时的最新摄像头字段
+            ((PLVLivePlayerController *)self.player).cameraClosed = YES;
+        }
         if (!self.pptOnSecondaryView && !self.secondaryView.hidden) {//而iOS端，副屏为视频且已经打开，则自动关闭副屏
             [self closeSecondaryView:self.skinView];
         }
