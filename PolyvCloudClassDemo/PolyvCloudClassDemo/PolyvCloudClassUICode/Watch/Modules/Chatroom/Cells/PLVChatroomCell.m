@@ -478,7 +478,7 @@ UITextViewDelegate
         self.imgView.layer.cornerRadius = 5.0;
         self.imgView.layer.masksToBounds = YES;
         self.imgView.userInteractionEnabled = YES;
-        [self addSubview:self.imgView];
+        [self.contentView addSubview:self.imgView];
         
         [self.imgView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.size.mas_equalTo(CGSizeMake(132.0, 132.0));
@@ -494,7 +494,7 @@ UITextViewDelegate
         self.activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         self.activityView.color = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
         [self addSubview:self.activityView];
-        [self.activityView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        [self.activityView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.equalTo(self.imgView.mas_centerX);
             make.centerY.equalTo(self.imgView.mas_centerY).offset(-12.0);
         }];
@@ -504,7 +504,7 @@ UITextViewDelegate
         self.progressLabel.font = [UIFont systemFontOfSize:12.0];
         self.progressLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.progressLabel];
-        [self.progressLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+        [self.progressLabel mas_makeConstraints:^(MASConstraintMaker *make) {
             make.size.mas_equalTo(CGSizeMake(self.imgView.frame.size.width, 24.0));
             make.centerX.equalTo(self.imgView.mas_centerX);
             make.centerY.equalTo(self.imgView.mas_centerY).offset(12.0);
@@ -572,22 +572,24 @@ UITextViewDelegate
 }
 
 - (void)uploadProgress:(CGFloat)progress {
-    if (progress < 0.0) {
-        self.loadingBgView.hidden = NO;
-        [self.activityView stopAnimating];
-        self.progressLabel.hidden = YES;
-    } else if (progress == 1.0) {
-        self.refreshBtn.hidden = YES;
-        self.loadingBgView.hidden = YES;
-        [self.activityView stopAnimating];
-        self.progressLabel.hidden = YES;
-        self.progressLabel.text = [NSString stringWithFormat:@"%0.2f%%", progress * 100.0];
-    } else {
-        self.loadingBgView.hidden = NO;
-        [self.activityView startAnimating];
-        self.progressLabel.hidden = NO;
-        self.progressLabel.text = [NSString stringWithFormat:@"%0.2f%%", progress * 100.0];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (progress < 0.0) {
+            self.loadingBgView.hidden = NO;
+            [self.activityView stopAnimating];
+            self.progressLabel.hidden = YES;
+        } else if (progress == 1.0) {
+            self.refreshBtn.hidden = YES;
+            self.loadingBgView.hidden = YES;
+            [self.activityView stopAnimating];
+            self.progressLabel.hidden = YES;
+            self.progressLabel.text = [NSString stringWithFormat:@"%0.2f%%", progress * 100.0];
+        } else {
+            self.loadingBgView.hidden = NO;
+            [self.activityView startAnimating];
+            self.progressLabel.hidden = NO;
+            self.progressLabel.text = [NSString stringWithFormat:@"%0.2f%%", progress * 100.0];
+        }
+    });
 }
 
 - (void)checkFail:(BOOL)fail {
@@ -609,6 +611,48 @@ UITextViewDelegate
     self.refreshBtn.enabled = NO;
     if (self.delegate && [self.delegate respondsToSelector:@selector(refreshUpload:)]) {
         [self.delegate refreshUpload:self];
+    }
+}
+
+- (void)setImgUrl:(NSString *)imgUrl {
+    _imgUrl = imgUrl;
+    if (!imgUrl) return;
+    
+    __weak typeof(self)weakSelf = self;
+    if (CGSizeEqualToSize(self.imageViewSize, CGSizeZero)) { // 兼容无 size 数据
+        [_imgView sd_setImageWithURL:[NSURL URLWithString:imgUrl] placeholderImage:nil options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            if (error) {
+                [weakSelf uploadProgress:-1.0];
+            }else {
+                if (image.size.width > 132 || image.size.height > 132) {
+                    weakSelf.imgView.contentMode = UIViewContentModeScaleAspectFit;
+                }else {
+                    weakSelf.imgView.contentMode = UIViewContentModeCenter;
+                }
+            }
+        }];
+    } else { // 有 size 数据
+        self.imgView.contentMode = UIViewContentModeScaleAspectFill;
+        [self.imgView mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.size.mas_equalTo(self.imageViewSize);
+            make.top.equalTo(self.mas_top).offset(10.0);
+            make.trailing.equalTo(self.mas_trailing).offset(-10.0);
+        }];
+        [self.progressLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.size.mas_equalTo(CGSizeMake(self.imageViewSize.width, 24.0));
+            make.centerX.equalTo(self.imgView.mas_centerX);
+            make.centerY.equalTo(self.imgView.mas_centerY).offset(12.0);
+        }];
+        [_imgView sd_setImageWithURL:[NSURL URLWithString:imgUrl] placeholderImage:nil options:SDWebImageRetryFailed progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+            CGFloat progress = (CGFloat)receivedSize/expectedSize;
+            [weakSelf uploadProgress:progress];
+        } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            if (error) {
+                [weakSelf uploadProgress:-1.0];
+            } else {
+                [weakSelf uploadProgress:1.0];
+            }
+        }];
     }
 }
 
@@ -663,7 +707,7 @@ UITextViewDelegate
         self.imgView.layer.cornerRadius = 5.0;
         self.imgView.layer.masksToBounds = YES;
         self.imgView.userInteractionEnabled = YES;
-        [self addSubview:self.imgView];
+        [self.contentView addSubview:self.imgView];
         
         self.activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         [self.imgView addSubview:self.activityView];

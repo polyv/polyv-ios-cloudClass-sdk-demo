@@ -27,7 +27,6 @@
 @synthesize secondaryView;
 @synthesize originSecondaryFrame;
 @synthesize pptOnSecondaryView;
-@synthesize pptFlag;
 @synthesize vodList;
 
 #pragma mark - life cycle

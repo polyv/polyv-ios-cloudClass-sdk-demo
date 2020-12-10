@@ -171,14 +171,27 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             }
         } break;
         case PLVSocketChatRoomEventType_CHAT_IMG: {
-            if (object.isLocalMessage) {
+            // 初始化历史图片消息
+            if ([object.jsonDict[@"user"][@"userId"] isEqualToString:
+                 [PLVChatroomManager sharedManager].socketUser.userId]) {
+                model.localMessageModel = YES;
+                model.type = PLVChatroomModelTypeImageSend;
+                NSDictionary *content = [object.jsonDict[@"values"] firstObject];
+                NSDictionary *imgSize = content[@"size"];
+                model.imgUrl = content[@"uploadImgUrl"];
+                [model calculateImageViewSizeWithImageSize:CGSizeMake([imgSize[@"width"] floatValue], [imgSize[@"height"] floatValue])];
+                if ([model.imgUrl hasPrefix:@"http:"]) {
+                    model.imgUrl = [model.imgUrl stringByReplacingOccurrencesOfString:@"http:" withString:@"https:"];
+                }
+            } else if (model.localMessageModel) {
+                // 自己刚发送的图片消息
                 model.type = PLVChatroomModelTypeImageSend;
                 model.uploadProgress = 0.0;
                 NSArray *values = object.jsonDict[@"values"];
                 model.imgId = values[0];
                 model.image = values[1];
                 [model calculateImageViewSizeWithImageSize:model.image.size];
-            }else {
+            } else {
                 model.type = PLVChatroomModelTypeImageReceived;
                 model.msgId = object.jsonDict[@"id"];
                 NSDictionary *content = [object.jsonDict[@"values"] firstObject];
@@ -283,8 +296,12 @@ NSString *PLVNameStringWithChatroomModelType(PLVChatroomModelType type) {
             if (!CGSizeEqualToSize(self.imageViewSize, CGSizeZero)) {
                 [(PLVChatroomImageSendCell *)cell setImageViewSize:self.imageViewSize];
             }
-            [(PLVChatroomImageSendCell *)cell setImage:self.image];
-            [(PLVChatroomImageSendCell *)cell uploadProgress:self.uploadFail ? -1.0 : self.uploadProgress];
+            if (!self.imgUrl) {
+                [(PLVChatroomImageSendCell *)cell uploadProgress:self.uploadFail ? -1.0 : self.uploadProgress];
+                [(PLVChatroomImageSendCell *)cell setImage:self.image];
+            } else {
+                [(PLVChatroomImageSendCell *)cell setImgUrl:self.imgUrl];
+            }
             ((PLVChatroomImageSendCell *)cell).refreshBtn.hidden = !self.uploadFail;
             ((PLVChatroomImageSendCell *)cell).refreshBtn.enabled = YES;
             [(PLVChatroomImageSendCell *)cell checkFail:self.checkFail];

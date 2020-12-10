@@ -128,7 +128,8 @@ typedef NS_ENUM(NSInteger, PLVChatroomCellType) {
 @property (nonatomic, assign) CGSize imageViewSize;
 /// 刷新按钮
 @property (nonatomic, strong) UIButton *refreshBtn;
-
+/// 图片URL
+@property (nonatomic, strong) NSString *imgUrl;
 /// 更新上传进度
 - (void)uploadProgress:(CGFloat)progress;
 

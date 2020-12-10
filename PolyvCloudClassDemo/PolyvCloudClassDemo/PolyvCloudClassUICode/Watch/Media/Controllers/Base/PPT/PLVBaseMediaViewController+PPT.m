@@ -72,9 +72,6 @@
         [self.mainView insertSubview:self.pptVC.view atIndex:0];
         self.pptVC.view.frame = self.mainView.bounds;
     } else {
-        if (manualControl) {
-            self.pptFlag = manualControl;
-        }
         [self.mainView insertSubview:self.player.playerView atIndex:0];
         [self.player setFrame:self.mainView.bounds];
         [self.secondaryView insertSubview:self.pptVC.view atIndex:0];
@@ -166,11 +163,6 @@
         [self.moreView modifyModeBtnSelected:((PLVLivePlayerController*)self.player).audioMode];
     }
     
-    if (self.pptOnSecondaryView && !self.player.playingAD && !self.pptFlag) {//自动切换主屏为PPT，副屏为视频
-        self.pptFlag = YES;
-        [self switchAction:NO];
-    }
-
     if (![self cameraClosed] && !self.player.playingAD && !self.pptOnSecondaryView && self.secondaryView.hidden) {
         [self openSecondaryView];//推流端打开了摄像头，而iOS端，正在播放直播（非广告），副屏为视频且已经关闭，则自动打开副屏
     }

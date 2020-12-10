@@ -20,8 +20,6 @@
 @property (nonatomic, assign) CGRect originSecondaryFrame;
 /// PPT是否在副屏
 @property (nonatomic, assign) BOOL pptOnSecondaryView;
-/// PPT主副屏自动切换标志位
-@property (nonatomic, assign) BOOL pptFlag;
 
 @optional
 /// 加载副屏
