@@ -496,4 +496,44 @@
     [self loadVideoMarqueeView:self.videoMarquee.marqueeModel];
 }
 
+#pragma mark - 播放器LOGO
+- (void)setupPlayerLogoImage:(PLVLiveVideoChannel *)channel {
+    if (channel.logoImageUrl && channel.logoImageUrl.length) {
+        PLVPlayerLogoParam *polyvLogoParam = [[PLVPlayerLogoParam alloc] init];
+        polyvLogoParam.logoUrl = channel.logoImageUrl;
+        polyvLogoParam.position = channel.logoPosition;
+        polyvLogoParam.logoAlpha = channel.logoOpacity;
+        polyvLogoParam.logoWidthScale = 0.2;
+        polyvLogoParam.logoHeightScale = 0.2;
+
+        PLVPlayerLogo *playerLogo = [[PLVPlayerLogo alloc] init];
+        [playerLogo insertLogoWithParam:polyvLogoParam];
+        [self addPlayerLogo:playerLogo];
+    }
+}
+
+- (void)addPlayerLogo:(PLVPlayerLogo *)logo {
+    self.logoView = logo;
+    if (self.mainView) {
+        [self.logoView addAtView:self.mainView];
+    }
+}
+
+#pragma mark - getter
+- (UIButton *)replayButton {
+    if (!_replayButton) {
+        _replayButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_replayButton setTitle:@"重试" forState:UIControlStateNormal];
+        [_replayButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        _replayButton.titleLabel.font = [UIFont fontWithName:@"PingFang SC" size:14];
+        _replayButton.backgroundColor = [UIColor blackColor];
+        _replayButton.alpha = 0.5;
+        _replayButton.layer.cornerRadius = 15;
+        _replayButton.layer.masksToBounds = YES;
+        _replayButton.layer.borderColor = [UIColor whiteColor].CGColor;
+        _replayButton.layer.borderWidth = 1.0;
+    }
+    return _replayButton;
+}
+
 @end

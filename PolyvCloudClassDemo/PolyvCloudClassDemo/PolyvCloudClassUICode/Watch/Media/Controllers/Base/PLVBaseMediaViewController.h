@@ -11,6 +11,7 @@
 #import "PLVPlayerSkinView.h"
 #import "PLVPlayerSkinMoreView.h"
 #import "PLVPlayerSkinAudioModeView.h"
+#import "PLVPlayerLogo.h"
 
 #define GrayBackgroundColor [UIColor colorWithRed:246.0 / 255.0 green:249.0 / 255.0 blue:250.0 / 255.0 alpha:1.0]
 #define BlueBackgroundColor [UIColor colorWithRed:215.0 / 255.0 green:242.0 / 255.0 blue:254.0 / 255.0 alpha:1.0]
@@ -45,6 +46,17 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 /// 登录用户名类型跑马灯显示内容
 @property (nonatomic, strong) NSString *nickName;
 
+@property (nonatomic, strong) PLVPlayerLogo *logoView;
+
+/// 是否处于网络错误导致的播放中断状态
+@property (nonatomic, assign) BOOL networkErrorStatus;
+/// 网络错误时的重试视图，只在直播回放中使用
+@property (nonatomic, strong) UIView *networkErrorView;
+
+@property (nonatomic, strong) UIButton *replayButton;
+/// 记住网络错误时的播放进度，网络恢复后从该进度继续播放
+@property (nonatomic, assign) NSTimeInterval timeOfInterruption;
+ 
 /**
  *  是否启用弹幕模块，默认由后台参数决定，若需由App决定，则直接覆盖此值即可
  *  默认逻辑为：
@@ -115,6 +127,9 @@ typedef NS_ENUM(NSInteger, PLVBaseMediaErrorCode) {
 
 /// 设置跑马灯
 - (void)setupMarquee:(PLVLiveVideoChannel *)channel customNick:(NSString *)customNick;
+
+/// 设置播放器LOGO
+- (void)setupPlayerLogoImage:(PLVLiveVideoChannel *)channel;
 
 /// PLVBaseMediaViewController+PPT.m里loadPPT会回调这个函数
 - (void)loadPPTEnd;

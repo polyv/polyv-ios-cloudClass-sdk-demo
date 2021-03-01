@@ -252,6 +252,7 @@
 - (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
     self.enableDanmuModule = !channel.closeDanmuEnable;
     [self setupMarquee:channel customNick:self.nickName];
+    [self setupPlayerLogoImage:channel];
 }
 
 @end

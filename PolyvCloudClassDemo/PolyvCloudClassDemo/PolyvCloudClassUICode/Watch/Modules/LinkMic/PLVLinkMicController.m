@@ -414,15 +414,52 @@
     self.linkMicBtn.enabled = NO;
     [self createLinkMicManager];
     
-    int code = [self.linkMicManager joinRtcChannelWithChannelId:@(self.login.roomId).stringValue userLinkMicId:self.login.linkMicId];
-    if (code == 0) {
-        self.linkMicStatus = PLVLinkMicStatusJoining;
-        [PLVLiveVideoAPI requestViewerIdLinkMicIdRelate:[NSString stringWithFormat:@"%lu",self.login.roomId] viewerId:self.login.userId linkMicId:self.login.linkMicId completion:nil failure:^(NSError * _Nonnull error) {
-            NSLog(@"PLVLinkMicController - id relate failed %@",error);
+    if (_linkMicManager) {
+        PLVLinkMicGetTokenModel *getTokenModel = [[PLVLinkMicGetTokenModel alloc]init];
+        getTokenModel.channelId = [NSString stringWithFormat:@"%zd", self.login.roomId];
+        getTokenModel.userId = self.login.linkMicId;
+        getTokenModel.viewerId = self.login.userId;
+        getTokenModel.nickname = self.login.nickName;
+        getTokenModel.sessionId = self.sessionId;
+        
+        if (self.linkMicType == PLVLinkMicTypeLive || self.linkMicType == PLVLinkMicTypeNormalLive) {
+            getTokenModel.scene = @"alone";
+        } else if (self.linkMicType == PLVLinkMicTypeCloudClass) {
+            getTokenModel.scene = @"ppt";
+        }
+        
+        switch (self.login.userType) {
+            case PLVSocketObjectUserTypeStudent:
+            case PLVSocketObjectUserTypeSlice: {
+                getTokenModel.userType = @"audience";
+                break;
+            }
+            case PLVSocketObjectUserTypeTeacher:{
+                getTokenModel.userType = @"teacher";
+                break;
+            }
+            default:
+                break;
+        }
+        
+        __weak typeof(self) weakSelf = self;
+        [self.linkMicManager updateLinkMicTokenWith:getTokenModel completion:^(BOOL updateResult) {
+            if (updateResult) {
+                int code = [weakSelf.linkMicManager joinRtcChannelWithChannelId:@(weakSelf.login.roomId).stringValue userLinkMicId:weakSelf.login.linkMicId];
+                if (code == 0) {
+                    weakSelf.linkMicStatus = PLVLinkMicStatusJoining;
+                    [PLVLiveVideoAPI requestViewerIdLinkMicIdRelate:[NSString stringWithFormat:@"%lu", (unsigned long)weakSelf.login.roomId] viewerId:weakSelf.login.userId linkMicId:weakSelf.login.linkMicId completion:nil failure:^(NSError *_Nonnull error) {
+                        NSLog(@"PLVLinkMicController - id relate failed %@", error);
+                    }];
+                } else {
+                    weakSelf.linkMicBtn.enabled = YES;
+                    [weakSelf toastTitle:@"连麦提示：加入失败！" detail:[NSString stringWithFormat:@"Join channel failed: %d", code]];
+                }
+            } else {
+                weakSelf.linkMicBtn.enabled = YES;
+                [weakSelf toastTitle:@"连麦提示：加入失败！" detail:[NSString stringWithFormat:@"Join channel failed, get token error"]];
+            }
         }];
-    }else{
-        self.linkMicBtn.enabled = YES;
-        [self toastTitle:@"连麦提示：加入失败！" detail:[NSString stringWithFormat:@"Join channel failed: %d", code]];
     }
 }
 
@@ -976,8 +1013,6 @@
 
 - (void)resetUIAfterLeftRTCChannel {
     self.token = @"";
-    [self.linkMicViewDic removeAllObjects];
-    [self.linkMicViewArray removeAllObjects];
     
     for (PLVLinkMicView *view in self.scrollView.subviews) {
         [view removeFromSuperview];
@@ -997,6 +1032,8 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(cancelLinkMic:)]) {
         [self.delegate cancelLinkMic:self];
     }
+    [self.linkMicViewDic removeAllObjects];
+    [self.linkMicViewArray removeAllObjects];
     [UIApplication sharedApplication].idleTimerDisabled = self.idleTimerDisabled;
 }
 

@@ -99,8 +99,8 @@
         [self.skinView linkMicStart:NO];
     } else {
         if (self.mainView.subviews.count > 1) {
-            UIView *videoView = self.mainView.subviews[self.mainView.subviews.count - 1];
-            [videoView removeFromSuperview];
+            PLVLinkMicView *linkMicView = [self.linkMicVC.linkMicViewArray objectAtIndex:0];
+            [linkMicView.mainView removeFromSuperview];
         }
 
         ((PLVLivePlayerController*)self.player).linkMic = NO;
@@ -182,6 +182,7 @@
 - (void)liveVideoChannelDidUpdate:(PLVLiveVideoChannel *)channel {
     self.enableDanmuModule = !channel.closeDanmuEnable;
     [self setupMarquee:channel customNick:self.nickName];
+    [self setupPlayerLogoImage:channel];
 }
 
 @end

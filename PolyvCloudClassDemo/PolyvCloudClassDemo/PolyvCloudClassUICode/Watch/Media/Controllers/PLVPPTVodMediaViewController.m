@@ -41,6 +41,7 @@
         __weak typeof(self)weakSelf = self;
         [PLVLivePlayerController loadLiveVideoChannelWithUserId:liveConfig.userId channelId:liveConfig.channelId.integerValue completion:^(PLVLiveVideoChannel *channel) {
             [weakSelf setupMarquee:channel customNick:self.nickName];
+            [weakSelf setupPlayerLogoImage:channel];
         } failure:^(NSError *error) {
             NSLog(@"直播频道信息加载失败：%@",error);
         }];
@@ -61,7 +62,8 @@
 }
 
 - (void)loadPlayer {
-    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId displayView:self.secondaryView delegate:self];
+    PLVLiveVideoConfig *liveConfig = [PLVLiveVideoConfig sharedInstance];
+    self.player = [[PLVVodPlayerController alloc] initWithChannelId:liveConfig.channelId vodId:self.vodId vodList:NO displayView:self.secondaryView delegate:self];
     [self.pptVC videoStart:self.vodId];
     self.pptVC.pptPlayable = YES;
 }
@@ -77,6 +79,10 @@
 
 - (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
     [self mainPlaybackIsPreparedToPlay:notification];
+    if (self.networkErrorStatus) {
+        [(PLVVodPlayerController *)self.player seek:self.timeOfInterruption];
+    }
+    self.networkErrorStatus = NO;
 }
 
 #pragma mark - PLVPlayerSkinViewDelegate

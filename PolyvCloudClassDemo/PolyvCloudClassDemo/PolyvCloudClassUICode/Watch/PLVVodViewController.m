@@ -14,6 +14,8 @@
 #import "PLVLiveInfoViewController.h"
 #import "PLVChatPlaybackController.h"
 #import "PCCUtils.h"
+#import "PLVReachabilityManager.h"
+#import <Masonry/Masonry.h>
 
 #define PPTPlayerViewScale (9.0 / 16.0)
 #define NormalPlayerViewScale (9.0 / 16.0)
@@ -29,12 +31,15 @@
 
 @property (nonatomic, strong) NSTimer *pollingTimer;
 
+@property (nonatomic, strong) UILabel *mobileInternetDataTipsLable;
+
 @end
 
 @implementation PLVVodViewController
 
 #pragma mark - life cycle
 - (void)dealloc {
+    [PLVReachabilityManager destoryWithTarget:self];
     NSLog(@"%s", __FUNCTION__);
 }
 
@@ -74,6 +79,11 @@
     self.mediaVC.player.pauseInBackground = YES; // 默认回后台暂停
     
     self.pollingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(playerPolling) userInfo:nil repeats:YES];
+    
+    /// 检查当前网络
+    [self checkCurrentNetworkStatus];
+    /// 监听当前网络类型
+    [PLVReachabilityManager listenNetWorkingStatusWithTarget:self selector:@selector(networkChanged:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -96,6 +106,13 @@
     //NSLog(@"观看时长：%ld，停留时长：%ld", self.mediaVC.player.watchDuration, self.mediaVC.player.stayDuration);
     if (self.chatPlaybackCtl) {
         [self.chatPlaybackCtl scrollToTime:self.mediaVC.player.currentPlaybackTime];
+    }
+}
+
+- (void)networkChanged:(NSNotification *)notification {
+    PLVReachability *reachability = (PLVReachability*)notification.object;
+    if ([reachability currentReachabilityStatus] == PLVReachableViaWWAN) {
+        [self showUseMobileInternetDataTips];
     }
 }
 
@@ -155,6 +172,27 @@
     self.liveInfoViewController.menu = descMenu;
     self.liveInfoViewController.vod = YES;
     self.liveInfoViewController.view.frame = self.chatroomFrame;
+}
+
+#pragma mark - Network
+- (void)checkCurrentNetworkStatus {
+    PLVNetworkStatus status = [PLVReachabilityManager currentReachabilityStatus];
+    if (status == PLVReachableViaWWAN) {
+        [self showUseMobileInternetDataTips];
+    }
+}
+
+- (void)showUseMobileInternetDataTips {
+    [self.mediaVC.view addSubview:self.mobileInternetDataTipsLable];
+    [self.mobileInternetDataTipsLable mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.center.mas_offset(0);
+        make.height.mas_equalTo(33);
+        make.width.mas_equalTo(220);
+    }];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.mobileInternetDataTipsLable removeFromSuperview];
+    });
 }
 
 #pragma mark - <PLVChatPlaybackControllerDelegate>
@@ -223,6 +261,25 @@
 
 - (void)player:(PLVPlayerController<PLVPlayerControllerProtocol> *)player loadMainPlayerFailure:(NSString *)message {
     [PCCUtils showHUDWithTitle:message detail:nil view:self.view];
+}
+
+#pragma mark - getter
+- (UILabel *)mobileInternetDataTipsLable {
+    if (!_mobileInternetDataTipsLable) {
+        _mobileInternetDataTipsLable = [[UILabel alloc]init];
+        _mobileInternetDataTipsLable.text = @"当前非Wi-Fi环境，请注意流量消耗";
+        [_mobileInternetDataTipsLable setTextColor:[UIColor whiteColor]];
+        _mobileInternetDataTipsLable.backgroundColor = [UIColor blackColor];
+        _mobileInternetDataTipsLable.font = [UIFont systemFontOfSize:12.0];
+        _mobileInternetDataTipsLable.alpha = 0.5;
+        _mobileInternetDataTipsLable.textAlignment = NSTextAlignmentCenter;
+        
+        _mobileInternetDataTipsLable.layer.cornerRadius = 18;
+        _mobileInternetDataTipsLable.layer.masksToBounds = YES;
+        _mobileInternetDataTipsLable.layer.borderColor = [UIColor blackColor].CGColor;
+        _mobileInternetDataTipsLable.layer.borderWidth = 1.0;
+    }
+    return _mobileInternetDataTipsLable;
 }
 
 @end

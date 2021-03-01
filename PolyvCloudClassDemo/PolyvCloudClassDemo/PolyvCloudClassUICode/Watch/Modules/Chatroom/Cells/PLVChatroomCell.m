@@ -159,7 +159,7 @@ UITextViewDelegate
         
         self.messageTextView = [[PLVChatTextView alloc] initWithMine:NO];
         self.messageTextView.delegate = self;
-        [self addSubview:self.messageTextView];
+        [self.contentView addSubview:self.messageTextView];
         
         [self.actorLB mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.avatarView.mas_top);

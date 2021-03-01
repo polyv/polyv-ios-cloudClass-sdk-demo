@@ -36,12 +36,13 @@
         __weak typeof(self)weakSelf = self;
         [PLVLivePlayerController loadLiveVideoChannelWithUserId:liveConfig.userId channelId:liveConfig.channelId.integerValue completion:^(PLVLiveVideoChannel *channel) {
             [weakSelf setupMarquee:channel customNick:self.nickName];
+            [weakSelf setupPlayerLogoImage:channel];
         } failure:^(NSError *error) {
             NSLog(@"直播频道信息加载失败：%@",error);
         }];
     }
     
-    self.player = [[PLVVodPlayerController alloc] initWithVodId:self.vodId vodList:self.vodList displayView:self.mainView delegate:self];
+    self.player = [[PLVVodPlayerController alloc] initWithChannelId:liveConfig.channelId vodId:self.vodId vodList:self.vodList displayView:self.mainView delegate:self];
 }
 
 #pragma mark - PLVBaseMediaViewController
@@ -72,6 +73,10 @@
 - (void)playerController:(PLVPlayerController *)playerController mainPlaybackIsPreparedToPlay:(NSNotification *)notification {
     self.skinView.controllView.hidden = NO;
     [self skinShowAnimaion];
+    if (self.networkErrorStatus) {
+        [(PLVVodPlayerController *)self.player seek:self.timeOfInterruption];
+    }
+    self.networkErrorStatus = NO;
 }
 
 - (void)changePlayerScreenBackgroundColor:(PLVPlayerController *)playerController {
