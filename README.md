@@ -1,7 +1,10 @@
+#### ❗️ 该项目已废弃不再维护，请移步至：[保利威多场景项目](https://github.com/polyv/polyv-ios-livescenes-sdk-demo)
+---
 # polyv-ios-cloudClass-sdk-demo
 
 [![build passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
-[![GitHub release](https://img.shields.io/badge/release-v0.13.1-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
+[![GitHub release](https://img.shields.io/badge/release-v0.16.3-blue.svg)](https://github.com/polyv/polyv-ios-cloudClass-sdk-demo)
+[![GitHub release](https://img.shields.io/badge/维护状态-废弃-red.svg)](https://github.com/polyv/polyv-ios-livescenes-sdk-demo)
 
 本项目从属于广州易方信息科技股份有限公司旗下的POLYV保利威视频云核心产品“云课堂”，是一款云课堂教学的示例 APP。该 demo 包含了视频教学直播、ppt 在线演示同步播放、教学连麦、在线聊天功能，以及直播回放功能。非常适合直播视频教学的应用场景。想要集成本项目提供的 SDK，需要在[保利威视频云平台](http://www.polyv.net/)注册账号，并开通相关服务。
 
